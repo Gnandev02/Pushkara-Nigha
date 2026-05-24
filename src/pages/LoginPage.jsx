@@ -12,19 +12,19 @@ const LoginPage = () => {
     const [rememberMe, setRememberMe] = useState(true);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    
+
     const navigate = useNavigate();
 
-    // Direct routing check: if already authenticated, auto-bypass login screen
+    // If already authenticated, skip login and go straight to dashboard
     useEffect(() => {
         const isAlreadyAuth = AuthService.isAuthenticated();
         if (isAlreadyAuth) {
-            console.log("LoginPage: Operator already validated. Auto-routing to /dashboard.");
-            navigate("/dashboard");
+            console.log("LoginPage: Valid session found. Auto-routing to /dashboard.");
+            navigate("/dashboard", { replace: true });
         }
     }, [navigate]);
 
-    // Preload credentials to simplify audits
+    // Preload credentials for demo/audit convenience
     useEffect(() => {
         setError('');
         if (role === 'admin') {
@@ -40,18 +40,19 @@ const LoginPage = () => {
         setError('');
         setIsLoading(true);
 
-        // Add 1.2s delay to simulate secure Government neural-ICCC handshake verification
+        // 1.2s delay to simulate secure Government neural-ICCC handshake verification
         setTimeout(() => {
             const response = AuthService.login(username, password, role);
 
             if (response.success) {
                 setIsLoading(false);
+
                 if (window.showSystemBanner) {
                     window.showSystemBanner(`Clearance verified. Welcome operator: ${response.user.fullName}`);
                 }
-                
-                // Redirect user to the secure dashboard path!
-                navigate("/dashboard");
+
+                // Redirect to the secure dashboard
+                navigate("/dashboard", { replace: true });
             } else {
                 setIsLoading(false);
                 setError(response.message);
@@ -62,9 +63,9 @@ const LoginPage = () => {
     return (
         <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
             <BackgroundHero />
-            
+
             <LoginLayout activeRole={role} onRoleChange={setRole}>
-                <LoginForm 
+                <LoginForm
                     username={username}
                     password={password}
                     rememberMe={rememberMe}

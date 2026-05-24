@@ -224,16 +224,32 @@ const Session = {
         });
 
         confirmBtn.addEventListener("click", () => {
+            // Clear legacy session
             this.clear();
+
+            // Also clear React SPA auth keys to keep both systems in sync
+            const reactKeys = [
+                "pushkara_is_auth",
+                "pushkara_username",
+                "pushkara_role",
+                "pushkara_fullname",
+                "pushkara_empid",
+                "pushkara_district"
+            ];
+            reactKeys.forEach(key => {
+                localStorage.removeItem(key);
+                sessionStorage.removeItem(key);
+            });
+
             overlay.remove();
-            
-            // Reload / Redirect to reload interface
+
             if (window.showSystemBanner) {
                 window.showSystemBanner("Neural security session terminated. Redirecting to login...");
             }
-            
+
+            // Redirect to /login instead of reloading to current URL (which might be /dashboard)
             setTimeout(() => {
-                window.location.reload();
+                window.location.href = "/login";
             }, 1000);
         });
     }

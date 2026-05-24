@@ -1,6 +1,7 @@
 /**
  * Pushkara Nigha - React SPA Authentication Service
  * Manages active operator credentials matches, session storage variables, and active states.
+ * Single source of truth for React Router auth state.
  */
 
 const AuthService = {
@@ -12,6 +13,9 @@ const AuthService = {
         EMPLOYEE_ID: "pushkara_empid",
         DISTRICT: "pushkara_district"
     },
+
+    // Legacy session key used by vanilla-JS session.js (for cross-compatibility)
+    LEGACY_SESSION_KEY: "pushkara_nigha_session",
 
     /**
      * Validate credentials based on selected role and register active states
@@ -78,19 +82,25 @@ const AuthService = {
     },
 
     /**
-     * Clear all session data on logout
+     * Clear all session data on logout — clears both React and legacy vanilla-JS session keys
      */
     logout() {
+        // Clear React SPA auth keys
         localStorage.removeItem(this.KEYS.IS_AUTH);
         localStorage.removeItem(this.KEYS.USERNAME);
         localStorage.removeItem(this.KEYS.ROLE);
         localStorage.removeItem(this.KEYS.FULL_NAME);
         localStorage.removeItem(this.KEYS.EMPLOYEE_ID);
         localStorage.removeItem(this.KEYS.DISTRICT);
+
+        // Also clear legacy vanilla-JS session so old protectRoute() doesn't resurrect it
+        localStorage.removeItem(this.LEGACY_SESSION_KEY);
+        sessionStorage.removeItem(this.LEGACY_SESSION_KEY);
     },
 
     /**
-     * Check if user session is active
+     * Check if user session is active.
+     * Checks the React auth key. Returns false if missing or not "true".
      * @returns {boolean}
      */
     isAuthenticated() {

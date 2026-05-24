@@ -10,9 +10,11 @@ const Dashboard = () => {
     const [section, setSection] = useState('overview'); // Default section
 
     useEffect(() => {
-        // 1. Check Authentication state
+        // 1. Verify authentication — ProtectedRoute already guards this,
+        //    but double-check for edge cases (e.g. localStorage cleared mid-session).
         if (!AuthService.isAuthenticated()) {
-            navigate("/login");
+            console.warn("Dashboard: Session expired or cleared. Redirecting to /login.");
+            navigate("/login", { replace: true });
             return;
         }
 
@@ -26,10 +28,11 @@ const Dashboard = () => {
             setSection('overview');
         }
 
-        // 3. Make dashboard DOM visible
+        // 3. Make the static dashboard DOM container visible.
+        //    We use setProperty to override the inline !important style.
         const appContainer = document.querySelector(".app-container");
         if (appContainer) {
-            appContainer.style.display = "flex";
+            appContainer.style.setProperty("display", "flex", "important");
         }
 
         const loginOverlay = document.getElementById("login-portal-overlay");
@@ -59,13 +62,20 @@ const Dashboard = () => {
                 window.lucide.createIcons();
             }
         }, 100);
+
+        // 5. Cleanup: hide app-container when unmounting (e.g. if navigating away)
+        return () => {
+            const appContainer = document.querySelector(".app-container");
+            if (appContainer) {
+                appContainer.style.setProperty("display", "none", "important");
+            }
+        };
     }, [navigate]);
 
-    // 5. Handle Tab Navigation Transitions inside existing DOM sections
+    // 6. Handle Tab Navigation Transitions inside existing DOM sections
     useEffect(() => {
         if (!section) return;
 
-        // Transition classes
         document.querySelectorAll(".dashboard-section").forEach(sec => {
             sec.classList.remove("active");
         });
@@ -77,33 +87,34 @@ const Dashboard = () => {
 
         console.log(`React Dashboard: Navigating to section #${section}`);
 
-        // Dispatch simulated loading toast alerts
         if (section !== 'overview' && window.showSystemBanner) {
             const pageTitle = section.charAt(0).toUpperCase() + section.slice(1);
             window.showSystemBanner(`Loading ${pageTitle} telemetry controls...`);
         }
     }, [section]);
 
-    // 6. Handle Security Terminate Session
+    // 7. Handle Security Terminate Session
     const handleLogout = () => {
         if (window.Session) {
+            // Use the futuristic confirmation dialog from vanilla-JS
             window.Session.confirmLogout();
         } else {
-            // Fallback clear & redirect
+            // Fallback: clear auth and redirect
             AuthService.logout();
-            navigate("/login");
+            navigate("/login", { replace: true });
         }
     };
 
-    if (!user) return null; // Wait for authentication check
+    // Wait for authentication check to complete before rendering
+    if (!user) return null;
 
     return (
         <React.Fragment>
             {/* Inject modular Sidebar */}
-            <Sidebar 
-                activeRole={user.role} 
-                currentSection={section} 
-                onNavigate={setSection} 
+            <Sidebar
+                activeRole={user.role}
+                currentSection={section}
+                onNavigate={setSection}
                 onLogout={handleLogout}
             />
 
