@@ -81,8 +81,10 @@ const Dashboard = () => {
             // 5a. Re-initialize core vanilla modules
             if (typeof window.initSidebar === 'function') window.initSidebar();
             if (typeof window.initApp === 'function') window.initApp();
+            if (typeof window.initMonitoringModule === 'function') window.initMonitoringModule();
             if (typeof window.initSurveillanceCommandCenter === 'function') window.initSurveillanceCommandCenter();
             if (typeof window.initOverviewDashboard === 'function') window.initOverviewDashboard();
+            if (typeof window.initDashboardModule === 'function') window.initDashboardModule();
             if (typeof window.initMap === 'function') window.initMap();
 
             // 5b. Apply role-based permission restrictions to sidebar items

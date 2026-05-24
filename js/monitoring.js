@@ -368,7 +368,7 @@ function initMonitoringModule() {
                 if (!inputField) return;
 
                 const parts = targetId.split("-");
-                const ghatId = parts[parts.length - 1];
+                const ghatId = parts.slice(2).join("-");
 
                 const capacity = parseInt(document.getElementById(`capacity-${ghatId}`).value) || 5000;
                 const inMen = parseInt(document.getElementById(`in-men-${ghatId}`).value) || 0;
@@ -1075,6 +1075,8 @@ function initMonitoringModule() {
         
         // Step 6: Recalculate Global Command statistics
         recalculateGlobalCommandCenterTelemetry();
+    }
+
     // Expose inner function
     window.initSurveillanceCommandCenter = initSurveillanceCommandCenter;
 
