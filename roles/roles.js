@@ -31,7 +31,8 @@ const Roles = {
 
             const targetSectionName = href.substring(1); // e.g. overview, usermanagement, settings
             
-            if (allowedSections.includes(targetSectionName)) {
+            // Allow the logout button to remain visible for all authenticated roles
+            if (anchor.id === 'sidebar-logout-btn' || allowedSections.includes(targetSectionName)) {
                 li.style.display = "block"; // Show permitted item
             } else {
                 li.style.display = "none";  // Block unauthorized option

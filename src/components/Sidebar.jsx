@@ -77,44 +77,16 @@ const Sidebar = ({ activeRole, currentSection, onNavigate, onLogout }) => {
                     </li>
                 )}
                 
-                {/* 5. AI Alerts (Admin Only) */}
-                {!isSupervisor && (
-                    <li>
-                        <a 
-                            href="#aialerts" 
-                            onClick={(e) => { e.preventDefault(); onNavigate('aialerts'); }}
-                            className={`sidebar-nav-item ${currentSection === 'aialerts' ? 'active' : ''}`}
-                        >
-                            <i data-lucide="cpu"></i>
-                            <span className="sidebar-collapsed-hide">AI Alerts</span>
-                        </a>
-                    </li>
-                )}
-                
-                {/* 6. Settings (Admin Only) */}
-                {!isSupervisor && (
-                    <li>
-                        <a 
-                            href="#settings" 
-                            onClick={(e) => { e.preventDefault(); onNavigate('settings'); }}
-                            className={`sidebar-nav-item ${currentSection === 'settings' ? 'active' : ''}`}
-                        >
-                            <i data-lucide="settings"></i>
-                            <span className="sidebar-collapsed-hide">Settings</span>
-                        </a>
-                    </li>
-                )}
-                
-                {/* 7. Bottom Terminate Logout trigger */}
-                <li style={{ marginTop: 'auto', borderTop: '1px solid var(--sidebar-border)', paddingTop: '8px' }}>
+                {/* 5. Bottom Terminate Logout trigger */}
+                <li className="sidebar-signout-spacer">
                     <a 
                         href="#" 
                         onClick={(e) => { e.preventDefault(); onLogout(); }}
-                        className="sidebar-nav-item text-red-500 hover:text-red-400"
-                        style={{ color: '#EF4444' }}
+                        className="sidebar-nav-item sidebar-signout-btn"
+                        id="sidebar-logout-btn"
                     >
                         <i data-lucide="log-out"></i>
-                        <span className="sidebar-collapsed-hide">Logout Session</span>
+                        <span className="sidebar-collapsed-hide">Sign Out</span>
                     </a>
                 </li>
             </ul>
