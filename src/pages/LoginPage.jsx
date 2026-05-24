@@ -5,6 +5,16 @@ import LoginLayout from '../components/LoginLayout.jsx';
 import LoginForm from '../components/LoginForm.jsx';
 import AuthService from '../auth/authService.js';
 
+/**
+ * LoginPage - Full-screen React login portal.
+ *
+ * This is the ONLY React component rendered when unauthenticated.
+ * On successful login it:
+ *   1. Sets the React auth session via AuthService (pushkara_is_auth, etc.)
+ *   2. Populates the legacy vanilla-JS session key (pushkara_nigha_session)
+ *      so Session.get() / Session.protectRoute() also sees the user
+ *   3. Navigates to /dashboard where Dashboard.jsx reveals the static app-container
+ */
 const LoginPage = () => {
     const [role, setRole] = useState('admin');
     const [username, setUsername] = useState('');
@@ -15,16 +25,15 @@ const LoginPage = () => {
 
     const navigate = useNavigate();
 
-    // If already authenticated, skip login and go straight to dashboard
+    // ── Auto-skip login if already authenticated ──────────────────────────────
     useEffect(() => {
-        const isAlreadyAuth = AuthService.isAuthenticated();
-        if (isAlreadyAuth) {
-            console.log("LoginPage: Valid session found. Auto-routing to /dashboard.");
-            navigate("/dashboard", { replace: true });
+        if (AuthService.isAuthenticated()) {
+            console.log('LoginPage: Valid session found. Auto-routing to /dashboard.');
+            navigate('/dashboard', { replace: true });
         }
     }, [navigate]);
 
-    // Preload credentials for demo/audit convenience
+    // ── Pre-fill credentials when role changes (demo convenience) ────────────
     useEffect(() => {
         setError('');
         if (role === 'admin') {
@@ -36,23 +45,46 @@ const LoginPage = () => {
         }
     }, [role]);
 
+    // ── Login submission handler ───────────────────────────────────────────────
     const handleLoginSubmit = () => {
         setError('');
         setIsLoading(true);
 
-        // 1.2s delay to simulate secure Government neural-ICCC handshake verification
+        // 1.2s simulated secure handshake (matches original design)
         setTimeout(() => {
             const response = AuthService.login(username, password, role);
 
             if (response.success) {
                 setIsLoading(false);
 
-                if (window.showSystemBanner) {
-                    window.showSystemBanner(`Clearance verified. Welcome operator: ${response.user.fullName}`);
+                const user = response.user;
+
+                // ── Sync the LEGACY vanilla-JS session key ──────────────────
+                // Session.js reads from "pushkara_nigha_session" in localStorage.
+                // We write it here so the static dashboard's Session.protectRoute()
+                // and Session.syncProfileUI() work without any changes to auth.js / session.js.
+                const legacySession = {
+                    username: user.username,
+                    fullName: user.fullName,
+                    role: user.role,
+                    employeeId: user.employeeId || 'ICCC-ADMIN-01',
+                    district: user.district || 'All Districts',
+                    loginTime: new Date().toISOString()
+                };
+
+                if (rememberMe) {
+                    localStorage.setItem('pushkara_nigha_session', JSON.stringify(legacySession));
+                } else {
+                    sessionStorage.setItem('pushkara_nigha_session', JSON.stringify(legacySession));
                 }
 
-                // Redirect to the secure dashboard
-                navigate("/dashboard", { replace: true });
+                // Show welcome banner if the vanilla banner system is ready
+                if (window.showSystemBanner) {
+                    window.showSystemBanner(`Clearance verified. Welcome operator: ${user.fullName}`);
+                }
+
+                // Navigate to protected dashboard — Dashboard.jsx handles the rest
+                navigate('/dashboard', { replace: true });
             } else {
                 setIsLoading(false);
                 setError(response.message);

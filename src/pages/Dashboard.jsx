@@ -1,128 +1,144 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../components/Sidebar.jsx';
-import Navbar from '../components/Navbar.jsx';
 import AuthService from '../auth/authService.js';
 
+/**
+ * Dashboard - React auth bridge for the original vanilla-JS static dashboard.
+ *
+ * This component DOES NOT render any new React UI.
+ * It acts purely as:
+ *   1. Auth guard (mirrors ProtectedRoute, extra safety net)
+ *   2. Orchestrator that reveals the existing .app-container DOM (original dashboard)
+ *   3. Session synchronizer — keeps vanilla Session & React AuthService in sync
+ *   4. Cleanup handler — hides .app-container when navigating away (e.g. logout)
+ *
+ * All actual dashboard UI (sidebar, navbar, monitoring, stats, etc.) is rendered
+ * by the original index.html static HTML + vanilla JS files (dashboard.js, sidebar.js, etc.)
+ */
 const Dashboard = () => {
     const navigate = useNavigate();
-    const [user, setUser] = useState(null);
-    const [section, setSection] = useState('overview'); // Default section
+    const isRevealedRef = useRef(false);
 
     useEffect(() => {
-        // 1. Verify authentication — ProtectedRoute already guards this,
-        //    but double-check for edge cases (e.g. localStorage cleared mid-session).
-        if (!AuthService.isAuthenticated()) {
-            console.warn("Dashboard: Session expired or cleared. Redirecting to /login.");
-            navigate("/login", { replace: true });
+        // ── 1. AUTH GUARD ──────────────────────────────────────────────────────
+        const currentUser = AuthService.getCurrentUser();
+        if (!AuthService.isAuthenticated() || !currentUser) {
+            console.warn('Dashboard: No valid session. Redirecting to /login.');
+            navigate('/login', { replace: true });
             return;
         }
 
-        const currentUser = AuthService.getCurrentUser();
-        setUser(currentUser);
-
-        // 2. Adjust fallback section based on role
-        if (currentUser.role === 'command-supervisor') {
-            setSection('monitoring'); // Supervisors have no access to Overview
-        } else {
-            setSection('overview');
+        // ── 2. SYNC VANILLA SESSION from React auth keys ───────────────────────
+        // The vanilla JS session.js reads from pushkara_nigha_session.
+        // If the user authenticated via the React login form (which only writes
+        // to pushkara_is_auth, pushkara_username, etc.) we must also populate the
+        // legacy key so that Session.get() and Session.protectRoute() work correctly.
+        const legacyKey = 'pushkara_nigha_session';
+        const existingLegacy = localStorage.getItem(legacyKey);
+        if (!existingLegacy) {
+            const legacySession = {
+                username: currentUser.username,
+                fullName: currentUser.fullName || 'Command Center Admin',
+                role: currentUser.role,
+                employeeId: currentUser.employeeId || 'ICCC-ADMIN-01',
+                district: currentUser.district || 'All Districts',
+                loginTime: new Date().toISOString()
+            };
+            localStorage.setItem(legacyKey, JSON.stringify(legacySession));
         }
 
-        // 3. Make the static dashboard DOM container visible.
-        //    We use setProperty to override the inline !important style.
-        const appContainer = document.querySelector(".app-container");
+        // ── 3. REVEAL ORIGINAL DASHBOARD ─────────────────────────────────────
+        const appContainer = document.getElementById('app-container');
         if (appContainer) {
-            appContainer.style.setProperty("display", "flex", "important");
+            appContainer.style.setProperty('display', 'flex', 'important');
+            isRevealedRef.current = true;
         }
 
-        const loginOverlay = document.getElementById("login-portal-overlay");
-        if (loginOverlay) {
-            loginOverlay.style.display = "none";
-        }
-
-        // 4. Initialize dynamic widgets once DOM elements are rendered
-        setTimeout(() => {
-            // Apply DOM-level permission checks
-            if (window.Roles) {
+        // ── 4. APPLY ROLE PERMISSIONS via vanilla Roles module ────────────────
+        // Small timeout ensures all vanilla scripts have had time to define window.Roles
+        const permissionsTimer = setTimeout(() => {
+            if (window.Roles && typeof window.Roles.applyPermissions === 'function') {
                 window.Roles.applyPermissions(currentUser.role);
             }
 
-            // Initialize shift management tables & stats clocks
+            // Sync profile pill in the static header with real user data
+            if (window.Session && typeof window.Session.syncProfileUI === 'function') {
+                const legacySession = JSON.parse(localStorage.getItem(legacyKey) || '{}');
+                if (legacySession.username) {
+                    window.Session.syncProfileUI(legacySession);
+                }
+            }
+
+            // Initialize Reporting and UserUI modules if present
             if (window.Reporting && typeof window.Reporting.init === 'function') {
                 window.Reporting.init();
             }
-
-            // Initialize supervisor administration tables
             if (window.UsersUI && typeof window.UsersUI.init === 'function') {
                 window.UsersUI.init();
             }
 
-            // Render Lucide icons
+            // Re-render Lucide icons that may have been added dynamically
             if (window.lucide) {
                 window.lucide.createIcons();
             }
-        }, 100);
 
-        // 5. Cleanup: hide app-container when unmounting (e.g. if navigating away)
+            // Navigate supervisors to the Monitoring section by default
+            if (currentUser.role === 'command-supervisor') {
+                const monitoringNav = document.querySelector(".sidebar-nav-item[href='#monitoring']");
+                if (monitoringNav) {
+                    monitoringNav.click();
+                }
+            } else {
+                // Admins land on Overview (which is active by default in index.html)
+                const overviewNav = document.querySelector(".sidebar-nav-item[href='#overview']");
+                if (overviewNav && !overviewNav.classList.contains('active')) {
+                    overviewNav.click();
+                }
+            }
+        }, 80);
+
+        // ── 5. LOGOUT BUTTON WIRING ───────────────────────────────────────────
+        // The static sidebar logout button (#sidebar-logout-btn) must trigger
+        // the futuristic HUD confirm dialog. Wire it now if Session is available.
+        const wireLogoutBtn = () => {
+            const logoutBtn = document.getElementById('sidebar-logout-btn');
+            if (logoutBtn && !logoutBtn.dataset.reactWired) {
+                logoutBtn.dataset.reactWired = 'true';
+                logoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (window.Session && typeof window.Session.confirmLogout === 'function') {
+                        window.Session.confirmLogout();
+                    } else {
+                        // Fallback: clear all auth and redirect
+                        AuthService.logout();
+                        localStorage.removeItem('pushkara_nigha_session');
+                        sessionStorage.removeItem('pushkara_nigha_session');
+                        navigate('/login', { replace: true });
+                    }
+                });
+            }
+        };
+
+        // Try immediately, and also after a short delay for slow script loads
+        wireLogoutBtn();
+        const logoutWireTimer = setTimeout(wireLogoutBtn, 300);
+
+        // ── 6. CLEANUP — hide dashboard when unmounting (logout/route change) ──
         return () => {
-            const appContainer = document.querySelector(".app-container");
-            if (appContainer) {
-                appContainer.style.setProperty("display", "none", "important");
+            clearTimeout(permissionsTimer);
+            clearTimeout(logoutWireTimer);
+            if (isRevealedRef.current) {
+                const appContainer = document.getElementById('app-container');
+                if (appContainer) {
+                    appContainer.style.setProperty('display', 'none', 'important');
+                }
+                isRevealedRef.current = false;
             }
         };
     }, [navigate]);
 
-    // 6. Handle Tab Navigation Transitions inside existing DOM sections
-    useEffect(() => {
-        if (!section) return;
-
-        document.querySelectorAll(".dashboard-section").forEach(sec => {
-            sec.classList.remove("active");
-        });
-
-        const targetSec = document.getElementById(`section-${section}`);
-        if (targetSec) {
-            targetSec.classList.add("active");
-        }
-
-        console.log(`React Dashboard: Navigating to section #${section}`);
-
-        if (section !== 'overview' && window.showSystemBanner) {
-            const pageTitle = section.charAt(0).toUpperCase() + section.slice(1);
-            window.showSystemBanner(`Loading ${pageTitle} telemetry controls...`);
-        }
-    }, [section]);
-
-    // 7. Handle Security Terminate Session
-    const handleLogout = () => {
-        if (window.Session) {
-            // Use the futuristic confirmation dialog from vanilla-JS
-            window.Session.confirmLogout();
-        } else {
-            // Fallback: clear auth and redirect
-            AuthService.logout();
-            navigate("/login", { replace: true });
-        }
-    };
-
-    // Wait for authentication check to complete before rendering
-    if (!user) return null;
-
-    return (
-        <React.Fragment>
-            {/* Inject modular Sidebar */}
-            <Sidebar
-                activeRole={user.role}
-                currentSection={section}
-                onNavigate={setSection}
-                onLogout={handleLogout}
-            />
-
-            {/* Injected Top Navbar within the existing App Main column */}
-            {/* The main column is handled by .app-main inside index.html */}
-            <Navbar user={user} onLogout={handleLogout} />
-        </React.Fragment>
-    );
+    // This component renders nothing — the entire dashboard UI comes from index.html
+    return null;
 };
 
 export default Dashboard;
