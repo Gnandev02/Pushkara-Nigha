@@ -80,6 +80,10 @@ function initSidebar() {
     navItems.forEach(item => {
         if (!item.dataset.wired) {
             item.dataset.wired = 'true';
+
+            // Skip wiring section navigation on the Sign Out button
+            if (item.id === 'sidebar-logout-btn') return;
+
             item.addEventListener("click", (e) => {
                 e.preventDefault();
                 
@@ -95,6 +99,23 @@ function initSidebar() {
             });
         }
     });
+
+    // ── Sign Out handler ──
+    const logoutBtn = document.getElementById("sidebar-logout-btn");
+    if (logoutBtn && !logoutBtn.dataset.logoutWired) {
+        logoutBtn.dataset.logoutWired = 'true';
+        logoutBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (window.Session && typeof window.Session.confirmLogout === "function") {
+                window.Session.confirmLogout();
+            } else {
+                // Fallback: clear all storage and redirect
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = "/login";
+            }
+        });
+    }
 
     function triggerSectionTransition(sectionName) {
         console.log(`Command Center navigating to sector view: ${sectionName}`);

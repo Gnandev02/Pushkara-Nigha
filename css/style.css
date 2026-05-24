@@ -466,6 +466,55 @@ button, input, select {
     display: flex; 
 }
 
+/* ── Sign Out Button ── */
+.sidebar-signout-spacer {
+    margin-top: auto !important;
+    padding-top: 12px;
+    border-top: 1px solid var(--sidebar-border);
+}
+
+.sidebar-signout-btn {
+    color: #F87171 !important;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: var(--radius-sm);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar-signout-btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(239, 68, 68, 0.04);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.sidebar-signout-btn:hover {
+    color: #FFFFFF !important;
+    background: rgba(239, 68, 68, 0.15) !important;
+    border-color: rgba(239, 68, 68, 0.45);
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.15), inset 0 0 8px rgba(239, 68, 68, 0.05);
+}
+
+.sidebar-signout-btn:hover::before {
+    opacity: 1;
+}
+
+.sidebar-signout-btn:active {
+    transform: scale(0.97);
+}
+
+.collapsed .sidebar-signout-btn {
+    justify-content: center;
+    border-color: transparent;
+}
+
+.collapsed .sidebar-signout-btn:hover {
+    border-color: rgba(239, 68, 68, 0.35);
+}
+
 
 .dashboard-content {
     padding: 16px 20px; 
