@@ -1,0 +1,33 @@
+{
+  "name": "neuralcrowd-ai-dashboard",
+  "version": "1.0.0",
+  "description": "Smart City Crowd Management & Artificial Intelligence Command Center Frontend",
+  "main": "index.html",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "command-center",
+    "smart-city",
+    "crowd-management",
+    "ai-surveillance",
+    "vanilla-js"
+  ],
+  "author": "Smart City Operations Team",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.11.2",
+    "framer-motion": "^10.12.16"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.7",
+    "@types/react-dom": "^18.2.4",
+    "@vitejs/plugin-react": "^4.0.0",
+    "vite": "^4.3.9"
+  }
+}

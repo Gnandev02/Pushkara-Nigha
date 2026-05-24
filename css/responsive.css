@@ -1,0 +1,168 @@
+
+
+
+@media (max-width: 1280px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+    
+    .right-sidebar-panel {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        gap: 32px;
+    }
+}
+
+
+@media (max-width: 1024px) {
+    :root {
+        --sidebar-width: 260px;
+    }
+    
+    
+    .app-sidebar {
+        transform: translateX(-100%);
+        transition: transform var(--transition-slow);
+        box-shadow: none;
+    }
+    
+    .app-sidebar.mobile-open {
+        transform: translateX(0);
+        box-shadow: 10px 0 30px rgba(15, 23, 42, 0.25);
+    }
+    
+    .app-main {
+        margin-left: 0 !important;
+    }
+    
+    .app-sidebar.collapsed + .app-main {
+        margin-left: 0 !important;
+    }
+    
+    
+    .mobile-menu-trigger {
+        display: flex !important;
+    }
+    
+    .app-header {
+        padding: 0 24px;
+    }
+    
+    .dashboard-content {
+        padding: 24px;
+    }
+}
+
+
+@media (max-width: 768px) {
+    :root {
+        --header-height: 70px;
+    }
+    
+    .app-header {
+        padding: 0 16px;
+    }
+    
+    .header-left h1 {
+        font-size: 1.35rem;
+    }
+    
+    .sync-status-indicator {
+        display: none !important; 
+    }
+    
+    .dashboard-content {
+        padding: 16px;
+        gap: 20px;
+    }
+    
+    
+    .kpi-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 10px !important;
+    }
+    
+    .right-sidebar-panel {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .map-container {
+        height: 320px !important; 
+    }
+    
+    .camera-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .bottom-widgets-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .header-actions {
+        gap: 8px !important;
+    }
+    
+    
+    .profile-pill span {
+        display: none !important;
+    }
+    
+    .profile-pill {
+        padding: 6px !important;
+    }
+    
+    .quick-action-card {
+        display: none !important; 
+    }
+}
+
+
+@media (max-width: 480px) {
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .map-legend {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .map-marker {
+        width: 14px !important;
+        height: 14px !important;
+    }
+    
+    .map-tooltip {
+        width: 180px !important;
+    }
+}
+
+
+@media (max-width: 768px) {
+    .gov-header-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px 20px;
+    }
+    
+    .gov-header-title {
+        font-size: 1.25rem;
+    }
+    
+    .gov-info-bar {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .gov-info-col {
+        padding: 10px 16px;
+    }
+    
+    .gov-info-col:not(:last-child) {
+        border-right: none !important;
+        border-bottom: 1px solid var(--border-light);
+    }
+}

@@ -1,0 +1,63 @@
+
+@keyframes alert-soft-pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.55;
+    }
+}
+
+.pulse-alert-critical {
+    animation: alert-soft-pulse 1.8s infinite ease-in-out;
+}
+
+.pulse-alert-warning {
+    animation: alert-soft-pulse 2.2s infinite ease-in-out;
+}
+
+@keyframes blink-record {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.25; }
+}
+
+.recording-dot {
+    width: 6px;
+    height: 6px;
+    background-color: var(--color-critical);
+    border-radius: 50%;
+    display: inline-block;
+    animation: blink-record 1.5s infinite ease-in-out;
+}
+
+.camera-scanline {
+    display: none !important;
+}
+
+.radar-wave {
+    display: none !important;
+}
+
+.progress-bar-fill {
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.skeleton-screen {
+    background: linear-gradient(90deg, var(--border-light) 25%, rgba(0, 0, 0, 0.02) 37%, var(--border-light) 63%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.8s infinite ease-in-out;
+}
+
+[data-theme="dark"] .skeleton-screen {
+    background: linear-gradient(90deg, #1E293B 25%, rgba(255, 255, 255, 0.01) 37%, #1E293B 63%);
+    background-size: 200% 100%;
+}

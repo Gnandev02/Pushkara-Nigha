@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pushkara Nigha - AI Crowd Command Center</title>
+    
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="styles/login.css">
+    
+    <!-- Lucide, & Tailwind CSS Portal CDNs -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            corePlugins: {
+                preflight: false, // Protects vanilla style.css base styles from being reset
+            }
+        }
+    </script>
+</head>
+<body data-theme="light">
+
+    <!-- Unified React Mount Point -->
+    <div id="root"></div>
+
+    <!-- Protected Static Dashboard Layout (hidden by default on startup) -->
+    <div class="app-container" style="display: none !important;">
+        
+      
+        <aside class="app-sidebar">
+            <button class="sidebar-toggle-btn" title="Toggle Sidebar">
+                <i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i>
+            </button>
+            <div class="sidebar-brand-wrapper">
+                <div class="sidebar-logo-group">
+                    <div class="sidebar-logo-graphic">
+                        <span>PN</span>
+                    </div>
+                    <div class="sidebar-brand-text-group sidebar-collapsed-hide">
+                        <span class="sidebar-brand-name">Pushkara Nigha</span>
+                        <span class="sidebar-brand-subtitle">AI Crowd Command</span>
+                    </div>
+                </div>
+            </div>
+            
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="#overview" class="sidebar-nav-item active">
+                        <i data-lucide="layout-dashboard"></i>
+                        <span class="sidebar-collapsed-hide">Overview</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#monitoring" class="sidebar-nav-item">
+                        <i data-lucide="activity"></i>
+                        <span class="sidebar-collapsed-hide">Monitoring</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#reporting" class="sidebar-nav-item">
+                        <i data-lucide="file-text"></i>
+                        <span class="sidebar-collapsed-hide">Reporting</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#usermanagement" class="sidebar-nav-item">
+                        <i data-lucide="users"></i>
+                        <span class="sidebar-collapsed-hide">User Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#aialerts" class="sidebar-nav-item">
+                        <i data-lucide="cpu"></i>
+                        <span class="sidebar-collapsed-hide">AI Alerts</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#settings" class="sidebar-nav-item">
+                        <i data-lucide="settings"></i>
+                        <span class="sidebar-collapsed-hide">Settings</span>
+                    </a>
+                </li>
+                <li style="margin-top: auto; border-top: 1px solid var(--sidebar-border); padding-top: 8px;">
+                    <a href="#" class="sidebar-nav-item" id="sidebar-logout-btn" style="color: #EF4444;">
+                        <i data-lucide="log-out"></i>
+                        <span class="sidebar-collapsed-hide">Logout Session</span>
+                    </a>
+                </li>
+            </ul>
+            
+            
+            <div class="sidebar-bottom-actions sidebar-collapsed-hide">
+                <button class="sidebar-action-btn" id="btn-analytics-demo">Video analytics demo</button>
+                <button class="sidebar-action-btn" id="btn-citizen-app">Citizen app</button>
+                <button class="sidebar-action-btn" id="btn-control-center">Control center</button>
+                <button class="sidebar-action-btn" id="btn-response-desk">Response desk</button>
+            </div>
+        </aside>
+
+      
+        <main class="app-main">
+            
+          
+            <div class="dashboard-content">
+                
+                <div class="gov-header-card">
+                    <div class="gov-header-left">
+                        <button class="mobile-menu-trigger gov-mobile-menu-trigger" title="Open Menu" style="display: none;">
+                            <i data-lucide="menu" style="width: 18px; height: 18px;"></i>
+                        </button>
+                        <div class="gov-header-title-container">
+                            <span class="gov-header-subtitle">GOVERNMENT OF ANDHRA PRADESH</span>
+                            <h1 class="gov-header-title">AI Crowd Management and Reporting Platform</h1>
+                        </div>
+                    </div>
+                    <div class="gov-header-right">
+                        <div class="gov-sync-badge">
+                            <span class="gov-sync-dot">●</span> Synced <span id="sync-time-value">03:30 PM</span>
+                        </div>
+                        <button class="gov-refresh-btn refresh-btn" title="Force Refresh Telemetry" style="margin-right: 12px;">
+                            <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
+                        </button>
+                        
+                        <!-- Interactive Profile Pill styled by style.css -->
+                        <div class="profile-pill" id="header-profile-pill">
+                            <div class="profile-avatar-circle">OP</div>
+                            <span style="font-size: 0.78rem; font-weight: 600;">System Operator</span>
+                        </div>
+                    </div>
+                </div>
+
+              
+                <div class="gov-info-bar">
+                    <div class="gov-info-col">
+                        <span class="gov-info-label">Event window</span>
+                        <span class="gov-info-value">26 Jun 2027 to 7 Jul 2027 (12 days)</span>
+                    </div>
+                    <div class="gov-info-col">
+                        <span class="gov-info-label">Operating model</span>
+                        <span class="gov-info-value">ICCC led, field verified</span>
+                    </div>
+                    <div class="gov-info-col">
+                        <span class="gov-info-label">Public output</span>
+                        <span class="gov-info-value">Approved advisories only</span>
+                    </div>
+                </div>
+                              
+                <div id="section-overview" class="dashboard-section active">
+                   
+                    <!-- Overview Premium Cyber Stats Grid -->
+                    <section class="overview-stats-grid">
+                        <div class="overview-stat-card active-ghats">
+                            <div class="stat-header">
+                                <span class="stat-title">Active Ghats</span>
+                                <div class="stat-icon-wrapper">
+                                    <i data-lucide="layers"></i>
+                                </div>
+                            </div>
+                            <div class="stat-body">
+                                <span class="stat-number" id="overview-kpi-active-ghats">0</span>
+                            </div>
+                            <div class="stat-footer-text">12 Total monitored</div>
+                            <div class="stat-glow-border"></div>
+                        </div>
+
+                        <div class="overview-stat-card live-crowd">
+                            <div class="stat-header">
+                                <span class="stat-title">Live Active Crowd</span>
+                                <div class="stat-icon-wrapper">
+                                    <i data-lucide="users"></i>
+                                </div>
+                            </div>
+                            <div class="stat-body">
+                                <span class="stat-number" id="overview-kpi-live-crowd">0</span>
+                            </div>
+                            <div class="stat-footer-text">Real-time devotee flow</div>
+                            <div class="stat-glow-border"></div>
+                        </div>
+
+                        <div class="overview-stat-card active-cams">
+                            <div class="stat-header">
+                                <span class="stat-title">Active AI Feeds</span>
+                                <div class="stat-icon-wrapper">
+                                    <i data-lucide="video"></i>
+                                </div>
+                            </div>
+                            <div class="stat-body">
+                                <span class="stat-number" id="overview-kpi-active-cameras">0</span>
+                            </div>
+                            <div class="stat-footer-text">Streaming smart grids</div>
+                            <div class="stat-glow-border"></div>
+                        </div>
+
+                        <div class="overview-stat-card high-risk">
+                            <div class="stat-header">
+                                <span class="stat-title">High Risk Sectors</span>
+                                <div class="stat-icon-wrapper">
+                                    <i data-lucide="alert-triangle"></i>
+                                </div>
+                            </div>
+                            <div class="stat-body">
+                                <span class="stat-number" id="overview-kpi-high-risk">0</span>
+                            </div>
+                            <div class="stat-footer-text">Occupancy exceeding 65%</div>
+                            <div class="stat-glow-border"></div>
+                        </div>
+
+                        <div class="overview-stat-card safe-zones">
+                            <div class="stat-header">
+                                <span class="stat-title">Nominal Zones</span>
+                                <div class="stat-icon-wrapper">
+                                    <i data-lucide="shield-check"></i>
+                                </div>
+                            </div>
+                            <div class="stat-body">
+                                <span class="stat-number" id="overview-kpi-safe-zones">0</span>
+                            </div>
+                            <div class="stat-footer-text">Under 30% utilization</div>
+                            <div class="stat-glow-border"></div>
+                        </div>
+
+                        <div class="overview-stat-card ai-alerts">
+                            <div class="stat-header">
+                                <span class="stat-title">Active AI Alerts</span>
+                                <div class="stat-icon-wrapper">
+                                    <i data-lucide="cpu"></i>
+                                </div>
+                            </div>
+                            <div class="stat-body">
+                                <span class="stat-number" id="overview-kpi-ai-alerts">0</span>
+                            </div>
+                            <div class="stat-footer-text">Anomalies cataloged</div>
+                            <div class="stat-glow-border"></div>
+                        </div>
+                    </section>
+
+                   
+                    <div class="dashboard-grid">
+                      
+                        <div class="left-panel-stack">
+                           
+                            <div class="dashboard-card map-card">
+                                <div class="map-header-row">
+                                    <div class="map-header-left">
+                                        <span class="map-section-label">GODAVARI CORRIDOR</span>
+                                        <h3 class="map-title">Live ghat risk map</h3>
+                                    </div>
+                                    <span class="map-ai-badge">✦ AI assisted</span>
+                                </div>
+                              
+                                <div id="map"></div>
+                            </div>
+
+                            <!-- 12 GHAT LIVE SURVEILLANCE LIST SECTION -->
+                            <div class="surveillance-list-card">
+                                <div class="surveillance-list-hud-header">
+                                    <div class="hud-header-left">
+                                        <i data-lucide="activity" style="color: var(--primary); width: 20px; height: 20px;"></i>
+                                        <h3 class="hud-title">12 GHAT LIVE SURVEILLANCE LIST</h3>
+                                        <span class="hud-status-badge"><span class="hud-status-dot"></span> ICCC Core Active</span>
+                                    </div>
+                                    <div class="hud-header-metrics">
+                                        <div class="hud-metric-pill" title="Monitored Sectors">
+                                            <span class="hud-metric-lbl">Monitored</span>
+                                            <strong class="hud-metric-val" id="hud-stats-monitored">12</strong>
+                                        </div>
+                                        <div class="hud-metric-pill" title="Active Cameras">
+                                            <span class="hud-metric-lbl">Cameras</span>
+                                            <strong class="hud-metric-val" id="hud-stats-cameras">0</strong>
+                                        </div>
+                                        <div class="hud-metric-pill" title="Total Live Devotees Flow">
+                                            <span class="hud-metric-lbl">Live Crowd</span>
+                                            <strong class="hud-metric-val" id="hud-stats-crowd">0</strong>
+                                        </div>
+                                        <div class="hud-metric-pill" title="Last Neural Sync Time">
+                                            <span class="hud-metric-lbl">Synced</span>
+                                            <strong class="hud-metric-val" id="hud-stats-synced">03:30 PM</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="surveillance-table-responsive-wrapper">
+                                    <table class="surveillance-cyber-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 50px;">#</th>
+                                                <th>Ghat Name</th>
+                                                <th>District</th>
+                                                <th>Zone Status</th>
+                                                <th>Capacity</th>
+                                                <th>Current Crowd</th>
+                                                <th style="min-width: 140px;">Occupancy %</th>
+                                                <th>Inflow</th>
+                                                <th>Outflow</th>
+                                                <th>Cameras</th>
+                                                <th>Risk Status</th>
+                                                <th>Last Updated</th>
+                                                <th>Live Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="overview-table-body">
+                                            <!-- Rendered dynamically by javascript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Futuristic Live Crowd Heatmap Section -->
+                            <div class="overview-heatmap-section">
+                                <div class="heatmap-header">
+                                    <div class="heatmap-title-group">
+                                        <i data-lucide="grid" style="color: var(--primary); width: 18px; height: 18px;"></i>
+                                        <h3 class="card-heading">Live Devotee Density Heatmap Matrix</h3>
+                                    </div>
+                                    <span class="map-ai-badge">✦ Interactive Real-time Map grid</span>
+                                </div>
+                                <div class="heatmap-grid" id="overview-heatmap-grid">
+                                    <!-- Rendered dynamically by javascript -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                       
+                        <div class="right-sidebar-panel">
+                           
+                            <div class="dashboard-card" style="margin-bottom: 32px;">
+                                <div class="card-header-row" style="margin-bottom: 16px;">
+                                    <div class="card-title-group">
+                                        <div class="card-icon-container" style="background-color: var(--color-critical-bg); color: var(--color-critical);">
+                                            <i data-lucide="alert-octagon"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="card-heading">Highest Priority Ghats</h3>
+                                            <span style="font-size: 0.75rem; color: var(--text-muted)">Crowd density and occupancy monitoring</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="alert-queue-container" id="alert-queue-container"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="section-monitoring" class="dashboard-section">
+                    <!-- Command Center Cyber Header -->
+                    <div class="dashboard-card command-center-header">
+                        <div class="header-cyber-glow"></div>
+                        <div class="header-main-info">
+                            <span class="cyber-badge">✦ AI-ICCC TELEMETRY CORE</span>
+                            <h2>Pushkara Crowd Command Center</h2>
+                            <p>Futuristic neural-grid crowd surveillance, live flow counts, capacity utilization risk vectoring, and incident response routing.</p>
+                        </div>
+                    </div>
+
+                    <!-- Sticky Command Controls Bar -->
+                    <div class="command-controls-bar">
+                        <!-- Search Core Group -->
+                        <div class="control-group search-group" id="command-search-bar-container">
+                            <label for="command-search-input"><i data-lucide="search"></i> Search core</label>
+                            <div class="command-search-wrapper">
+                                <i data-lucide="search" class="search-icon"></i>
+                                <input type="text" id="command-search-input" placeholder="Search ghats, districts, sectors...">
+                            </div>
+                        </div>
+
+                        <!-- District Group -->
+                        <div class="control-group">
+                            <label for="filter-area"><i data-lucide="map-pin"></i> District</label>
+                            <select id="filter-area" class="command-select">
+                                <option value="all">All Districts</option>
+                                <option value="East Godavari">East Godavari</option>
+                                <option value="Khammam">Khammam</option>
+                                <option value="West Godavari">West Godavari</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Density Status Group -->
+                        <div class="control-group">
+                            <label for="filter-status"><i data-lucide="activity"></i> Density status</label>
+                            <select id="filter-status" class="command-select">
+                                <option value="all">All Densities</option>
+                                <option value="open">Open Zone (&lt;30%)</option>
+                                <option value="crowded">Crowded (30%-65%)</option>
+                                <option value="highly-crowded">Highly Crowded (&gt;65%)</option>
+                            </select>
+                        </div>
+
+                        <!-- Sector Capacity Group -->
+                        <div class="control-group">
+                            <label for="filter-capacity"><i data-lucide="users"></i> Sector limit</label>
+                            <select id="filter-capacity" class="command-select">
+                                <option value="all">All Capacities</option>
+                                <option value="low">Small (&lt; 7,000)</option>
+                                <option value="mid">Medium (7,000 - 8,500)</option>
+                                <option value="high">Large (&gt; 8,500)</option>
+                            </select>
+                        </div>
+
+                        <!-- Diagnostics Reset Group -->
+                        <div class="control-group button-group">
+                            <label class="button-label-placeholder"><i data-lucide="rotate-ccw" style="visibility: hidden;"></i>&nbsp;</label>
+                            <button id="btn-reset-filters" class="btn-reset-filters" title="Reset all telemetry filters">
+                                <i data-lucide="rotate-ccw"></i> Reset Filters
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Command Center Real-Time Telemetry Stats -->
+                    <div class="command-stats-panel">
+                        <div class="cyber-stat-card">
+                            <div class="cyber-stat-icon safe"><i data-lucide="layers"></i></div>
+                            <div class="cyber-stat-info">
+                                <span class="cyber-stat-label">TOTAL MONITORED SECTORS</span>
+                                <strong class="cyber-stat-val" id="stats-total-ghats">5</strong>
+                            </div>
+                        </div>
+                        <div class="cyber-stat-card">
+                            <div class="cyber-stat-icon busy"><i data-lucide="users"></i></div>
+                            <div class="cyber-stat-info">
+                                <span class="cyber-stat-label">TOTAL LIVE CROWD</span>
+                                <strong class="cyber-stat-val" id="stats-total-crowd">24,340</strong>
+                            </div>
+                        </div>
+                        <div class="cyber-stat-card">
+                            <div class="cyber-stat-icon critical"><i data-lucide="alert-triangle"></i></div>
+                            <div class="cyber-stat-info">
+                                <span class="cyber-stat-label">MOST CROWDED DISTRICT</span>
+                                <strong class="cyber-stat-val" id="stats-most-crowded">Konaseema (85.6%)</strong>
+                            </div>
+                        </div>
+                        <div class="cyber-stat-card">
+                            <div class="cyber-stat-icon safe"><i data-lucide="shield-check"></i></div>
+                            <div class="cyber-stat-info">
+                                <span class="cyber-stat-label">SAFEST DISTRICT</span>
+                                <strong class="cyber-stat-val" id="stats-safest-ghat">Jagtial (52.0%)</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cyber Skeleton Loaders (Simulated neural load) -->
+                    <div id="command-loading-skeleton" class="command-loading-skeleton" style="display: none;">
+                        <div class="skeleton-header"></div>
+                        <div class="skeleton-grid">
+                            <div class="skeleton-card"></div>
+                            <div class="skeleton-card"></div>
+                        </div>
+                    </div>
+
+                    <!-- Empty State UI -->
+                    <div id="command-empty-state" class="command-empty-state" style="display: none;">
+                        <i data-lucide="info" class="empty-icon"></i>
+                        <h3>No matching sectors detected</h3>
+                        <p>Your search or filters do not match any active Godavari ghats, districts, or cameras. Try refining your parameters.</p>
+                    </div>
+
+                    <!-- Dynamic Collapsible Area Groups Container -->
+                    <div id="monitoring-areas-container" class="monitoring-areas-container">
+                        <!-- JavaScript will renderCollapsibleAreas here! -->
+                    </div>
+                </div>
+
+             
+                <div id="section-reporting" class="dashboard-section">
+                    <div class="dashboard-card">
+                        <h2 style="font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Crowd Monitoring Command Reports</h2>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px;">Download official incident logs, devotee flow statistics, and ICCC daily reports.</p>
+                        
+                        <div class="reporting-placeholder-card" style="border: 1px dashed var(--border-light); padding: 40px; text-align: center; border-radius: var(--radius-sm); background-color: var(--bg-card); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                            <i data-lucide="file-text" style="width: 48px; height: 48px; color: var(--text-muted);"></i>
+                            <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin: 0;">No reports compiled yet</h3>
+                            <p style="font-size: 0.78rem; color: var(--text-muted); max-width: 420px; line-height: 1.4; margin: 0;">Telemetry reports are compiled automatically at the end of each daily smart city monitoring shift.</p>
+                            <button class="gov-refresh-btn" style="width: auto; padding: 0 16px; font-size: 0.78rem; font-weight: 600; background-color: var(--primary); color: #FFFFFF; border-color: var(--primary-light); height: 32px; border-radius: var(--radius-sm); margin-top: 8px;">Generate Pre-Shift Summary</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEW: Command Supervisor Management Admin section -->
+                <div id="section-usermanagement" class="dashboard-section">
+                    <!-- Loaded dynamically by UsersUI.init() -->
+                </div>
+
+                <!-- NEW: High-fidelity AI Alerts console -->
+                <div id="section-aialerts" class="dashboard-section">
+                    <div class="dashboard-card command-center-header" style="margin-bottom: 20px;">
+                        <div class="header-cyber-glow"></div>
+                        <div class="header-main-info">
+                            <span class="cyber-badge">✦ NEURAL PREDICTION CONSOLE</span>
+                            <h2>Active AI Incident Vectoring & Recommendations</h2>
+                            <p>Real-time crowd load predictive algorithms running onGodavari range feeds. Dispatch response commands instantly.</p>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="left-panel-stack" id="ai-predictions-container">
+                            <!-- Populated dynamically by window.renderAIPredictions or static mockup -->
+                            <div class="ai-prediction-card">
+                                <div class="ai-pred-icon" style="color: #EF4444; background: rgba(239, 68, 68, 0.05); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                    <i data-lucide="shield-alert"></i>
+                                </div>
+                                <div class="ai-pred-details" style="flex: 1; margin-left: 16px;">
+                                    <div class="ai-pred-header-row" style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                                        <h4 class="ai-pred-title" style="font-size: 0.95rem; font-weight: 600;">Preemptive Gating at Pushkar Ghat</h4>
+                                        <span class="ai-pred-conf" style="font-size: 0.72rem; color: #EF4444; font-weight: 700; background: rgba(239, 68, 68, 0.08); padding: 2px 8px; border-radius: 4px;">91.8% Confidence</span>
+                                    </div>
+                                    <p class="ai-pred-desc" style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 12px;">Neural network models predict visitor occupancy levels to peak at 92% near Rajamahendravaram corridor. Advise instant entry throttling parameters.</p>
+                                    <div class="ai-pred-actions" style="display: flex; gap: 8px;">
+                                        <button class="ai-pred-btn-deploy" style="background: var(--primary); color: #FFFFFF; font-weight: 700; font-size: 0.72rem; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Execute Gate Throttle</button>
+                                        <button class="ai-pred-btn-dismiss" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-light); font-size: 0.72rem; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Ignore Alert</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="right-sidebar-panel">
+                            <div class="dashboard-card">
+                                <h3 class="card-heading" style="margin-bottom: 12px;">Highest Density Sector Ranks</h3>
+                                <div class="alert-queue-container" style="display: flex; flex-direction: column; gap: 8px;">
+                                    <div class="alert-queue-item busy" style="padding: 10px; border-radius: 6px; border-left: 3px solid var(--color-busy); background: rgba(15,23,42,0.02);">
+                                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                                            <strong>Bhadrachalam stairs</strong>
+                                            <span style="color: var(--color-busy); font-weight: 700;">82% Occupied</span>
+                                        </div>
+                                    </div>
+                                    <div class="alert-queue-item safe" style="padding: 10px; border-radius: 6px; border-left: 3px solid var(--color-safe); background: rgba(15,23,42,0.02);">
+                                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                                            <strong>Dowleswaram Plaza</strong>
+                                            <span style="color: var(--color-safe); font-weight: 700;">56% Occupied</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEW: System parameters Settings section -->
+                <div id="section-settings" class="dashboard-section">
+                    <div class="gov-header-card" style="margin-bottom: 20px;">
+                        <div class="gov-header-left">
+                            <div class="gov-header-title-container">
+                                <span class="gov-header-subtitle">ICCC NODE CONFIGURATION</span>
+                                <h1 class="gov-header-title">System Settings & Calibration</h1>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="left-panel-stack">
+                            <div class="dashboard-card">
+                                <h3 class="card-heading" style="margin-bottom: 16px; border-bottom: 1px solid var(--border-light); padding-bottom: 8px;">Core AI Model Pipelines</h3>
+                                
+                                <div style="display: flex; flex-direction: column; gap: 16px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(15, 23, 42, 0.01); border-radius: 6px; border: 1px solid var(--border-light);">
+                                        <div>
+                                            <strong style="font-size: 0.85rem; display: block;">Occupancy Vectors Tracking</strong>
+                                            <span style="font-size: 0.72rem; color: var(--text-muted);">Calibrates entry/exit gating limits automatically</span>
+                                        </div>
+                                        <label class="checkbox-container" style="margin-bottom: 0;">
+                                            <input type="checkbox" checked style="width: 18px; height: 18px; cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(15, 23, 42, 0.01); border-radius: 6px; border: 1px solid var(--border-light);">
+                                        <div>
+                                            <strong style="font-size: 0.85rem; display: block;">Devotee Pacing & Velocity Engine</strong>
+                                            <span style="font-size: 0.72rem; color: var(--text-muted);">Alerts if speed falls below 0.3m/s (potential crush warnings)</span>
+                                        </div>
+                                        <label class="checkbox-container" style="margin-bottom: 0;">
+                                            <input type="checkbox" checked style="width: 18px; height: 18px; cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(15, 23, 42, 0.01); border-radius: 6px; border: 1px solid var(--border-light);">
+                                        <div>
+                                            <strong style="font-size: 0.85rem; display: block;">Weather Calibration Alerts</strong>
+                                            <span style="font-size: 0.72rem; color: var(--text-muted);">Triggers alerts based on humidity and river currents indices</span>
+                                        </div>
+                                        <label class="checkbox-container" style="margin-bottom: 0;">
+                                            <input type="checkbox" style="width: 18px; height: 18px; cursor: pointer;">
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="right-sidebar-panel">
+                            <div class="dashboard-card">
+                                <h3 class="card-heading" style="margin-bottom: 12px;">Node Details</h3>
+                                <div style="font-size: 0.78rem; display: flex; flex-direction: column; gap: 8px; color: var(--text-secondary);">
+                                    <div style="display: flex; justify-content: space-between;"><span>Server Port:</span> <strong>3000 (lite-server)</strong></div>
+                                    <div style="display: flex; justify-content: space-between;"><span>Active Database:</span> <strong>Local Telemetry API</strong></div>
+                                    <div style="display: flex; justify-content: space-between;"><span>Security Handshake:</span> <strong>SHA-256 HUD Crypt</strong></div>
+                                    <div style="display: flex; justify-content: space-between;"><span>Inference Latency:</span> <strong style="color: var(--color-safe);">38 ms (Nominal)</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Unified React Router SPA Bootstrapper -->
+    <script type="module" src="/src/main.jsx"></script>
+
+    
+    <script src="js/mock-data.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/monitoring.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/app.js"></script>
+
+  
+    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtu-pHBMT2MD-9O3zqMQRulSPyVQwtRyw&callback=initMap"></script>
+</body>
+</html>
