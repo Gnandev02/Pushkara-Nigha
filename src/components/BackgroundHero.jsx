@@ -3,19 +3,15 @@ import React from 'react';
 const BackgroundHero = () => {
     return (
         <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
-            {/* Background Image with Parallax Scale Animation */}
+            {/* Background Image */}
             <img 
                 src="assets/pushkara_ghat_surveillance.png" 
                 alt="AP Godavari River Pushkaram Surveillance" 
-                className="absolute inset-0 w-full h-full object-cover select-none animate-parallax"
-                style={{ transformOrigin: 'center center' }}
+                className="absolute inset-0 w-full h-full object-cover select-none"
             />
             
-            {/* Soft Blur Glass Overlay */}
-            <div className="absolute inset-0 bg-slate-900/10 backdrop-blur-[2px] z-1"></div>
-            
-            {/* Gradient Mask for high readability & official contrast */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-slate-950/90 via-slate-900/75 to-slate-950/40 z-2"></div>
+            {/* Soft dark wash + cinematic backdrop blur overlay for high contrast and readability */}
+            <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[3px] z-1"></div>
         </div>
     );
 };

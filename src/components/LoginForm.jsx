@@ -49,10 +49,10 @@ const LoginForm = ({
                 </div>
             )}
 
-            {/* OPERATOR ID / EMAIL */}
+            {/* Username / Email */}
             <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest" htmlFor="react-username">
-                    Operator ID / Email
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider" htmlFor="react-username">
+                    Username / Email
                 </label>
                 <div className="relative flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3.5 text-slate-400"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -64,7 +64,7 @@ const LoginForm = ({
                             onUsernameChange(e.target.value);
                             if (inputErrors.username) setInputErrors(prev => ({ ...prev, username: false }));
                         }}
-                        placeholder="Enter credentials ID"
+                        placeholder="Enter your username or email"
                         disabled={isLoading}
                         className={`w-full h-11 pl-10 pr-4 bg-slate-50/70 border ${
                             inputErrors.username ? 'border-red-400 bg-red-50/20' : 'border-slate-200'
@@ -74,10 +74,10 @@ const LoginForm = ({
                 </div>
             </div>
 
-            {/* CLEARANCE PASSCODE */}
+            {/* Password */}
             <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest" htmlFor="react-password">
-                    Clearance Passcode
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider" htmlFor="react-password">
+                    Password
                 </label>
                 <div className="relative flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3.5 text-slate-400"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -89,7 +89,7 @@ const LoginForm = ({
                             onPasswordChange(e.target.value);
                             if (inputErrors.password) setInputErrors(prev => ({ ...prev, password: false }));
                         }}
-                        placeholder="••••••••"
+                        placeholder="Enter password"
                         disabled={isLoading}
                         className={`w-full h-11 pl-10 pr-10 bg-slate-50/70 border ${
                             inputErrors.password ? 'border-red-400 bg-red-50/20' : 'border-slate-200'
@@ -101,7 +101,7 @@ const LoginForm = ({
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         tabIndex="-1"
-                        className="absolute right-3 text-slate-400 hover:text-slate-600"
+                        className="absolute right-3 text-slate-400 hover:text-slate-600 cursor-pointer"
                     >
                         {showPassword ? (
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
@@ -112,7 +112,7 @@ const LoginForm = ({
                 </div>
             </div>
 
-            {/* KEEP ACTIVE & FORGOT HANDLES */}
+            {/* Remember Me & Forgot Password */}
             <div className="flex justify-between items-center text-xs select-none">
                 <label className="flex items-center gap-2 text-slate-600 cursor-pointer">
                     <input 
@@ -122,7 +122,7 @@ const LoginForm = ({
                         disabled={isLoading}
                         className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                     />
-                    <span>Keep Session Active</span>
+                    <span>Remember Me</span>
                 </label>
                 
                 <a 
@@ -130,27 +130,24 @@ const LoginForm = ({
                     onClick={handleForgotClick}
                     className="text-blue-600 font-semibold hover:text-blue-700 hover:underline"
                 >
-                    Forgot passcode?
+                    Forgot Password?
                 </a>
             </div>
 
-            {/* SECURE SUBMIT BUTTON */}
+            {/* Secure Login Button */}
             <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-11 bg-gradient-to-r from-blue-600 to-emerald-700 hover:from-blue-700 hover:to-emerald-800 text-white rounded-lg text-sm font-bold shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
+                className="w-full h-11 bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white rounded-lg text-sm font-bold shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
                 style={{ fontFamily: "'Inter', sans-serif" }}
             >
                 {isLoading ? (
                     <>
                         <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                        <span>SYNCHRONIZING SECURE NODE...</span>
+                        <span>Logging in securely...</span>
                     </>
                 ) : (
-                    <>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        <span>Secure Login</span>
-                    </>
+                    <span>Secure Login</span>
                 )}
             </button>
         </form>
