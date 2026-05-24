@@ -1,15 +1,14 @@
 
 
-document.addEventListener("DOMContentLoaded", () => {
-    
+function initApp() {
     const themeToggleBtn = document.querySelector(".theme-toggle-btn");
-    
     
     const savedTheme = localStorage.getItem("command-center-theme") || "light";
     document.body.setAttribute("data-theme", savedTheme);
     updateThemeToggleIcon(savedTheme);
 
-    if (themeToggleBtn) {
+    if (themeToggleBtn && !themeToggleBtn.dataset.wired) {
+        themeToggleBtn.dataset.wired = 'true';
         themeToggleBtn.addEventListener("click", () => {
             const currentTheme = document.body.getAttribute("data-theme");
             const newTheme = currentTheme === "dark" ? "light" : "dark";
@@ -42,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    
     function updateSyncTime() {
         const syncTimeValue = document.getElementById("sync-time-value");
         if (!syncTimeValue) return;
@@ -59,17 +57,15 @@ document.addEventListener("DOMContentLoaded", () => {
         syncTimeValue.textContent = `${hoursStr}:${minutesStr} ${ampm}`;
     }
 
-    
     updateSyncTime();
 
-    
     const refreshBtn = document.querySelector(".refresh-btn");
     const syncDot = document.getElementById("sync-dot");
     const syncText = document.getElementById("sync-text");
 
-    if (refreshBtn) {
+    if (refreshBtn && !refreshBtn.dataset.wired) {
+        refreshBtn.dataset.wired = 'true';
         refreshBtn.addEventListener("click", () => {
-            
             const icon = refreshBtn.querySelector("i");
             if (icon) {
                 icon.style.transition = "transform 0.8s ease";
@@ -80,40 +76,41 @@ document.addEventListener("DOMContentLoaded", () => {
                 }, 800);
             }
 
-            
             updateSyncTime();
 
-            
             if (syncDot && syncText) {
                 syncDot.style.backgroundColor = "var(--color-moderate)";
                 syncText.textContent = "INDEXING FEEDS...";
             }
 
-            
             if (window.showSystemBanner) {
                 window.showSystemBanner("Neural-grid re-scan initiated. Calibrating live telemetry...");
             }
 
-            
             setTimeout(() => {
                 const db = window.SmartCityTelemetry;
                 if (db) {
                     db.MONITORED_GHATS.forEach(ghat => {
-                        
                         const noise = Math.floor(Math.random() * 200 - 100);
                         ghat.occupancy = Math.max(100, ghat.occupancy + noise);
-                        ghat.crowdDensity = (ghat.occupancy / ghat.capacity) * 100;
+                        ghat.crowdDensity = parseFloat(((ghat.occupancy / ghat.capacity) * 100).toFixed(1));
+                        
+                        if (ghat.crowdDensity >= 88.0) ghat.risk = "critical";
+                        else if (ghat.crowdDensity >= 75.0) ghat.risk = "busy";
+                        else if (ghat.crowdDensity >= 50.0) ghat.risk = "moderate";
+                        else ghat.risk = "safe";
                     });
-                    
-                    
-                    const event = new Event("DOMContentLoaded");
-                    document.dispatchEvent(event);
+
+                    // Save force-refresh changes to localStorage
+                    localStorage.setItem("pushkara_nigha_telemetry", JSON.stringify(db));
+
+                    if (window.updateOverviewDashboard) {
+                        window.updateOverviewDashboard();
+                    }
                 }
 
-                
                 updateSyncTime();
 
-                
                 if (syncDot && syncText) {
                     syncDot.style.backgroundColor = "var(--color-safe)";
                     syncText.textContent = "SYNCHRONIZED";
@@ -122,12 +119,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    
     const notificationBtn = document.querySelector(".notification-btn");
     let notificationDropdown = null;
 
-    if (notificationBtn) {
-        
+    if (notificationBtn && !notificationBtn.dataset.wired) {
+        notificationBtn.dataset.wired = 'true';
         notificationBtn.addEventListener("click", (e) => {
             e.stopPropagation();
             
@@ -147,7 +143,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         notificationDropdown = document.createElement("div");
         notificationDropdown.className = "notification-popover-dropdown";
-        
         
         const db = window.SmartCityTelemetry;
         const currentAlerts = db ? db.INCIDENT_LOGS.slice(0, 4) : [];
@@ -182,7 +177,6 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
         `;
 
-        
         Object.assign(notificationDropdown.style, {
             position: "absolute",
             top: "65px",
@@ -199,12 +193,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         notificationBtn.appendChild(notificationDropdown);
 
-        
         const clearBtn = notificationDropdown.querySelector(".clear-all-notif-btn");
         if (clearBtn) {
             clearBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
-                if (db) db.INCIDENT_LOGS.forEach(log => log.status = "resolved");
+                if (db) {
+                    db.INCIDENT_LOGS.forEach(log => log.status = "resolved");
+                    localStorage.setItem("pushkara_nigha_telemetry", JSON.stringify(db));
+                }
                 
                 if (window.showSystemBanner) {
                     window.showSystemBanner("System events acknowledged by operator");
@@ -212,25 +208,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 notificationDropdown.remove();
                 notificationDropdown = null;
-                
-                
-                const event = new Event("DOMContentLoaded");
-                document.dispatchEvent(event);
+
+                if (window.updateOverviewDashboard) {
+                    window.updateOverviewDashboard();
+                }
             });
         }
     }
 
-    
-    document.addEventListener("click", () => {
-        if (notificationDropdown) {
-            notificationDropdown.remove();
-            notificationDropdown = null;
-        }
-    });
+    if (!window.documentClickWired) {
+        window.documentClickWired = true;
+        document.addEventListener("click", () => {
+            if (notificationDropdown) {
+                notificationDropdown.remove();
+                notificationDropdown = null;
+            }
+        });
+    }
 
-    
     const searchInput = document.querySelector(".header-search-bar input");
-    if (searchInput) {
+    if (searchInput && !searchInput.dataset.wired) {
+        searchInput.dataset.wired = 'true';
         searchInput.addEventListener("keypress", (e) => {
             if (e.key === "Enter") {
                 const query = searchInput.value.trim().toLowerCase();
@@ -240,11 +238,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (db) {
                     const matchedGhat = db.MONITORED_GHATS.find(g => g.name.toLowerCase().includes(query));
                     if (matchedGhat) {
-                        
                         const marker = document.getElementById(`marker-${matchedGhat.id}`);
                         if (marker) {
                             marker.click();
-                            
                             document.querySelector(".map-visualization-wrapper").scrollIntoView({ behavior: "smooth" });
                         }
                     } else {
@@ -258,8 +254,16 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    
     if (window.lucide) {
         window.lucide.createIcons();
     }
-});
+}
+
+window.initApp = initApp;
+
+if (document.readyState === "complete" || document.readyState === "interactive") {
+    initApp();
+} else {
+    document.addEventListener("DOMContentLoaded", initApp);
+}
+

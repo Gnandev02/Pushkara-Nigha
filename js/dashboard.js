@@ -1,6 +1,6 @@
 
 
-document.addEventListener("DOMContentLoaded", () => {
+function initDashboardModule() {
     
     const db = window.SmartCityTelemetry;
     if (!db) {
@@ -381,7 +381,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     
     
-    setInterval(() => {
+    if (window.dashboardIntervalId) {
+        clearInterval(window.dashboardIntervalId);
+    }
+    window.dashboardIntervalId = setInterval(() => {
         
         const randomIndex = Math.floor(Math.random() * db.MONITORED_GHATS.length);
         const targetGhat = db.MONITORED_GHATS[randomIndex];
@@ -446,6 +449,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 syncText.textContent = "SYNCED";
             }, 1000);
         }
+
+        // Save fluctuations to localStorage to persist state
+        localStorage.setItem("pushkara_nigha_telemetry", JSON.stringify(db));
 
     }, 6000);
 
@@ -680,7 +686,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     window.updateOverviewDashboard = updateOverviewDashboard;
+    window.initOverviewDashboard = initOverviewDashboard;
 
     // Initialize New Overview List View
     initOverviewDashboard();
-});
+}
+
+window.initDashboardModule = initDashboardModule;
+
+if (document.readyState === "complete" || document.readyState === "interactive") {
+    initDashboardModule();
+} else {
+    document.addEventListener("DOMContentLoaded", initDashboardModule);
+}

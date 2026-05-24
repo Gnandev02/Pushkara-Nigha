@@ -9,7 +9,7 @@
  * - Interactive CCTV local uploads, Drag & Drop, Zoom Lens, and diagnostic menus
  */
 
-document.addEventListener("DOMContentLoaded", () => {
+function initMonitoringModule() {
     // --------------------------------------------------------------------------
     // 1. DATA MODEL & TELEMETRY INITIAL STORES
     // --------------------------------------------------------------------------
@@ -555,6 +555,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (window.updateOverviewDashboard) {
             window.updateOverviewDashboard();
         }
+        localStorage.setItem("pushkara_nigha_telemetry", JSON.stringify(window.SmartCityTelemetry));
     }
 
     // Recalculates district aggregate averages dynamically
@@ -793,13 +794,26 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        if (searchInput) searchInput.addEventListener("input", runAdvancedFilterSystem); // Live search
-        if (areaSelect) areaSelect.addEventListener("change", triggerFilterWithSkeletonEffect);
-        if (statusSelect) statusSelect.addEventListener("change", triggerFilterWithSkeletonEffect);
-        if (capSelect) capSelect.addEventListener("change", triggerFilterWithSkeletonEffect);
+        if (searchInput && !searchInput.dataset.wired) {
+            searchInput.dataset.wired = 'true';
+            searchInput.addEventListener("input", runAdvancedFilterSystem); // Live search
+        }
+        if (areaSelect && !areaSelect.dataset.wired) {
+            areaSelect.dataset.wired = 'true';
+            areaSelect.addEventListener("change", triggerFilterWithSkeletonEffect);
+        }
+        if (statusSelect && !statusSelect.dataset.wired) {
+            statusSelect.dataset.wired = 'true';
+            statusSelect.addEventListener("change", triggerFilterWithSkeletonEffect);
+        }
+        if (capSelect && !capSelect.dataset.wired) {
+            capSelect.dataset.wired = 'true';
+            capSelect.addEventListener("change", triggerFilterWithSkeletonEffect);
+        }
 
         // Bind Reset Filters Button
-        if (resetBtn) {
+        if (resetBtn && !resetBtn.dataset.wired) {
+            resetBtn.dataset.wired = 'true';
             resetBtn.addEventListener("click", () => {
                 // Clear all input elements
                 if (searchInput) searchInput.value = "";
@@ -1061,8 +1075,17 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // Step 6: Recalculate Global Command statistics
         recalculateGlobalCommandCenterTelemetry();
-    }
+    // Expose inner function
+    window.initSurveillanceCommandCenter = initSurveillanceCommandCenter;
 
     // Fire the command sequence
     initSurveillanceCommandCenter();
-});
+}
+
+window.initMonitoringModule = initMonitoringModule;
+
+if (document.readyState === "complete" || document.readyState === "interactive") {
+    initMonitoringModule();
+} else {
+    document.addEventListener("DOMContentLoaded", initMonitoringModule);
+}

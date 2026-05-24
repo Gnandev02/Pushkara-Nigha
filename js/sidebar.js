@@ -1,36 +1,39 @@
 
 
-document.addEventListener("DOMContentLoaded", () => {
+function initSidebar() {
     const sidebar = document.querySelector(".app-sidebar");
     const sidebarToggle = document.querySelector(".sidebar-toggle-btn");
     const mobileMenuTrigger = document.querySelector(".mobile-menu-trigger");
     const navItems = document.querySelectorAll(".sidebar-nav-item");
     
-    
-    const mobileOverlay = document.createElement("div");
-    mobileOverlay.className = "mobile-sidebar-overlay";
-    document.body.appendChild(mobileOverlay);
+    // Ensure mobile sidebar overlay is created once
+    let mobileOverlay = document.querySelector(".mobile-sidebar-overlay");
+    if (!mobileOverlay) {
+        mobileOverlay = document.createElement("div");
+        mobileOverlay.className = "mobile-sidebar-overlay";
+        document.body.appendChild(mobileOverlay);
 
-    Object.assign(mobileOverlay.style, {
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100vw",
-        height: "100vh",
-        backgroundColor: "rgba(15, 23, 42, 0.4)",
-        backdropFilter: "blur(4px)",
-        webkitBackdropFilter: "blur(4px)",
-        zIndex: "95",
-        opacity: "0",
-        pointerEvents: "none",
-        transition: "opacity 0.3s ease"
-    });
+        Object.assign(mobileOverlay.style, {
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(15, 23, 42, 0.4)",
+            backdropFilter: "blur(4px)",
+            webkitBackdropFilter: "blur(4px)",
+            zIndex: "95",
+            opacity: "0",
+            pointerEvents: "none",
+            transition: "opacity 0.3s ease"
+        });
+    }
 
     
-    if (sidebarToggle && sidebar) {
+    if (sidebarToggle && sidebar && !sidebarToggle.dataset.wired) {
+        sidebarToggle.dataset.wired = 'true';
         sidebarToggle.addEventListener("click", () => {
             sidebar.classList.toggle("collapsed");
-            
             
             const toggleIcon = sidebarToggle.querySelector("i");
             if (toggleIcon) {
@@ -48,7 +51,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     
-    if (mobileMenuTrigger && sidebar) {
+    if (mobileMenuTrigger && sidebar && !mobileMenuTrigger.dataset.wired) {
+        mobileMenuTrigger.dataset.wired = 'true';
         mobileMenuTrigger.addEventListener("click", () => {
             sidebar.classList.add("mobile-open");
             mobileOverlay.style.opacity = "1";
@@ -57,9 +61,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     
-    mobileOverlay.addEventListener("click", () => {
-        dismissMobileSidebar();
-    });
+    if (mobileOverlay && !mobileOverlay.dataset.wired) {
+        mobileOverlay.dataset.wired = 'true';
+        mobileOverlay.addEventListener("click", () => {
+            dismissMobileSidebar();
+        });
+    }
 
     function dismissMobileSidebar() {
         if (sidebar) {
@@ -71,45 +78,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
     
     navItems.forEach(item => {
-        item.addEventListener("click", (e) => {
-            e.preventDefault();
-            
-            
-            navItems.forEach(nav => nav.classList.remove("active"));
-            
-            
-            item.classList.add("active");
-            
-            
-            if (window.innerWidth <= 1024) {
-                dismissMobileSidebar();
-            }
+        if (!item.dataset.wired) {
+            item.dataset.wired = 'true';
+            item.addEventListener("click", (e) => {
+                e.preventDefault();
+                
+                navItems.forEach(nav => nav.classList.remove("active"));
+                item.classList.add("active");
+                
+                if (window.innerWidth <= 1024) {
+                    dismissMobileSidebar();
+                }
 
-            const targetSection = item.getAttribute("href").substring(1);
-            triggerSectionTransition(targetSection);
-        });
+                const targetSection = item.getAttribute("href").substring(1);
+                triggerSectionTransition(targetSection);
+            });
+        }
     });
 
     function triggerSectionTransition(sectionName) {
         console.log(`Command Center navigating to sector view: ${sectionName}`);
         
-        
         document.querySelectorAll(".dashboard-section").forEach(sec => {
             sec.classList.remove("active");
         });
-        
         
         const targetSec = document.getElementById(`section-${sectionName}`);
         if (targetSec) {
             targetSec.classList.add("active");
         } else {
-            
             const overviewSec = document.getElementById("section-overview");
             if (overviewSec) {
                 overviewSec.classList.add("active");
             }
         }
-        
         
         if (sectionName !== "overview") {
             const pageTitle = sectionName.charAt(0).toUpperCase() + sectionName.slice(1);
@@ -153,17 +155,23 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
         
-        
         setTimeout(() => {
             banner.style.transform = "translateY(0)";
         }, 100);
 
-        
         setTimeout(() => {
             banner.style.transform = "translateY(150%)";
         }, 3500);
     }
     
-    
     window.showSystemBanner = showSystemBanner;
-});
+}
+
+window.initSidebar = initSidebar;
+
+if (document.readyState === "complete" || document.readyState === "interactive") {
+    initSidebar();
+} else {
+    document.addEventListener("DOMContentLoaded", initSidebar);
+}
+

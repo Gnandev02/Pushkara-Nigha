@@ -398,11 +398,27 @@ const SYSTEM_STATUS = {
     inferenceLatency: "38ms"
 };
 
-window.SmartCityTelemetry = {
-    MONITORED_GHATS,
-    CCTV_FEEDS,
-    INCIDENT_LOGS,
-    WEATHER_TELEMETRY,
-    AI_RECOMMENDATIONS,
-    SYSTEM_STATUS
-};
+window.SmartCityTelemetry = (function() {
+    const STORAGE_KEY = "pushkara_nigha_telemetry";
+    const cached = localStorage.getItem(STORAGE_KEY);
+    if (cached) {
+        try {
+            const parsed = JSON.parse(cached);
+            console.log("[Telemetry] Successfully restored existing telemetry state from storage.");
+            return parsed;
+        } catch (e) {
+            console.error("[Telemetry] Failed to parse cached telemetry, seeding defaults.", e);
+        }
+    }
+    const defaultData = {
+        MONITORED_GHATS,
+        CCTV_FEEDS,
+        INCIDENT_LOGS,
+        WEATHER_TELEMETRY,
+        AI_RECOMMENDATIONS,
+        SYSTEM_STATUS
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultData));
+    return defaultData;
+})();
+
