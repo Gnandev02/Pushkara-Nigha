@@ -1,257 +1,151 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
+import { BarChart2, TrendingUp, Users, RefreshCw } from "lucide-react";
 import { useSocket } from "@/components/SocketProvider";
-import { motion } from "framer-motion";
-import { 
-  BarChart3, 
-  Download, 
-  Calendar, 
-  Filter, 
-  TrendingUp, 
-  Users, 
-  Percent, 
-  Clock 
-} from "lucide-react";
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  Cell,
-  PieChart,
-  Pie
-} from "recharts";
 
-export default function Analytics() {
-  const { summary } = useSocket();
-  const [historyData, setHistoryData] = useState([]);
-  const [selectedRange, setSelectedRange] = useState("live");
+interface AnalyticsRecord {
+  id: string;
+  totalPeople: number;
+  uniquePeople: number;
+  maleCount: number;
+  femaleCount: number;
+  unknownGender: number;
+  riskScore: number;
+  density: number;
+  createdAt: string;
+}
 
-  // Fetch historical telemetry
+export default function AnalyticsPage() {
+  const { analytics: socketAnalytics } = useSocket();
+  const [history, setHistory] = useState<AnalyticsRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const res = await fetch("/api/analytics?limit=30");
-        const data = await res.json();
-        if (data.success) {
-          // format historical items
-          const formatted = data.history.map((h, i) => {
-            const date = new Date(h.createdAt);
-            return {
-              time: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-              Count: h.totalPeople,
-              Risk: Math.round(h.riskScore * 100),
-              Unique: h.uniquePeople,
-              maleCount: h.maleCount,
-              femaleCount: h.femaleCount,
-              unknownGender: h.unknownGender,
-              key: h.id || i
-            };
-          });
-          setHistoryData(formatted);
-        }
-      } catch (err) {
-        console.error("Failed to load historical analytics:", err);
-      }
-    };
-
-    fetchHistory();
-    // Refresh history statistics every 8 seconds
-    const interval = setInterval(fetchHistory, 8000);
-    return () => clearInterval(interval);
+    fetch("/api/analytics")
+      .then(r => r.json())
+      .then(data => { setHistory(data.analytics || []); setLoading(false); })
+      .catch(() => setLoading(false));
   }, []);
 
-  // Format demographic data for Pie Chart
-  const demographicsData = useMemo(() => {
-    const total = summary.maleCount + summary.femaleCount + summary.unknownGender || 1;
-    return [
-      { name: "Male", value: summary.maleCount, percentage: ((summary.maleCount / total) * 100).toFixed(0), color: "#00b4d8" },
-      { name: "Female", value: summary.femaleCount, percentage: ((summary.femaleCount / total) * 100).toFixed(0), color: "#ff007f" },
-      { name: "Unknown", value: summary.unknownGender, percentage: ((summary.unknownGender / total) * 100).toFixed(0), color: "#9d4edd" }
-    ];
-  }, [summary]);
+  const analyticsValues = Object.values(socketAnalytics || {});
+  const latest = analyticsValues[0] as any;
+  const totalMale = history.reduce((s, r) => s + r.maleCount, 0);
+  const totalFemale = history.reduce((s, r) => s + r.femaleCount, 0);
+  const totalPeople = history.reduce((s, r) => s + r.totalPeople, 0);
 
   return (
-    <div className="space-y-8 flex-1">
+    <div className="p-6 space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="gov-header-card">
         <div>
-          <h2 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
-            AI Crowd Behavior Analytics
-            <BarChart3 className="w-8 h-8 text-neonPurple" />
-          </h2>
-          <p className="text-gray-400 mt-1">
-            Deep demographic insights, unique pedestrian tracking metrics, and density trends.
-          </p>
+          <span className="gov-header-subtitle">AI ANALYTICS ENGINE</span>
+          <h1 className="gov-header-title">Crowd Analytics & Demographics</h1>
         </div>
-        
-        {/* Actions bar */}
-        <div className="flex items-center gap-3">
-          <select 
-            value={selectedRange} 
-            onChange={(e) => setSelectedRange(e.target.value)}
-            className="bg-darkBg border border-glassBorder rounded-xl px-4 py-2.5 text-xs text-gray-300 font-medium focus:outline-none focus:border-neonPurple cursor-pointer"
-          >
-            <option value="live">Live Stream (Real-Time)</option>
-            <option value="1h">Last 1 Hour</option>
-            <option value="24h">Last 24 Hours</option>
-            <option value="7d">Last 7 Days</option>
-          </select>
-
-          <button 
-            onClick={() => alert("Telemetry analytics exported successfully in CSV format.")}
-            className="flex items-center gap-2 bg-gradient-to-r from-neonPurple to-neonBlue text-white font-extrabold tracking-widest text-xs font-mono uppercase px-4 py-2.5 rounded-xl shadow-neonGlow hover:shadow-glow transition-all duration-300"
-          >
-            <Download className="w-3.5 h-3.5" />
-            Export Data
-          </button>
-        </div>
+        <button
+          onClick={() => { setLoading(true); fetch("/api/analytics").then(r => r.json()).then(d => { setHistory(d.analytics || []); setLoading(false); }).catch(() => setLoading(false)); }}
+          className="flex items-center gap-2 text-xs font-semibold text-[#0D9488] hover:underline"
+        >
+          <RefreshCw style={{ width: 13, height: 13 }} /> Refresh
+        </button>
       </div>
 
-      {/* Grid overview */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Interactive Density Timeline Area Chart */}
-        <div className="glassmorphism rounded-2xl p-6 lg:col-span-2 border border-glassBorder flex flex-col h-[400px]">
-          <h3 className="font-extrabold text-white tracking-wide uppercase text-sm mb-6 flex items-center gap-2">
-            Historical Crowd Surge & Footfall timeline
-            <Clock className="w-4 h-4 text-neonBlue animate-pulse" />
-          </h3>
-          <div className="flex-1 w-full min-h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={historyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorUnique" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#9d4edd" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#9d4edd" stopOpacity={0.0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(157, 78, 221, 0.05)" />
-                <XAxis dataKey="time" stroke="#6b7280" fontSize={10} tickLine={false} />
-                <YAxis stroke="#6b7280" fontSize={10} tickLine={false} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "rgba(18, 10, 36, 0.95)",
-                    border: "1px solid rgba(157, 78, 221, 0.3)",
-                    borderRadius: "12px",
-                    fontSize: "12px"
-                  }}
-                />
-                <Area type="monotone" dataKey="Count" stroke="#00b4d8" strokeWidth={2} fillOpacity={0} />
-                <Area type="monotone" dataKey="Unique" stroke="#9d4edd" strokeWidth={2} fillOpacity={1} fill="url(#colorUnique)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Demographics Pie Breakdown */}
-        <div className="glassmorphism rounded-2xl p-6 border border-glassBorder flex flex-col h-[400px]">
-          <h3 className="font-extrabold text-white tracking-wide uppercase text-sm mb-6">
-            Pedestrian Demographics Summary
-          </h3>
-          
-          <div className="flex-1 flex items-center justify-center relative">
-            <div className="absolute flex flex-col items-center justify-center text-center">
-              <span className="text-[10px] text-gray-500 font-mono tracking-widest uppercase">TRACKED</span>
-              <span className="text-3xl font-extrabold text-white font-mono mt-0.5">
-                {summary.maleCount + summary.femaleCount + summary.unknownGender}
-              </span>
-              <span className="text-[9px] text-neonBlue font-semibold font-mono mt-0.5">PEOPLE</span>
-            </div>
-
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie
-                  data={demographicsData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={65}
-                  outerRadius={85}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {demographicsData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "rgba(18, 10, 36, 0.9)",
-                    border: "1px solid rgba(157, 78, 221, 0.3)",
-                    borderRadius: "12px",
-                    fontSize: "12px"
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="space-y-2 mt-4">
-            {demographicsData.map((item) => (
-              <div key={item.name} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
-                <div className="flex items-center gap-3">
-                  <span className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span className="text-xs font-semibold text-gray-300">{item.name}</span>
-                </div>
-                <span className="text-xs font-bold text-white font-mono">
-                  {item.percentage}% ({item.value})
-                </span>
+      {/* Live telemetry cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: "Live People", value: latest?.totalPeople ?? 0, icon: Users, color: "#0B6B53" },
+          { label: "Unique Persons", value: latest?.uniquePeople ?? 0, icon: BarChart2, color: "#0D9488" },
+          { label: "Risk Score", value: `${((latest?.riskScore ?? 0) * 100).toFixed(0)}%`, icon: TrendingUp, color: "#D97706" },
+          { label: "Total Sessions", value: history.length, icon: BarChart2, color: "#475569" },
+        ].map(card => {
+          const Icon = card.icon;
+          return (
+            <div key={card.label} className="dashboard-card flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: `${card.color}14` }}>
+                <Icon style={{ width: 18, height: 18, color: card.color }} />
               </div>
-            ))}
-          </div>
-        </div>
-
+              <div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{card.label}</p>
+                <p className="text-xl font-extrabold text-slate-900 font-mono">{card.value}</p>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Historical Logs List */}
-      <div className="glassmorphism rounded-2xl p-6 border border-glassBorder">
-        <h3 className="font-extrabold text-white tracking-wide uppercase text-sm mb-6">
-          Pedestrian Flow Logs (Database History)
-        </h3>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-glassBorder text-gray-500 uppercase tracking-widest font-mono font-bold">
-                <th className="pb-3 pl-2">Time</th>
-                <th className="pb-3">Surge Count</th>
-                <th className="pb-3">Unique Counter</th>
-                <th className="pb-3">Male / Female / Unknown</th>
-                <th className="pb-3 text-right pr-2">Surge Risk Index</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5 text-gray-300">
-              {historyData.map((row, idx) => (
-                <tr key={row.key || idx} className="hover:bg-white/5 transition-colors">
-                  <td className="py-3 pl-2 font-mono">{row.time}</td>
-                  <td className="py-3 font-semibold text-white font-mono">{row.Count}</td>
-                  <td className="py-3 text-neonBlue font-mono">{row.Unique}</td>
-                  <td className="py-3 font-mono">
-                    {row.maleCount}m / {row.femaleCount}f / {row.unknownGender}u
-                  </td>
-                  <td className="py-3 text-right pr-2 font-semibold font-mono">
-                    <span className={row.Risk > 60 ? "text-neonPink" : row.Risk > 40 ? "text-amber-400" : "text-green-400"}>
-                      {row.Risk}%
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              {historyData.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="py-8 text-center text-gray-500">
-                    No pedestrian telemetry recorded in database yet.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      {/* Demographics summary */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="dashboard-card text-center">
+          <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-3">
+            <Users style={{ width: 24, height: 24, color: "#3B82F6" }} />
+          </div>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Male Entries</p>
+          <p className="text-3xl font-black text-blue-600 font-mono">{totalMale.toLocaleString()}</p>
         </div>
+        <div className="dashboard-card text-center">
+          <div className="w-14 h-14 rounded-2xl bg-pink-50 flex items-center justify-center mx-auto mb-3">
+            <Users style={{ width: 24, height: 24, color: "#EC4899" }} />
+          </div>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Female Entries</p>
+          <p className="text-3xl font-black text-pink-500 font-mono">{totalFemale.toLocaleString()}</p>
+        </div>
+        <div className="dashboard-card text-center">
+          <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
+            <Users style={{ width: 24, height: 24, color: "#64748B" }} />
+          </div>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Logged</p>
+          <p className="text-3xl font-black text-slate-700 font-mono">{totalPeople.toLocaleString()}</p>
+        </div>
+      </div>
+
+      {/* History table */}
+      <div className="dashboard-card p-0 overflow-hidden">
+        <div className="px-5 py-4" style={{ borderBottom: "1px solid #F1F5F9" }}>
+          <h3 className="card-heading">Analytics History (from YOLO AI)</h3>
+        </div>
+        {loading ? (
+          <div className="py-12 text-center text-slate-400 text-sm">Loading analytics...</div>
+        ) : history.length === 0 ? (
+          <div className="py-12 text-center text-slate-400">
+            <p className="text-sm font-semibold">No analytics data yet</p>
+            <p className="text-xs mt-1">Start app.py to begin streaming AI telemetry.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="surveillance-cyber-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Timestamp</th>
+                  <th>Total</th>
+                  <th>Unique</th>
+                  <th>Male</th>
+                  <th>Female</th>
+                  <th>Unknown</th>
+                  <th>Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                {history.slice(0, 40).map((r, i) => (
+                  <tr key={r.id}>
+                    <td className="font-mono text-slate-400 text-xs">{i + 1}</td>
+                    <td className="font-mono text-xs text-slate-500">{new Date(r.createdAt).toLocaleString("en-IN")}</td>
+                    <td className="font-bold font-mono">{r.totalPeople}</td>
+                    <td className="font-mono">{r.uniquePeople}</td>
+                    <td className="text-blue-600 font-semibold">{r.maleCount}</td>
+                    <td className="text-pink-600 font-semibold">{r.femaleCount}</td>
+                    <td className="text-slate-400">{r.unknownGender}</td>
+                    <td>
+                      <span className={`table-risk-badge ${r.riskScore > 0.7 ? "critical" : r.riskScore > 0.4 ? "busy" : "safe"}`}>
+                        {(r.riskScore * 100).toFixed(0)}%
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

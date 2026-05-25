@@ -1,208 +1,126 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { Bell, AlertTriangle, CheckCircle, Clock, RefreshCw } from "lucide-react";
 import { useSocket } from "@/components/SocketProvider";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-  AlertTriangle, 
-  CheckCircle2, 
-  Calendar, 
-  Clock, 
-  Search, 
-  SlidersHorizontal,
-  BellRing,
-  CheckCircle,
-  FileCheck
-} from "lucide-react";
+
+interface AlertItem {
+  id: string;
+  type: string;
+  message: string;
+  location: string;
+  timestamp: string;
+  resolved: boolean;
+}
 
 export default function AlertsPage() {
-  const { alerts, resolveAlert } = useSocket();
-  const [historyAlerts, setHistoryAlerts] = useState([]);
-  const [showResolved, setShowResolved] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-
-  // Load resolved alerts from database for archive view
-  const fetchAlertHistory = async () => {
-    try {
-      const res = await fetch(`/api/alerts?resolved=${showResolved}`);
-      const data = await res.json();
-      if (data.success) {
-        setHistoryAlerts(data.alerts);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const { alerts: socketAlerts } = useSocket();
+  const [dbAlerts, setDbAlerts] = useState<AlertItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchAlertHistory();
-  }, [showResolved, alerts]); // reload when state tab toggles or new socket alerts trigger
+    fetch("/api/alerts")
+      .then(r => r.json())
+      .then(data => { setDbAlerts(data.alerts || []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
 
-  // Filter alerts by search queries
-  const filteredAlerts = historyAlerts.filter(a => {
-    const term = searchTerm.toLowerCase();
-    return (
-      a.message.toLowerCase().includes(term) ||
-      a.cameraId.toLowerCase().includes(term) ||
-      a.severity.toLowerCase().includes(term)
-    );
-  });
+  const allAlerts = [...socketAlerts, ...dbAlerts];
+  const activeCount = allAlerts.filter(a => !a.resolved).length;
+  const resolvedCount = allAlerts.filter(a => a.resolved).length;
+
+  const handleResolve = (id: string) => {
+    setDbAlerts(prev => prev.map(a => a.id === id ? { ...a, resolved: true } : a));
+  };
 
   return (
-    <div className="space-y-8 flex-1">
+    <div className="p-6 space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="gov-header-card">
         <div>
-          <h2 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
-            Critical Incident Logs
-            <AlertTriangle className="w-8 h-8 text-neonPink animate-pulse" />
-          </h2>
-          <p className="text-gray-400 mt-1">
-            Review active AI-triggered threshold violations, crowd surges, and hardware warnings.
-          </p>
+          <span className="gov-header-subtitle">NEURAL PREDICTION CONSOLE</span>
+          <h1 className="gov-header-title">Active AI Incident Vectoring & Recommendations</h1>
         </div>
-
-        {/* Tab triggers */}
-        <div className="flex items-center gap-3 bg-white/5 border border-white/5 p-1.5 rounded-xl">
-          <button
-            onClick={() => setShowResolved(false)}
-            className={`px-4 py-2 text-xs font-extrabold tracking-widest font-mono uppercase rounded-lg transition-all duration-300 ${
-              !showResolved
-                ? "bg-neonPink/25 text-neonPink border border-neonPink/40 shadow-neonGlow"
-                : "text-gray-400 hover:text-white"
-            }`}
-          >
-            Active ({alerts.length})
-          </button>
-          <button
-            onClick={() => setShowResolved(true)}
-            className={`px-4 py-2 text-xs font-extrabold tracking-widest font-mono uppercase rounded-lg transition-all duration-300 ${
-              showResolved
-                ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                : "text-gray-400 hover:text-white"
-            }`}
-          >
-            Resolved Archive
-          </button>
-        </div>
+        <button
+          onClick={() => { setLoading(true); fetch("/api/alerts").then(r => r.json()).then(d => { setDbAlerts(d.alerts || []); setLoading(false); }).catch(() => setLoading(false)); }}
+          className="flex items-center gap-2 text-xs font-semibold text-[#0D9488] hover:underline"
+        >
+          <RefreshCw style={{ width: 13, height: 13 }} /> Refresh
+        </button>
       </div>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="glassmorphism p-5 rounded-2xl border border-glassBorder">
-          <span className="text-[10px] text-gray-500 font-mono tracking-wider block">UNRESOLVED ALERTS</span>
-          <span className="text-3xl font-extrabold mt-1 block font-mono text-neonPink animate-pulse">
-            {alerts.length}
-          </span>
-        </div>
-        <div className="glassmorphism p-5 rounded-2xl border border-glassBorder">
-          <span className="text-[10px] text-gray-500 font-mono tracking-wider block">CRITICAL EVENTS TODAY</span>
-          <span className="text-3xl font-extrabold mt-1 block font-mono text-white">
-            {historyAlerts.filter(a => a.severity === "critical").length}
-          </span>
-        </div>
-        <div className="glassmorphism p-5 rounded-2xl border border-glassBorder">
-          <span className="text-[10px] text-gray-500 font-mono tracking-wider block">SYSTEM ACCURACY RATE</span>
-          <span className="text-3xl font-extrabold mt-1 block font-mono text-neonBlue">
-            99.2%
-          </span>
-        </div>
+      {/* Summary */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {[
+          { label: "Total Alerts", value: allAlerts.length, icon: Bell, color: "#0B6B53" },
+          { label: "Active Incidents", value: activeCount, icon: AlertTriangle, color: "#DC2626" },
+          { label: "Resolved Today", value: resolvedCount, icon: CheckCircle, color: "#059669" },
+        ].map(card => {
+          const Icon = card.icon;
+          return (
+            <div key={card.label} className="dashboard-card flex items-center gap-4">
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: `${card.color}14` }}>
+                <Icon style={{ width: 20, height: 20, color: card.color }} />
+              </div>
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{card.label}</p>
+                <p className="text-2xl font-extrabold text-slate-900 font-mono">{card.value}</p>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Main filter list */}
-      <div className="glassmorphism rounded-2xl p-6 border border-glassBorder space-y-6">
-        {/* Filters control */}
-        <div className="flex items-center gap-4 bg-darkBg/50 border border-glassBorder p-3 rounded-xl">
-          <Search className="w-4 h-4 text-gray-500 pl-1" />
-          <input
-            type="text"
-            placeholder="Search incidents by camera, category, severity, keywords..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-transparent border-none text-white text-xs w-full focus:outline-none placeholder-gray-500"
-          />
-        </div>
-
-        {/* List items */}
-        <div className="space-y-4">
-          <AnimatePresence mode="popLayout">
-            {filteredAlerts.map((alert) => {
-              const isCrit = alert.severity === "critical";
-              
+      {/* Alerts list */}
+      <div className="dashboard-card">
+        <h3 className="card-heading mb-4">Incident Log</h3>
+        {loading ? (
+          <div className="py-12 text-center text-slate-400 text-sm">Loading alerts...</div>
+        ) : allAlerts.length === 0 ? (
+          <div className="py-12 flex flex-col items-center gap-3 text-slate-400">
+            <CheckCircle style={{ width: 40, height: 40, opacity: 0.3 }} />
+            <p className="font-semibold">No active alerts</p>
+            <p className="text-xs">All ghat sectors are operating within normal parameters.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {allAlerts.map((alert) => {
+              const isHigh = alert.type === "CRITICAL" || alert.type === "stampede_risk";
+              const cls = alert.resolved ? "safe" : isHigh ? "critical" : "busy";
               return (
-                <motion.div
-                  layout
-                  key={alert.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className={`p-5 rounded-xl border flex items-center justify-between gap-6 transition-all duration-300 ${
-                    alert.resolved
-                      ? "bg-green-500/5 border-green-500/10 text-gray-400"
-                      : isCrit
-                      ? "bg-neonPink/10 border-neonPink/25 shadow-neonGlow/10"
-                      : "bg-amber-500/10 border-amber-500/25"
-                  }`}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="mt-1">
-                      {alert.resolved ? (
-                        <CheckCircle2 className="w-5 h-5 text-green-500" />
-                      ) : (
-                        <AlertTriangle className={`w-5 h-5 ${isCrit ? "text-neonPink animate-bounce" : "text-amber-400"}`} />
-                      )}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-3">
-                        <span className={`px-2.5 py-0.5 rounded-[6px] text-[9px] font-extrabold font-mono border uppercase ${
-                          alert.resolved 
-                            ? "bg-green-500/10 border-green-500/20 text-green-400" 
-                            : isCrit 
-                            ? "bg-neonPink/20 border-neonPink/30 text-neonPink" 
-                            : "bg-amber-500/20 border-amber-500/30 text-amber-400"
-                        }`}>
-                          {alert.severity}
-                        </span>
-                        <span className="text-[10px] text-gray-500 font-mono">
-                          NODE: {alert.cameraId}
-                        </span>
+                <div key={alert.id} className={`alert-queue-item ${cls}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        {!alert.resolved && <AlertTriangle style={{ width: 14, height: 14, color: isHigh ? "#DC2626" : "#EA580C" }} />}
+                        {alert.resolved && <CheckCircle style={{ width: 14, height: 14, color: "#059669" }} />}
+                        <span className="text-sm font-bold text-slate-800">{alert.location || "Unknown Location"}</span>
+                        <span className={`table-risk-badge ${cls}`}>{alert.type}</span>
                       </div>
-                      <p className="text-white text-sm font-semibold tracking-wide mt-2 leading-relaxed">
-                        {alert.message}
-                      </p>
-                      <div className="flex items-center gap-4 text-[10px] text-gray-500 mt-2 font-mono">
-                        <span className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5" />
-                          {new Date(alert.timestamp).toLocaleDateString()}
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5" />
-                          {new Date(alert.timestamp).toLocaleTimeString()}
-                        </span>
+                      <p className="text-xs text-slate-500 font-medium">{alert.message}</p>
+                      <div className="flex items-center gap-1 mt-1.5 text-[10px] text-slate-400 font-mono">
+                        <Clock style={{ width: 10, height: 10 }} />
+                        {new Date(alert.timestamp).toLocaleString("en-IN")}
                       </div>
                     </div>
+                    {!alert.resolved && (
+                      <button
+                        onClick={() => handleResolve(alert.id)}
+                        className="flex-shrink-0 px-3 py-1.5 text-xs font-bold text-white rounded-lg transition-all hover:shadow-md"
+                        style={{ background: "#0B6B53" }}
+                      >
+                        Resolve
+                      </button>
+                    )}
+                    {alert.resolved && (
+                      <span className="flex-shrink-0 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg">RESOLVED</span>
+                    )}
                   </div>
-
-                  {!alert.resolved && (
-                    <button
-                      onClick={() => resolveAlert(alert.id)}
-                      className="px-4 py-2 text-xs font-extrabold tracking-widest font-mono uppercase bg-white/5 hover:bg-white/10 hover:text-white border border-white/10 rounded-xl transition-colors shrink-0"
-                    >
-                      Resolve Incident
-                    </button>
-                  )}
-                </motion.div>
+                </div>
               );
             })}
-            {filteredAlerts.length === 0 && (
-              <div className="py-12 text-center flex flex-col items-center justify-center">
-                <FileCheck className="w-12 h-12 text-gray-700 animate-pulse" />
-                <p className="text-gray-400 font-bold mt-4">No Incidents Found</p>
-                <p className="text-gray-500 text-xs mt-2">All filtered records have been checked and resolved.</p>
-              </div>
-            )}
-          </AnimatePresence>
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
