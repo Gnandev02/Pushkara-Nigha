@@ -10,11 +10,6 @@ import {
   Users,
   LogOut,
   ChevronLeft,
-  Cpu,
-  Video,
-  Settings,
-  Bell,
-  UploadCloud,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -22,13 +17,6 @@ const NAV_ITEMS = [
   { name: "Monitoring", href: "/monitoring", icon: Activity },
   { name: "Reporting", href: "/reporting", icon: FileText },
   { name: "User Management", href: "/users", icon: Users },
-];
-
-const BOTTOM_ACTIONS = [
-  { label: "Video analytics demo", href: "/upload" },
-  { label: "Citizen app", href: "#" },
-  { label: "Control center", href: "#" },
-  { label: "Response desk", href: "#" },
 ];
 
 export default function Sidebar() {
@@ -120,56 +108,7 @@ export default function Sidebar() {
           );
         })}
 
-        {/* Divider */}
-        <div className="my-3 border-t border-white/5" />
-
-        {/* Extra pages */}
-        {[
-          { name: "AI Alerts", href: "/alerts", icon: Bell },
-          { name: "Upload Video", href: "/upload", icon: UploadCloud },
-          { name: "Settings", href: "/settings", icon: Settings },
-        ].map((item) => {
-          const Icon = item.icon;
-          const isActive = pathname.startsWith(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              title={collapsed ? item.name : undefined}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${
-                collapsed ? "justify-center" : ""
-              } ${
-                isActive
-                  ? "sidebar-nav-active text-white font-semibold"
-                  : "text-slate-500 hover:text-slate-300 hover:bg-white/5 font-medium"
-              }`}
-            >
-              <Icon style={{ width: 16, height: 16 }} />
-              {!collapsed && (
-                <span className="text-xs tracking-wide truncate">
-                  {item.name}
-                </span>
-              )}
-            </Link>
-          );
-        })}
       </nav>
-
-      {/* Bottom action buttons */}
-      {!collapsed && (
-        <div className="p-3 space-y-1" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-          {BOTTOM_ACTIONS.map((action) => (
-            <Link
-              key={action.label}
-              href={action.href}
-              className="block w-full text-left px-3 py-2 text-[11px] font-semibold rounded-lg transition-all duration-150 hover:bg-white/8"
-              style={{ color: "#64748B" }}
-            >
-              {action.label}
-            </Link>
-          ))}
-        </div>
-      )}
 
       {/* Sign Out */}
       <div className="p-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
