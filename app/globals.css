@@ -447,22 +447,22 @@
   cursor: pointer;
 }
 .heatmap-block:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-.heatmap-block.safe { background: #10B981; border: 1px solid #059669; box-shadow: 0 4px 6px rgba(16,185,129,0.3); }
-.heatmap-block.moderate { background: #F59E0B; border: 1px solid #D97706; box-shadow: 0 4px 6px rgba(245,158,11,0.3); }
-.heatmap-block.busy { background: #F97316; border: 1px solid #EA580C; box-shadow: 0 4px 6px rgba(249,115,22,0.3); }
-.heatmap-block.critical { background: #EF4444; border: 1px solid #DC2626; box-shadow: 0 4px 6px rgba(239,68,68,0.3); }
-.heatmap-block span, .heatmap-block .heatmap-block-name, .heatmap-block .heatmap-block-pct { color: #FFFFFF !important; }
-.heatmap-block-name { font-size: 11px; font-weight: 700; }
+.heatmap-block.safe { background: #FFFFFF; border: 1px solid #E2E8F0; border-left: 4px solid #10B981; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.heatmap-block.moderate { background: #FFFFFF; border: 1px solid #E2E8F0; border-left: 4px solid #F59E0B; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.heatmap-block.busy { background: #FFFFFF; border: 1px solid #E2E8F0; border-left: 4px solid #F97316; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.heatmap-block.critical { background: #FFFFFF; border: 1px solid #E2E8F0; border-left: 4px solid #EF4444; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.heatmap-block span, .heatmap-block .heatmap-block-name { color: #475569 !important; }
+.heatmap-block-name { font-size: 11px; font-weight: 600; }
 .heatmap-block-pct { font-size: 16px; font-weight: 700; font-family: 'Inter', monospace; }
-.heatmap-pulse-dot {
-  position: absolute;
-  top: 8px; right: 8px;
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: #10B981;
-  animation: blink 1.2s ease-in-out infinite;
-}
-.heatmap-block .heatmap-pulse-dot { background: #FFFFFF; box-shadow: 0 0 8px rgba(255,255,255,0.8); }
+.heatmap-block.safe .heatmap-block-pct { color: #10B981 !important; }
+.heatmap-block.moderate .heatmap-block-pct { color: #F59E0B !important; }
+.heatmap-block.busy .heatmap-block-pct { color: #F97316 !important; }
+.heatmap-block.critical .heatmap-block-pct { color: #EF4444 !important; }
+.heatmap-pulse-dot { position: absolute; top: 8px; right: 8px; width: 6px; height: 6px; border-radius: 50%; animation: blink 1.2s ease-in-out infinite; }
+.heatmap-block.safe .heatmap-pulse-dot { background: #10B981; box-shadow: 0 0 8px rgba(16,185,129,0.4); }
+.heatmap-block.moderate .heatmap-pulse-dot { background: #F59E0B; box-shadow: 0 0 8px rgba(245,158,11,0.4); }
+.heatmap-block.busy .heatmap-pulse-dot { background: #F97316; box-shadow: 0 0 8px rgba(249,115,22,0.4); }
+.heatmap-block.critical .heatmap-pulse-dot { background: #EF4444; box-shadow: 0 0 8px rgba(239,68,68,0.4); }
 
 /* ── Alert queue items ── */
 .alert-queue-item {

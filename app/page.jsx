@@ -19,8 +19,8 @@ function getRiskClass(risk) {
 }
 function getHeatmapClass(density) {
   if (density < 30) return "safe";
-  if (density <= 65) return "moderate";
-  if (density <= 85) return "busy";
+  if (density < 55) return "moderate";
+  if (density < 70) return "busy";
   return "critical";
 }
 
