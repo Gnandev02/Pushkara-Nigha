@@ -167,11 +167,11 @@ export default function OverviewPage() {
       </section>
 
       {/* ROW 1: Google Maps (Left) and Priority/System Status (Right) */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 items-stretch">
         
         {/* Left: Google Maps Live Ghat Visualization */}
-        <div className="xl:col-span-2 space-y-4">
-          <div className="dashboard-card p-0 overflow-hidden relative" style={{ height: "550px", display: "flex", flexDirection: "column" }}>
+        <div className="xl:col-span-2 flex flex-col">
+          <div className="dashboard-card p-0 overflow-hidden relative flex-1 flex flex-col min-h-[550px]">
             <div className="flex items-center justify-between px-5 py-4 bg-white z-10 relative" style={{ borderBottom: "1px solid #F1F5F9" }}>
               <div className="flex items-center gap-2">
                 <span className="relative flex h-2.5 w-2.5">

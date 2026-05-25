@@ -39,7 +39,7 @@ function RadialRing({ pct }) {
 }
 
 // ── CCTV Panel ───────────────────────────────────────────────
-function CCTVPanel({ type, camId, title, state, ghatId, onChange }) {
+function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload }) {
   const fields = type === "in"
     ? ["inMen", "inWomen", "inOthers"]
     : ["outMen", "outWomen", "outOthers"];
@@ -60,6 +60,20 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange }) {
         <div className="flex-1" style={{ minHeight: 40 }} />
         <div className="text-[8px] font-mono text-[#2DD4BF]/50 select-none">
           AI DETECT: ON | REC
+        </div>
+        
+        {/* Hover Upload Overlay */}
+        <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 backdrop-blur-sm">
+          <label className="cursor-pointer bg-[#0D9488] hover:bg-[#0F766E] text-white px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2 shadow-lg border border-[#0D9488]/50">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            UPLOAD FEED
+            <input type="file" className="hidden" accept="video/*" onChange={(e) => {
+              if (e.target.files && e.target.files.length > 0 && onUpload) {
+                onUpload(e.target.files[0], ghatId, camId, type);
+              }
+              e.target.value = ''; // Reset input
+            }} />
+          </label>
         </div>
       </div>
       <div className="cctv-inputs-panel">
@@ -96,7 +110,7 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange }) {
 }
 
 // ── Ghat Monitor Card ────────────────────────────────────────
-function GhatCard({ ghat, state, onChange }) {
+function GhatCard({ ghat, state, onChange, onUpload }) {
   const totalIn = state.inMen + state.inWomen + state.inOthers;
   const totalOut = state.outMen + state.outWomen + state.outOthers;
   const crowd = Math.max(0, totalIn - totalOut);
@@ -146,8 +160,8 @@ function GhatCard({ ghat, state, onChange }) {
 
       {/* CCTV Grid */}
       <div className="monitor-cctv-grid">
-        <CCTVPanel type="in" camId={ghat.camInId} title="Entry counters" state={state} ghatId={ghat.id} onChange={onChange} />
-        <CCTVPanel type="out" camId={ghat.camOutId} title="Exit counters" state={state} ghatId={ghat.id} onChange={onChange} />
+        <CCTVPanel type="in" camId={ghat.camInId} title="Entry counters" state={state} ghatId={ghat.id} onChange={onChange} onUpload={onUpload} />
+        <CCTVPanel type="out" camId={ghat.camOutId} title="Exit counters" state={state} ghatId={ghat.id} onChange={onChange} onUpload={onUpload} />
       </div>
 
       {/* Flow Telemetry */}
@@ -195,7 +209,7 @@ function GhatCard({ ghat, state, onChange }) {
 }
 
 // ── District Group ────────────────────────────────────────────
-function DistrictGroup({ district, ghats, states, onChange, collapsed, onToggle, searchQuery }) {
+function DistrictGroup({ district, ghats, states, onChange, onUpload, collapsed, onToggle, searchQuery }) {
   const visibleGhats = ghats.filter(g =>
     !searchQuery || g.name.toLowerCase().includes(searchQuery) || g.districtFull.toLowerCase().includes(searchQuery)
   );
@@ -236,7 +250,7 @@ function DistrictGroup({ district, ghats, states, onChange, collapsed, onToggle,
       </div>
       <div className="monitoring-grid grid grid-cols-1 xl:grid-cols-2 gap-5">
         {visibleGhats.map(g => (
-          <GhatCard key={g.id} ghat={g} state={states[g.id]} onChange={onChange} />
+          <GhatCard key={g.id} ghat={g} state={states[g.id]} onChange={onChange} onUpload={onUpload} />
         ))}
       </div>
     </section>
@@ -254,6 +268,31 @@ export default function MonitoringPage() {
 
   const handleChange = useCallback((ghatId, field, value) => {
     setStates(prev => ({ ...prev, [ghatId]: { ...prev[ghatId], [field]: value } }));
+  }, []);
+
+  const handleUpload = useCallback(async (file, ghatId, camId, type) => {
+    // We send this to the FastAPI backend running on port 8000
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("camera_id", camId);
+    formData.append("ghat_id", ghatId);
+    formData.append("type", type);
+    
+    // Optimistic UI feedback could go here
+    try {
+      // Endpoint from the python app
+      const response = await fetch("http://localhost:8000/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (response.ok) {
+        console.log("Upload initiated for", camId);
+      } else {
+        console.error("Upload failed", response.status);
+      }
+    } catch (err) {
+      console.error("Upload error", err);
+    }
   }, []);
 
   const resetFilters = () => {
@@ -403,6 +442,7 @@ export default function MonitoringPage() {
             ghats={grouped[district] || []}
             states={states}
             onChange={handleChange}
+            onUpload={handleUpload}
             collapsed={!!collapsed[district]}
             onToggle={() => setCollapsed(prev => ({ ...prev, [district]: !prev[district] }))}
             searchQuery={search}
