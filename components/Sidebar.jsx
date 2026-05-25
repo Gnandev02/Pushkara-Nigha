@@ -101,17 +101,9 @@ export default function Sidebar() {
                 collapsed ? "justify-center" : ""
               } ${
                 isActive
-                  ? "text-white"
-                  : "text-slate-400 hover:text-white hover:bg-white/5"
+                  ? "sidebar-nav-active text-white font-semibold"
+                  : "text-slate-400 hover:text-white hover:bg-white/5 font-medium"
               }`}
-              style={
-                isActive
-                  ? {
-                      background: "rgba(13,148,136,0.15)",
-                      borderLeft: "3px solid #0D9488",
-                    }
-                  : {}
-              }
             >
               <Icon
                 className={`flex-shrink-0 transition-transform duration-200 group-hover:scale-105 ${
@@ -120,7 +112,7 @@ export default function Sidebar() {
                 style={{ width: 18, height: 18 }}
               />
               {!collapsed && (
-                <span className="text-sm font-semibold tracking-wide truncate">
+                <span className="text-sm tracking-wide truncate">
                   {item.name}
                 </span>
               )}
@@ -148,13 +140,13 @@ export default function Sidebar() {
                 collapsed ? "justify-center" : ""
               } ${
                 isActive
-                  ? "text-white"
-                  : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
+                  ? "sidebar-nav-active text-white font-semibold"
+                  : "text-slate-500 hover:text-slate-300 hover:bg-white/5 font-medium"
               }`}
             >
               <Icon style={{ width: 16, height: 16 }} />
               {!collapsed && (
-                <span className="text-xs font-semibold tracking-wide truncate text-slate-500">
+                <span className="text-xs tracking-wide truncate">
                   {item.name}
                 </span>
               )}

@@ -6,22 +6,26 @@ import { MONITORED_GHATS } from "@/lib/ghats-data";
 
 // ─── Risk color mapping ──────────────────────────────────────
 function getRiskColor(risk) {
-  if (risk === "safe") return { bg: "#10B981", ring: "rgba(16,185,129,0.35)", text: "#065F46" };
-  if (risk === "moderate") return { bg: "#D97706", ring: "rgba(217,119,6,0.35)", text: "#92400E" };
-  if (risk === "busy") return { bg: "#EA580C", ring: "rgba(234,88,12,0.35)", text: "#9A3412" };
-  return { bg: "#DC2626", ring: "rgba(220,38,38,0.4)", text: "#991B1B" };
+  if (risk === "safe") return { bg: "#10B981", ring: "rgba(16,185,129,0.45)", text: "#065F46" };
+  if (risk === "moderate") return { bg: "#D97706", ring: "rgba(217,119,6,0.45)", text: "#92400E" };
+  if (risk === "busy") return { bg: "#EA580C", ring: "rgba(234,88,12,0.45)", text: "#9A3412" };
+  if (risk === "monitored" || risk === "blue" || risk === "ai") return { bg: "#2563EB", ring: "rgba(37,99,235,0.45)", text: "#1E3A8A" };
+  return { bg: "#DC2626", ring: "rgba(220,38,38,0.5)", text: "#991B1B" };
 }
 
-// ─── Professional light map style ─────────────────────────────
+// ─── Professional abstract light GIS map style ────────────────
 const MAP_STYLES = [
   { elementType: "geometry", stylers: [{ color: "#F1F5F9" }] },
-  { elementType: "labels", stylers: [{ visibility: "off" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#64748B" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#F8FAFC" }] },
   { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#CBD5E1" }, { weight: 1 }] },
+  { featureType: "administrative.province", stylers: [{ visibility: "on" }] },
   { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#F8FAFC" }] },
   { featureType: "poi", stylers: [{ visibility: "off" }] },
   { featureType: "road", stylers: [{ visibility: "off" }] },
   { featureType: "transit", stylers: [{ visibility: "off" }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#E0F2FE" }] }
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#BAE6FD" }] },
+  { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#0369A1" }] }
 ];
 
 const MAP_CENTER = { lat: 17.05, lng: 81.30 };

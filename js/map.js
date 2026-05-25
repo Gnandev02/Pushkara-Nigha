@@ -7,13 +7,16 @@ let activeInfoWindow = null;
 
 const MAP_THEME_STYLE = [
     { elementType: "geometry", stylers: [{ color: "#F1F5F9" }] },
-    { elementType: "labels", stylers: [{ visibility: "off" }] },
+    { elementType: "labels.text.fill", stylers: [{ color: "#64748B" }] },
+    { elementType: "labels.text.stroke", stylers: [{ color: "#F8FAFC" }] },
     { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#CBD5E1" }, { weight: 1 }] },
+    { featureType: "administrative.province", stylers: [{ visibility: "on" }] },
     { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#F8FAFC" }] },
     { featureType: "poi", stylers: [{ visibility: "off" }] },
     { featureType: "road", stylers: [{ visibility: "off" }] },
     { featureType: "transit", stylers: [{ visibility: "off" }] },
-    { featureType: "water", elementType: "geometry", stylers: [{ color: "#E0F2FE" }] }
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#BAE6FD" }] },
+    { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#0369A1" }] }
 ];
 
 
@@ -72,12 +75,12 @@ function renderGoogleMapMarkers() {
         const coords = GHAT_GEOLOCATIONS[ghat.id];
         if (!coords) return;
 
-        
-        
-        let markerColor = "#10B981"; 
-        if (ghat.risk === "busy") markerColor = "#EA580C"; 
-        else if (ghat.risk === "moderate") markerColor = "#3B82F6"; 
-        else if (ghat.risk === "critical") markerColor = "#DC2626"; 
+        let markerColor = "#2563EB"; // Blue: AI monitored
+        if (ghat.risk === "safe") markerColor = "#10B981"; // Green
+        else if (ghat.risk === "moderate") markerColor = "#D97706"; // Orange (Moderate)
+        else if (ghat.risk === "busy") markerColor = "#EA580C"; // Saturated Orange (Busy)
+        else if (ghat.risk === "critical" || ghat.risk === "high") markerColor = "#DC2626"; // Red
+
 
         
         const markerIcon = {
