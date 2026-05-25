@@ -280,29 +280,29 @@
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
 }
 .ghat-monitor-card.zone-open { 
-  border: 1.5px solid rgba(16, 185, 129, 0.35) !important;
-  border-left: 5px solid #10B981 !important; 
-  background-color: rgba(16, 185, 129, 0.02) !important;
+  border: 2px solid rgba(16, 185, 129, 0.45) !important;
+  border-left: 6px solid #10B981 !important; 
+  background-color: rgba(16, 185, 129, 0.06) !important;
 }
 .ghat-monitor-card.zone-open:hover {
-  box-shadow: 0 0 16px rgba(16, 185, 129, 0.15);
+  box-shadow: 0 0 18px rgba(16, 185, 129, 0.25);
 }
 .ghat-monitor-card.zone-crowded { 
-  border: 1.5px solid rgba(217, 119, 6, 0.35) !important;
-  border-left: 5px solid #D97706 !important; 
-  background-color: rgba(217, 119, 6, 0.02) !important;
+  border: 2px solid rgba(217, 119, 6, 0.45) !important;
+  border-left: 6px solid #D97706 !important; 
+  background-color: rgba(217, 119, 6, 0.06) !important;
 }
 .ghat-monitor-card.zone-crowded:hover {
-  box-shadow: 0 0 16px rgba(217, 119, 6, 0.15);
+  box-shadow: 0 0 18px rgba(217, 119, 6, 0.25);
 }
 .ghat-monitor-card.zone-highly-crowded { 
-  border: 1.5px solid rgba(220, 38, 38, 0.35) !important;
-  border-left: 5px solid #DC2626 !important; 
-  background-color: rgba(220, 38, 38, 0.02) !important;
-  box-shadow: 0 0 15px rgba(220, 38, 38, 0.08);
+  border: 2px solid rgba(220, 38, 38, 0.45) !important;
+  border-left: 6px solid #DC2626 !important; 
+  background-color: rgba(220, 38, 38, 0.06) !important;
+  box-shadow: 0 0 16px rgba(220, 38, 38, 0.12), 0 2px 6px rgba(220, 38, 38, 0.06);
 }
 .ghat-monitor-card.zone-highly-crowded:hover {
-  box-shadow: 0 0 24px rgba(220, 38, 38, 0.22), 0 4px 12px rgba(220, 38, 38, 0.1);
+  box-shadow: 0 0 28px rgba(220, 38, 38, 0.28), 0 4px 14px rgba(220, 38, 38, 0.14);
 }
 
 /* ── Occupancy Warning Banner ── */
