@@ -1,23 +1,26 @@
 import "./globals.css";
+import "../css/style.css";
+import "../css/animations.css";
+import "../css/responsive.css";
 import Sidebar from "@/components/Sidebar";
 import SocketProvider from "@/components/SocketProvider";
 
 export const metadata = {
-  title: "NeuralCrowd — Advanced AI Crowd Analytics CommandCenter",
-  description: "Real-time GPU-accelerated video telemetry and crowd management system",
+  title: "Pushkara Nigha — AI Crowd Command Center",
+  description: "Advanced crowd management and safety reporting platform",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="grid-bg min-h-screen">
+      <body data-theme="dark">
         <SocketProvider>
-          <div className="flex min-h-screen">
+          <div className="app-container">
             {/* Sidebar Navigation */}
             <Sidebar />
 
             {/* Main Application Interface */}
-            <main className="flex-1 ml-64 min-h-screen flex flex-col p-8 transition-all duration-300">
+            <main className="app-main">
               {children}
             </main>
           </div>
