@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Activity,
@@ -23,6 +23,20 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+
+  useEffect(() => {
+    setUserRole(localStorage.getItem("pushkara_user_role"));
+  }, []);
+
+  const visibleNavItems = NAV_ITEMS.filter((item) => {
+    // During hydration/SSR, default to showing everything to prevent layout shift,
+    // or you can default to safe items.
+    if (!userRole || userRole === "admin") return true;
+    
+    // Command Supervisor can only see Monitoring and Reporting
+    return item.name === "Monitoring" || item.name === "Reporting";
+  });
 
   const handleSignOut = () => {
     localStorage.removeItem("pushkara_is_auth");
@@ -74,7 +88,7 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 p-3 space-y-1 mt-2 overflow-y-auto">
-        {NAV_ITEMS.map((item) => {
+        {visibleNavItems.map((item) => {
           const Icon = item.icon;
           const isActive =
             item.href === "/"
