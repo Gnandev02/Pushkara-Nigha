@@ -1,6 +1,9 @@
+import { Inter } from "next/font/google";
 import "./globals.css";
 import SocketProvider from "@/components/SocketProvider";
 import LayoutShell from "@/components/LayoutShell";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Pushkara Nigha — AI Crowd Command Center",
@@ -11,7 +14,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="min-h-screen" style={{ background: "#F4F6F9" }}>
+      <body className={`${inter.className} min-h-screen`} style={{ background: "#F4F6F9" }}>
         <SocketProvider>
           <LayoutShell>
             {children}
