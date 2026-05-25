@@ -1,669 +1,425 @@
 "use client";
 
-import React, { useMemo, useEffect, useState } from "react";
+import React, { useMemo } from "react";
 import { useSocket } from "@/components/SocketProvider";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Users, 
+  Fingerprint, 
+  Activity, 
   Video, 
   AlertTriangle, 
-  Layers, 
   ShieldCheck, 
-  Cpu, 
-  RefreshCw,
-  Search,
+  TrendingUp,
   MapPin,
-  Activity,
-  AlertOctagon,
-  Play
+  TrendingDown
 } from "lucide-react";
-
-// The 12 Monitored Ghats baseline data matching Mock-data exactly
-const BASELINE_GHATS = [
-  {
-    id: "ghat-dowleswaram",
-    cameraId: "ghat_dowleswaram",
-    name: "Dowleswaram Ghat",
-    district: "East Godavari",
-    capacity: 8000,
-    occupancy: 4500,
-    risk: "busy",
-    camerasCount: 24,
-    coordinates: { x: 42, y: 20 },
-    inMen: 2500, inWomen: 2300, inOthers: 200,
-    outMen: 300, outWomen: 150, outOthers: 50,
-  },
-  {
-    id: "ghat-goshpada",
-    cameraId: "local_webcam", // Map local webcam simulator here
-    name: "Goshpada Ghat",
-    district: "East Godavari",
-    capacity: 6500,
-    occupancy: 2800,
-    risk: "moderate",
-    camerasCount: 18,
-    coordinates: { x: 48, y: 28 },
-    inMen: 1500, inWomen: 1600, inOthers: 100,
-    outMen: 200, outWomen: 150, outOthers: 50,
-  },
-  {
-    id: "ghat-kotipalli",
-    cameraId: "ghat_kotipalli",
-    name: "Kotipalli Ghat",
-    district: "East Godavari",
-    capacity: 5000,
-    occupancy: 1200,
-    risk: "safe",
-    camerasCount: 12,
-    coordinates: { x: 55, y: 35 },
-    inMen: 800, inWomen: 700, inOthers: 50,
-    outMen: 200, outWomen: 100, outOthers: 50,
-  },
-  {
-    id: "ghat-pushkar",
-    cameraId: "ghat_1", // Map Python app.py YOLO model here
-    name: "Pushkar Ghat",
-    district: "East Godavari",
-    capacity: 9000,
-    occupancy: 7200,
-    risk: "busy",
-    camerasCount: 36,
-    coordinates: { x: 50, y: 12 },
-    inMen: 4200, inWomen: 4000, inOthers: 300,
-    outMen: 800, outWomen: 400, outOthers: 100,
-  },
-  {
-    id: "ghat-kovvur",
-    cameraId: "ghat_kovvur",
-    name: "Kovvur Ghat",
-    district: "West Godavari",
-    capacity: 7500,
-    occupancy: 4800,
-    risk: "busy",
-    camerasCount: 22,
-    coordinates: { x: 62, y: 48 },
-    inMen: 2800, inWomen: 2600, inOthers: 150,
-    outMen: 400, outWomen: 300, outOthers: 50,
-  },
-  {
-    id: "ghat-narasapuram",
-    cameraId: "ghat_narasapuram",
-    name: "Narasapuram Ghat",
-    district: "West Godavari",
-    capacity: 6000,
-    occupancy: 1500,
-    risk: "safe",
-    camerasCount: 14,
-    coordinates: { x: 68, y: 56 },
-    inMen: 1000, inWomen: 900, inOthers: 50,
-    outMen: 250, outWomen: 150, outOthers: 50,
-  },
-  {
-    id: "ghat-pattiseema",
-    cameraId: "ghat_pattiseema",
-    name: "Pattiseema Ghat",
-    district: "West Godavari",
-    capacity: 7000,
-    occupancy: 5400,
-    risk: "busy",
-    camerasCount: 28,
-    coordinates: { x: 78, y: 72 },
-    inMen: 3200, inWomen: 3000, inOthers: 100,
-    outMen: 500, outWomen: 350, outOthers: 50,
-  },
-  {
-    id: "ghat-siddhantam",
-    cameraId: "ghat_siddhantam",
-    name: "Siddhantam Ghat",
-    district: "West Godavari",
-    capacity: 5500,
-    occupancy: 1100,
-    risk: "safe",
-    camerasCount: 10,
-    coordinates: { x: 72, y: 64 },
-    inMen: 700, inWomen: 600, inOthers: 50,
-    outMen: 150, outWomen: 80, outOthers: 20,
-  },
-  {
-    id: "ghat-bhadrachalam",
-    cameraId: "ghat_bhadrachalam",
-    name: "Bhadrachalam Main Ghat",
-    district: "Khammam",
-    capacity: 7500,
-    occupancy: 5920,
-    risk: "busy",
-    camerasCount: 34,
-    coordinates: { x: 78, y: 30 },
-    inMen: 3500, inWomen: 3200, inOthers: 150,
-    outMen: 500, outWomen: 350, outOthers: 80,
-  },
-  {
-    id: "ghat-edugurallapalli",
-    cameraId: "ghat_edugurallapalli",
-    name: "Edugurallapalli Ghat",
-    district: "Khammam",
-    capacity: 5000,
-    occupancy: 950,
-    risk: "safe",
-    camerasCount: 8,
-    coordinates: { x: 82, y: 22 },
-    inMen: 600, inWomen: 550, inOthers: 30,
-    outMen: 120, outWomen: 80, outOthers: 30,
-  },
-  {
-    id: "ghat-koonavaram",
-    cameraId: "ghat_koonavaram",
-    name: "Koonavaram Ghat",
-    district: "Khammam",
-    capacity: 6000,
-    occupancy: 2100,
-    risk: "moderate",
-    camerasCount: 16,
-    coordinates: { x: 86, y: 38 },
-    inMen: 1200, inWomen: 1100, inOthers: 100,
-    outMen: 180, outWomen: 100, outOthers: 20,
-  },
-  {
-    id: "ghat-seetharama",
-    cameraId: "ghat_seetharama",
-    name: "Seetharama Ghat",
-    district: "Khammam",
-    capacity: 7000,
-    occupancy: 5100,
-    risk: "busy",
-    camerasCount: 24,
-    coordinates: { x: 90, y: 45 },
-    inMen: 3000, inWomen: 2800, inOthers: 100,
-    outMen: 400, outWomen: 350, outOthers: 50,
-  }
-];
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  Cell
+} from "recharts";
 
 export default function Dashboard() {
   const { analytics, alerts, summary, resolveAlert } = useSocket();
-  const [syncedTime, setSyncedTime] = useState("");
 
-  // Update Synced Clock
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      let hours = now.getHours();
-      const minutes = now.getMinutes();
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      hours = hours % 12;
-      hours = hours ? hours : 12; 
-      const minutesStr = minutes < 10 ? '0' + minutes : minutes;
-      const hoursStr = hours < 10 ? '0' + hours : hours;
-      setSyncedTime(`${hoursStr}:${minutesStr} ${ampm}`);
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 10000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Map live telemetry dynamically onto the 12 ghats
-  const liveGhats = useMemo(() => {
-    return BASELINE_GHATS.map(ghat => {
-      const liveData = analytics[ghat.cameraId];
-
-      if (liveData) {
-        const occupancy = liveData.totalPeople || 0;
-        const capacity = ghat.capacity;
-        const crowdDensity = (occupancy / capacity) * 100;
-        
-        let risk = "safe";
-        if (crowdDensity > 80 || liveData.riskScore > 0.7) risk = "critical";
-        else if (crowdDensity > 60 || liveData.riskScore > 0.4) risk = "busy";
-        else if (crowdDensity > 30) risk = "moderate";
-
-        // Map live gender telemetry
-        const male = liveData.maleCount || 0;
-        const female = liveData.femaleCount || 0;
-        const unknown = liveData.unknownGender || 0;
-
-        return {
-          ...ghat,
-          occupancy,
-          crowdDensity,
-          risk,
-          inMen: male,
-          inWomen: female,
-          inOthers: unknown,
-          lastUpdated: "Just Now",
-          isLive: true
-        };
-      }
-
-      // Default baseline density calculations
-      const crowdDensity = (ghat.occupancy / ghat.capacity) * 100;
-      return {
-        ...ghat,
-        crowdDensity,
-        isLive: false,
-        lastUpdated: "3 mins ago"
-      };
-    });
+  // Convert analytics map into list for list-based widgets
+  const activeFeeds = useMemo(() => {
+    return Object.values(analytics);
   }, [analytics]);
 
-  // Aggregated dynamic stats
-  const stats = useMemo(() => {
-    const totalGhats = liveGhats.length;
-    const totalCrowd = liveGhats.reduce((sum, g) => sum + g.occupancy, 0);
-    const activeCams = liveGhats.reduce((sum, g) => sum + (g.isLive ? 1 : 0), 0);
-    const highRiskSectors = liveGhats.filter(g => g.crowdDensity > 65).length;
-    const safeZones = liveGhats.filter(g => g.crowdDensity < 30).length;
-    const activeAlertsCount = alerts.length;
+  // Compute trend metrics (simulating active flow comparison)
+  const isCrowdSurging = summary.averageRisk > 0.4;
 
-    return {
-      totalGhats,
-      totalCrowd,
-      activeCams,
-      highRiskSectors,
-      safeZones,
-      activeAlertsCount
-    };
-  }, [liveGhats, alerts]);
-
-  // Priority queue sorted by crowd density
-  const sortedPriorityGhats = useMemo(() => {
-    return [...liveGhats].sort((a, b) => b.crowdDensity - a.crowdDensity);
-  }, [liveGhats]);
-
-  // Scrolling helpers
-  const handleScrollToGhat = (id) => {
-    const row = document.getElementById(`row-${id}`);
-    if (row) {
-      row.scrollIntoView({ behavior: "smooth", block: "center" });
-      row.style.background = "rgba(13, 148, 136, 0.15)";
-      setTimeout(() => {
-        row.style.background = "";
-      }, 2000);
+  // Real-time chart data from the active feeds
+  const chartData = useMemo(() => {
+    if (activeFeeds.length === 0) {
+      return [
+        { name: "Camera 1", Count: 0, Risk: 0 },
+        { name: "Camera 2", Count: 0, Risk: 0 },
+      ];
     }
-  };
+    return activeFeeds.map(feed => ({
+      name: feed.name || `Camera ${feed.cameraId.replace('ghat_', '')}`,
+      Count: feed.totalPeople || 0,
+      Risk: Math.round((feed.riskScore || 0) * 100)
+    }));
+  }, [activeFeeds]);
+
+  // Gender demographics data
+  const genderData = useMemo(() => {
+    return [
+      { name: "Male", count: summary.maleCount, color: "#00b4d8" },
+      { name: "Female", count: summary.femaleCount, color: "#ff007f" },
+      { name: "Unknown", count: summary.unknownGender, color: "#9d4edd" }
+    ];
+  }, [summary]);
 
   return (
-    <div className="dashboard-content">
-      {/* 1. Andhra Pradesh Government Header Card */}
-      <div className="gov-header-card">
-        <div className="gov-header-left">
-          <div className="gov-header-title-container">
-            <span className="gov-header-subtitle">GOVERNMENT OF ANDHRA PRADESH</span>
-            <h1 className="gov-header-title">AI Crowd Management and Reporting Platform</h1>
+    <div className="space-y-8 flex-1">
+      {/* 1. Header Bar */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
+            Pushkara Nigha AI Crowd Command Center
+            <span className="flex h-3 w-3 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neonPurple opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-neonPurple"></span>
+            </span>
+          </h2>
+          <p className="text-gray-400 mt-1">
+            GPU-efficient crowd analytics feed & Godavari Pushkaralu monitoring
+          </p>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="px-4 py-2 rounded-xl glassmorphism border border-glassBorder text-right">
+            <p className="text-[10px] text-gray-500 font-mono tracking-widest uppercase">System Load</p>
+            <p className="text-sm font-bold text-neonBlue font-mono">0.02ms Latency</p>
           </div>
-        </div>
-        <div className="gov-header-right">
-          <div className="gov-sync-badge">
-            <span className="gov-sync-dot">●</span> Synced <span id="sync-time-value">{syncedTime}</span>
+          <div className="px-4 py-2 rounded-xl glassmorphism border border-glassBorder text-right">
+            <p className="text-[10px] text-gray-500 font-mono tracking-widest uppercase">Database Status</p>
+            <p className="text-sm font-bold text-green-400 font-mono">NEON CONNECTED</p>
           </div>
-          <button 
-            className="gov-refresh-btn refresh-btn" 
-            onClick={() => window.location.reload()}
-            title="Force Sync Telemetry"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-          </button>
-          
-          <div className="profile-pill">
-            <div className="profile-avatar-circle">OP</div>
-            <span style={{ fontSize: "0.78rem", fontWeight: 600 }}>System Operator</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. Government Info Bar */}
-      <div className="gov-info-bar">
-        <div className="gov-info-col">
-          <span className="gov-info-label">Event window</span>
-          <span className="gov-info-value font-mono">26 Jun 2027 to 7 Jul 2027 (12 days)</span>
-        </div>
-        <div className="gov-info-col">
-          <span className="gov-info-label">Operating model</span>
-          <span className="gov-info-value font-mono">ICCC led, field verified</span>
-        </div>
-        <div className="gov-info-col">
-          <span className="gov-info-label">Public output</span>
-          <span className="gov-info-value font-mono">Approved advisories only</span>
         </div>
       </div>
 
-      {/* 3. Stats KPIs Grid */}
-      <section className="overview-stats-grid">
-        <div className="overview-stat-card active-ghats">
-          <div className="stat-header">
-            <span className="stat-title">Active Ghats</span>
-            <div className="stat-icon-wrapper">
-              <Layers className="w-4 h-4" />
+      {/* 2. Top Stats Counters */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Total Crowd Counter */}
+        <motion.div 
+          whileHover={{ y: -5 }}
+          className="glassmorphism rounded-2xl p-6 relative overflow-hidden group border-l-4 border-l-neonBlue"
+        >
+          <div className="absolute right-4 top-4 text-neonBlue/15 group-hover:scale-110 transition-transform duration-300">
+            <Users className="w-16 h-16" />
+          </div>
+          <p className="text-sm font-semibold tracking-wide text-gray-400">Total Live Crowd</p>
+          <h3 className="text-4xl font-extrabold text-white mt-2 tracking-tight font-mono">
+            {summary.totalPeople}
+          </h3>
+          <div className="flex items-center gap-1.5 mt-3 text-xs text-green-400 font-medium">
+            <TrendingUp className="w-4 h-4" />
+            <span>AI Real-time Frame Count</span>
+          </div>
+        </motion.div>
+
+        {/* Unique Tracking Counter */}
+        <motion.div 
+          whileHover={{ y: -5 }}
+          className="glassmorphism rounded-2xl p-6 relative overflow-hidden group border-l-4 border-l-neonPurple"
+        >
+          <div className="absolute right-4 top-4 text-neonPurple/15 group-hover:scale-110 transition-transform duration-300">
+            <Fingerprint className="w-16 h-16" />
+          </div>
+          <p className="text-sm font-semibold tracking-wide text-gray-400">Unique Persons (Session)</p>
+          <h3 className="text-4xl font-extrabold text-white mt-2 tracking-tight font-mono">
+            {summary.uniquePeople}
+          </h3>
+          <div className="flex items-center gap-1.5 mt-3 text-xs text-neonPurple font-medium">
+            <ShieldCheck className="w-4 h-4" />
+            <span>ByteTrack Unique ID Cache</span>
+          </div>
+        </motion.div>
+
+        {/* Average Risk Index */}
+        <motion.div 
+          whileHover={{ y: -5 }}
+          className={`glassmorphism rounded-2xl p-6 relative overflow-hidden group border-l-4 transition-colors duration-300 ${
+            isCrowdSurging ? "border-l-neonPink" : "border-l-neonPurple"
+          }`}
+        >
+          <div className="absolute right-4 top-4 text-neonPink/15 group-hover:scale-110 transition-transform duration-300">
+            <Activity className="w-16 h-16" />
+          </div>
+          <p className="text-sm font-semibold tracking-wide text-gray-400">Stampede Risk Score</p>
+          <h3 className={`text-4xl font-extrabold mt-2 tracking-tight font-mono ${
+            isCrowdSurging ? "text-neonPink" : "text-white"
+          }`}>
+            {(summary.averageRisk * 100).toFixed(0)}%
+          </h3>
+          <div className={`flex items-center gap-1.5 mt-3 text-xs font-medium ${
+            isCrowdSurging ? "text-neonPink" : "text-gray-400"
+          }`}>
+            {isCrowdSurging ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+            <span>{isCrowdSurging ? "Surging Flow Vectors" : "Normal Crowd Flow State"}</span>
+          </div>
+        </motion.div>
+
+        {/* Active Grid Cameras */}
+        <motion.div 
+          whileHover={{ y: -5 }}
+          className="glassmorphism rounded-2xl p-6 relative overflow-hidden group border-l-4 border-l-neonBlue"
+        >
+          <div className="absolute right-4 top-4 text-neonBlue/15 group-hover:scale-110 transition-transform duration-300">
+            <Video className="w-16 h-16" />
+          </div>
+          <p className="text-sm font-semibold tracking-wide text-gray-400">Connected Cameras</p>
+          <h3 className="text-4xl font-extrabold text-white mt-2 tracking-tight font-mono">
+            {activeFeeds.length}
+          </h3>
+          <div className="flex items-center gap-1.5 mt-3 text-xs text-neonBlue font-medium">
+            <Video className="w-4 h-4" />
+            <span>Active WebSockets</span>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* 3. Main Data Visualization Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* Trend Area Chart (Recharts) */}
+        <div className="glassmorphism rounded-2xl p-6 lg:col-span-2 border border-glassBorder flex flex-col h-[400px]">
+          <div className="flex items-center justify-between mb-6">
+            <h4 className="font-extrabold text-white tracking-wide uppercase text-sm">
+              Live Camera Crowd Density & Stampede Risk
+            </h4>
+            <div className="flex items-center gap-4 text-xs font-semibold">
+              <span className="flex items-center gap-1.5 text-neonBlue">
+                <span className="w-2.5 h-2.5 bg-neonBlue rounded-full shadow-blueGlow"></span>
+                Head Count
+              </span>
+              <span className="flex items-center gap-1.5 text-neonPurple">
+                <span className="w-2.5 h-2.5 bg-neonPurple rounded-full shadow-neonGlow"></span>
+                Stampede Risk Index (%)
+              </span>
             </div>
           </div>
-          <div className="stat-body">
-            <span className="stat-number">{stats.totalGhats}</span>
+          <div className="flex-1 w-full min-h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#00b4d8" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#00b4d8" stopOpacity={0.0}/>
+                  </linearGradient>
+                  <linearGradient id="colorRisk" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#9d4edd" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#9d4edd" stopOpacity={0.0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(157, 78, 221, 0.05)" />
+                <XAxis dataKey="name" stroke="#6b7280" fontSize={11} tickLine={false} />
+                <YAxis stroke="#6b7280" fontSize={11} tickLine={false} />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: "rgba(18, 10, 36, 0.9)", 
+                    border: "1px solid rgba(157, 78, 221, 0.3)",
+                    borderRadius: "12px",
+                    color: "#f1f1f1",
+                    fontSize: "12px"
+                  }} 
+                />
+                <Area type="monotone" dataKey="Count" stroke="#00b4d8" strokeWidth={2} fillOpacity={1} fill="url(#colorCount)" />
+                <Area type="monotone" dataKey="Risk" stroke="#9d4edd" strokeWidth={2} fillOpacity={1} fill="url(#colorRisk)" />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
-          <div className="stat-footer-text">12 Total monitored</div>
-          <div className="stat-glow-border"></div>
         </div>
 
-        <div className="overview-stat-card live-crowd">
-          <div className="stat-header">
-            <span className="stat-title">Live Active Crowd</span>
-            <div className="stat-icon-wrapper">
-              <Users className="w-4 h-4" />
-            </div>
+        {/* Gender breakdown bar charts */}
+        <div className="glassmorphism rounded-2xl p-6 border border-glassBorder flex flex-col h-[400px]">
+          <h4 className="font-extrabold text-white tracking-wide uppercase text-sm mb-6">
+            Demographic Gender Analytics
+          </h4>
+          <div className="flex-1 w-full min-h-[220px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={genderData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(157, 78, 221, 0.05)" />
+                <XAxis dataKey="name" stroke="#6b7280" fontSize={11} tickLine={false} />
+                <YAxis stroke="#6b7280" fontSize={11} tickLine={false} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "rgba(18, 10, 36, 0.9)",
+                    border: "1px solid rgba(157, 78, 221, 0.3)",
+                    borderRadius: "12px",
+                    fontSize: "12px"
+                  }}
+                  cursor={{ fill: "rgba(255, 255, 255, 0.03)" }}
+                />
+                <Bar dataKey="count" radius={[8, 8, 0, 0]}>
+                  {genderData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
-          <div className="stat-body">
-            <span className="stat-number">{stats.totalCrowd.toLocaleString()}</span>
-          </div>
-          <div className="stat-footer-text">Real-time devotee flow</div>
-          <div className="stat-glow-border"></div>
-        </div>
-
-        <div className="overview-stat-card active-cams">
-          <div className="stat-header">
-            <span className="stat-title">Active AI Feeds</span>
-            <div className="stat-icon-wrapper">
-              <Video className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="stat-body">
-            <span className="stat-number">{stats.activeCams}</span>
-          </div>
-          <div className="stat-footer-text">Streaming smart grids</div>
-          <div className="stat-glow-border"></div>
-        </div>
-
-        <div className="overview-stat-card high-risk">
-          <div className="stat-header">
-            <span className="stat-title">High Risk Sectors</span>
-            <div className="stat-icon-wrapper">
-              <AlertTriangle className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="stat-body">
-            <span className="stat-number">{stats.highRiskSectors}</span>
-          </div>
-          <div className="stat-footer-text">Occupancy exceeding 65%</div>
-          <div className="stat-glow-border"></div>
-        </div>
-
-        <div className="overview-stat-card safe-zones">
-          <div className="stat-header">
-            <span className="stat-title">Nominal Zones</span>
-            <div className="stat-icon-wrapper">
-              <ShieldCheck className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="stat-body">
-            <span className="stat-number">{stats.safeZones}</span>
-          </div>
-          <div className="stat-footer-text">Under 30% utilization</div>
-          <div className="stat-glow-border"></div>
-        </div>
-
-        <div className="overview-stat-card ai-alerts">
-          <div className="stat-header">
-            <span className="stat-title">Active AI Alerts</span>
-            <div className="stat-icon-wrapper">
-              <Cpu className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="stat-body">
-            <span className="stat-number text-neonPink">{stats.activeAlertsCount}</span>
-          </div>
-          <div className="stat-footer-text">Anomalies cataloged</div>
-          <div className="stat-glow-border"></div>
-        </div>
-      </section>
-
-      {/* 4. Split Grid Content */}
-      <div className="dashboard-grid">
-        <div className="left-panel-stack">
-          {/* A. Live Godavari Map Visualization (Stylized SVG representation) */}
-          <div className="dashboard-card map-card">
-            <div className="map-header-row">
-              <div className="map-header-left">
-                <span className="map-section-label">GODAVARI CORRIDOR</span>
-                <h3 className="map-title text-base font-bold">Live pushkar ghat risk map</h3>
-              </div>
-              <span className="map-ai-badge flex items-center gap-1">✦ AI assisted</span>
-            </div>
-
-            {/* Stylized Godavari river map representation */}
-            <div className="relative w-full h-[320px] bg-slate-950 border border-slate-900 rounded-xl overflow-hidden mt-4 flex items-center justify-center">
-              {/* Stylized Godavari River SVG winding backdrop */}
-              <svg className="absolute inset-0 w-full h-full opacity-40 pointer-events-none" viewBox="0 0 800 320" fill="none">
-                <path d="M -50,160 Q 200,60 400,160 T 850,160" stroke="#0ea5e9" strokeWidth="24" strokeLinecap="round" className="animate-pulse" />
-                <path d="M -50,160 Q 200,60 400,160 T 850,160" stroke="#00b4d8" strokeWidth="8" strokeLinecap="round" />
-              </svg>
-
-              {/* Grid overlay mesh */}
-              <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:24px_24px] opacity-35" />
-
-              {/* Active hot spots */}
-              {liveGhats.map((ghat) => (
-                <button
-                  key={ghat.id}
-                  onClick={() => handleScrollToGhat(ghat.id)}
-                  style={{ left: `${ghat.coordinates.x}%`, top: `${ghat.coordinates.y}%` }}
-                  className={`absolute w-4 h-4 -ml-2 -mt-2 group rounded-full z-20 flex items-center justify-center transition-all duration-300`}
-                  title={`${ghat.name}: ${ghat.crowdDensity.toFixed(1)}% occupied`}
-                >
-                  <span className={`absolute inset-0 rounded-full animate-ping opacity-60 ${
-                    ghat.risk === "critical" ? "bg-red-500" : ghat.risk === "busy" ? "bg-orange-500" : ghat.risk === "moderate" ? "bg-amber-500" : "bg-emerald-500"
-                  }`} />
-                  <span className={`w-2.5 h-2.5 rounded-full border border-white/40 ${
-                    ghat.risk === "critical" ? "bg-red-500" : ghat.risk === "busy" ? "bg-orange-500" : ghat.risk === "moderate" ? "bg-amber-500" : "bg-emerald-500"
-                  }`} />
-                  
-                  {/* Tooltip Overlay */}
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-44 hidden group-hover:block bg-slate-900 border border-slate-800 text-left p-2.5 rounded-lg shadow-xl z-50 pointer-events-none">
-                    <p className="text-[11px] font-bold text-white leading-tight">{ghat.name}</p>
-                    <p className="text-[10px] text-slate-400 font-mono mt-1">{ghat.crowdDensity.toFixed(1)}% density</p>
-                    <p className="text-[9px] text-slate-500 font-mono mt-0.5">{ghat.occupancy.toLocaleString()} / {ghat.capacity.toLocaleString()} cap</p>
-                  </div>
-                </button>
-              ))}
-              
-              <div className="absolute bottom-4 left-4 bg-slate-900/80 backdrop-blur border border-slate-800 px-3 py-1.5 rounded-lg text-[10px] font-mono text-slate-400 flex flex-col gap-1">
-                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-red-500 rounded-full" /> Critical (&gt;80%)</span>
-                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-orange-500 rounded-full" /> Busy (60-80%)</span>
-                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-amber-500 rounded-full" /> Moderate (30-60%)</span>
-                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-emerald-500 rounded-full" /> Nominal (&lt;30%)</span>
-              </div>
-            </div>
-          </div>
-
-          {/* B. 12 GHAT LIVE SURVEILLANCE LIST */}
-          <div className="surveillance-list-card">
-            <div className="surveillance-list-hud-header">
-              <div className="hud-header-left">
-                <Activity className="w-5 h-5 text-teal-400" />
-                <h3 className="hud-title font-extrabold text-base">12 GHAT LIVE SURVEILLANCE LIST</h3>
-                <span className="hud-status-badge flex items-center gap-1 font-bold">
-                  <span className="hud-status-dot animate-pulse"></span> ICCC Core Active
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            {genderData.map((item) => (
+              <div key={item.name} className="p-2.5 rounded-xl bg-white/5 border border-white/5 text-center">
+                <span className="text-[10px] text-gray-400 font-mono tracking-wider block">{item.name}</span>
+                <span className="text-base font-extrabold mt-1 block font-mono" style={{ color: item.color }}>
+                  {item.count}
                 </span>
               </div>
-              
-              <div className="hud-header-metrics font-mono">
-                <div className="hud-metric-pill">
-                  <span className="hud-metric-lbl">Monitored</span>
-                  <strong className="hud-metric-val">{stats.totalGhats}</strong>
-                </div>
-                <div className="hud-metric-pill">
-                  <span className="hud-metric-lbl">Live Feeds</span>
-                  <strong className="hud-metric-val">{stats.activeCams}</strong>
-                </div>
-                <div className="hud-metric-pill">
-                  <span className="hud-metric-lbl">Live Crowd</span>
-                  <strong className="hud-metric-val">{stats.totalCrowd.toLocaleString()}</strong>
-                </div>
-                <div className="hud-metric-pill">
-                  <span className="hud-metric-lbl">Synced</span>
-                  <strong className="hud-metric-val">{syncedTime}</strong>
-                </div>
-              </div>
-            </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
-            <div className="surveillance-table-responsive-wrapper">
-              <table className="surveillance-cyber-table font-mono">
-                <thead>
-                  <tr>
-                    <th style={{ width: "50px" }}>#</th>
-                    <th>Ghat Name</th>
-                    <th>District</th>
-                    <th>Zone Status</th>
-                    <th>Capacity</th>
-                    <th>Current Crowd</th>
-                    <th style={{ minWidth: "140px" }}>Occupancy %</th>
-                    <th>Inflow (M/F/O)</th>
-                    <th>Cameras</th>
-                    <th>Risk Status</th>
-                    <th>Last Updated</th>
-                    <th>Live Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {liveGhats.map((g, index) => {
-                    const density = g.crowdDensity;
-                    const pct = Math.min(100, Math.max(0, density)).toFixed(1);
-                    
-                    let zoneStatus = "open";
-                    let zoneLabel = "OPEN ZONE";
-                    if (density > 80) {
-                      zoneStatus = "highly-crowded";
-                      zoneLabel = "HIGH DENSITY";
-                    } else if (density >= 50) {
-                      zoneStatus = "crowded";
-                      zoneLabel = "CROWDED";
-                    }
-
-                    return (
-                      <tr 
-                        key={g.id} 
-                        id={`row-${g.id}`} 
-                        className={`hover:bg-slate-900/50 transition-colors cursor-pointer ${g.isLive ? 'border-l-2 border-l-teal-500' : ''}`}
-                      >
-                        <td className="table-serial-col">{index + 1}</td>
-                        <td className="table-name-col font-bold text-white">{g.name}</td>
-                        <td>{g.district}</td>
-                        <td>
-                          <span className={`table-zone-badge ${zoneStatus}`}>{zoneLabel}</span>
-                        </td>
-                        <td>{g.capacity.toLocaleString()}</td>
-                        <td className="font-bold text-slate-200">{g.occupancy.toLocaleString()}</td>
-                        <td>
-                          <div className="table-progress-wrapper flex items-center gap-2">
-                            <div className="table-progress-bar-track flex-1 bg-slate-800 rounded-full h-2.5 overflow-hidden">
-                              <div 
-                                className={`table-progress-bar-fill h-full rounded-full ${
-                                  g.risk === "critical" ? "bg-red-500" : g.risk === "busy" ? "bg-orange-500" : g.risk === "moderate" ? "bg-amber-500" : "bg-emerald-500"
-                                }`} 
-                                style={{ width: `${pct}%` }} 
-                              />
-                            </div>
-                            <span className="table-progress-pct text-[11px] font-bold min-w-[36px]">{pct}%</span>
-                          </div>
-                        </td>
-                        <td className="text-slate-400 font-mono text-[10px]">
-                          {g.inMen}/{g.inWomen}/{g.inOthers}
-                        </td>
-                        <td>{g.camerasCount}</td>
-                        <td>
-                          <span className={`table-risk-badge ${g.risk}`}>{g.risk.toUpperCase()}</span>
-                        </td>
-                        <td className="text-[10px] text-slate-500">{g.lastUpdated}</td>
-                        <td>
-                          <span className={`table-live-status ${g.isLive ? 'critical' : ''}`}>
-                            <span className="table-live-status-dot"></span> {g.isLive ? "LIVE" : "ACTIVE"}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+      {/* 4. Live Cameras & Incident Alerts Feeds */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* Live Active Feeds Column */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="flex items-center justify-between">
+            <h4 className="font-extrabold text-white tracking-wide uppercase text-sm">
+              Live Camera Feeds Grid ({activeFeeds.length})
+            </h4>
           </div>
 
-          {/* C. Live Heatmap Density Matrix */}
-          <div className="overview-heatmap-section">
-            <div className="heatmap-header">
-              <div className="heatmap-title-group flex items-center gap-2">
-                <Activity className="w-5 h-5 text-teal-400" />
-                <h3 className="card-heading font-extrabold text-base">Live Devotee Density Heatmap Matrix</h3>
-              </div>
-              <span className="map-ai-badge">✦ Interactive Real-time Map grid</span>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <AnimatePresence mode="popLayout">
+              {activeFeeds.map((feed) => {
+                const isRisk = feed.riskScore > 0.65;
+                const isWarning = feed.riskScore > 0.4 && feed.riskScore <= 0.65;
+                
+                return (
+                  <motion.div
+                    layout
+                    key={feed.cameraId}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    whileHover={{ scale: 1.02 }}
+                    className="glassmorphism rounded-2xl border border-glassBorder overflow-hidden group shadow-lg flex flex-col"
+                  >
+                    {/* Simulated Camera Video Stream placeholder */}
+                    <div className="h-44 bg-darkBg relative overflow-hidden flex items-center justify-center">
+                      <div className="absolute inset-0 bg-gradient-to-t from-darkBg to-transparent z-10" />
+                      <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
+                        <span className={`w-2.5 h-2.5 rounded-full relative flex ${
+                          isRisk ? "bg-neonPink" : isWarning ? "bg-amber-400" : "bg-green-400"
+                        }`}>
+                          <span className={`radar-pulse-ring absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                            isRisk ? "bg-neonPink" : isWarning ? "bg-amber-400" : "bg-green-400"
+                          }`} />
+                        </span>
+                        <span className="text-[11px] font-extrabold font-mono tracking-widest text-white drop-shadow bg-darkBg/60 px-2.5 py-0.5 rounded">
+                          {feed.name || feed.cameraId.toUpperCase()}
+                        </span>
+                      </div>
+                      
+                      {/* Live Indicators on Simulated Screen */}
+                      <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2 bg-darkBg/75 backdrop-blur px-3 py-1.5 rounded-lg border border-glassBorder">
+                        <Users className="w-3.5 h-3.5 text-neonBlue" />
+                        <span className="text-xs font-bold text-neonBlue font-mono">{feed.totalPeople} Inside</span>
+                      </div>
 
-            <div className="heatmap-grid mt-4">
-              {liveGhats.map((g) => (
-                <div 
-                  key={g.id} 
-                  className={`heatmap-block ${g.risk} cursor-pointer`}
-                  onClick={() => handleScrollToGhat(g.id)}
-                >
-                  <span className="heatmap-block-name font-bold">{g.name}</span>
-                  <strong className="heatmap-block-pct font-mono">{Math.round(g.crowdDensity)}%</strong>
-                  <div className="heatmap-pulse-dot"></div>
+                      {/* Cool Cyberpunk AI Box overlay simulation */}
+                      <div className="absolute inset-0 flex flex-col justify-between p-6 opacity-30 group-hover:opacity-75 transition-opacity duration-300 font-mono text-[9px] text-neonPurple">
+                        <div className="flex justify-between">
+                          <span>[AI DETECT: ON]</span>
+                          <span>[YOLOv8 INTENSE]</span>
+                        </div>
+                        <div className="border border-dashed border-neonPurple/40 h-20 w-36 self-center rounded flex items-center justify-center">
+                          <span className="animate-pulse">TRACK ID_{feed.cameraId}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>RISK: {(feed.riskScore * 100).toFixed(0)}%</span>
+                          <span>FPS: 28.4</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Metadata Panel */}
+                    <div className="p-5 flex-1 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
+                          <MapPin className="w-3.5 h-3.5" />
+                          <span>{feed.location}</span>
+                        </div>
+                      </div>
+                      <div className="pt-4 mt-2 border-t border-glassBorder grid grid-cols-2 gap-4">
+                        <div>
+                          <span className="text-[9px] text-gray-500 uppercase tracking-widest font-mono">Density Index</span>
+                          <p className="text-sm font-extrabold text-white font-mono mt-0.5">{(feed.density * 100).toFixed(0)}%</p>
+                        </div>
+                        <div>
+                          <span className="text-[9px] text-gray-500 uppercase tracking-widest font-mono">Unique Tracking</span>
+                          <p className="text-sm font-extrabold text-neonPurple font-mono mt-0.5">{feed.uniquePeople}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+              {activeFeeds.length === 0 && (
+                <div className="col-span-2 glassmorphism rounded-2xl p-12 text-center border border-dashed border-glassBorder/40">
+                  <Video className="w-12 h-12 text-gray-600 mx-auto animate-pulse" />
+                  <p className="text-gray-400 mt-4 font-semibold">No Active Camera Feed Inputs Registered</p>
+                  <p className="text-gray-500 text-xs mt-2">Startup python app.py or add camera sources to pipeline.</p>
                 </div>
-              ))}
-            </div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
-        {/* 5. Right Sidebar incident Queue */}
-        <div className="right-sidebar-panel">
-          <div className="dashboard-card">
-            <div className="card-header-row mb-4">
-              <div className="card-title-group flex items-center gap-2.5">
-                <div className="card-icon-container bg-red-500/10 text-red-500">
-                  <AlertOctagon className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="card-heading font-extrabold">Highest Priority Ghats</h3>
-                  <span className="text-[10px] text-slate-500 font-mono">Real-time capacity overload ranking</span>
-                </div>
-              </div>
-            </div>
+        {/* Live Alerts Panel column */}
+        <div className="space-y-6 flex flex-col">
+          <h4 className="font-extrabold text-white tracking-wide uppercase text-sm flex items-center justify-between">
+            Active System Incidents
+            {alerts.length > 0 && (
+              <span className="px-2.5 py-0.5 text-[9px] font-extrabold bg-neonPink/20 text-neonPink border border-neonPink/30 rounded animate-pulse">
+                {alerts.length} ALERTS
+              </span>
+            )}
+          </h4>
 
-            <div className="alert-queue-container flex flex-col gap-3 max-h-[700px] overflow-y-auto pr-1">
-              {sortedPriorityGhats.map((ghat) => (
-                <div 
-                  key={ghat.id} 
-                  className={`alert-queue-item ${ghat.risk} cursor-pointer hover:border-slate-700 transition-colors`}
-                  onClick={() => handleScrollToGhat(ghat.id)}
+          <div className="glassmorphism rounded-2xl p-5 border border-glassBorder flex-1 overflow-y-auto max-h-[500px] space-y-4">
+            <AnimatePresence mode="popLayout">
+              {alerts.map((alert) => (
+                <motion.div
+                  layout
+                  key={alert.id}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className={`p-4 rounded-xl border flex flex-col justify-between gap-3 ${
+                    alert.severity === "critical"
+                      ? "bg-neonPink/10 border-neonPink/30"
+                      : "bg-amber-500/10 border-amber-500/30"
+                  }`}
                 >
-                  <div className="queue-item-header flex justify-between items-start">
+                  <div className="flex gap-3">
+                    <AlertTriangle className={`w-5 h-5 flex-shrink-0 ${
+                      alert.severity === "critical" ? "text-neonPink" : "text-amber-400"
+                    }`} />
                     <div>
-                      <h4 className="queue-item-title font-bold text-white text-[12px]">{ghat.name}</h4>
-                      <span className="queue-item-subtitle text-[10px] text-slate-500 font-mono">{ghat.district}</span>
-                    </div>
-                    <span className={`queue-badge ${ghat.risk} text-[9px] font-bold font-mono px-2 py-0.5 rounded capitalize`}>
-                      {ghat.risk}
-                    </span>
-                  </div>
-
-                  <div className="queue-item-progress mt-2.5 font-mono">
-                    <div className="progress-info flex justify-between text-[10px] text-slate-400">
-                      <span>Density Index</span>
-                      <strong className="text-white">{ghat.crowdDensity.toFixed(1)}%</strong>
-                    </div>
-
-                    <div className="progress-bar-track bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1.5">
-                      <div 
-                        className={`progress-bar-fill h-full rounded-full ${
-                          ghat.risk === "critical" ? "bg-red-500" : ghat.risk === "busy" ? "bg-orange-500" : ghat.risk === "moderate" ? "bg-amber-500" : "bg-emerald-500"
-                        }`} 
-                        style={{ width: `${ghat.crowdDensity}%` }} 
-                      />
-                    </div>
-
-                    <div className="queue-footer-stats flex justify-between text-[9px] text-slate-500 mt-2">
-                      <span>{ghat.occupancy.toLocaleString()} / {ghat.capacity.toLocaleString()} max</span>
-                      <span>{ghat.camerasCount} Active Cams</span>
+                      <p className="text-xs font-semibold text-white tracking-wide leading-relaxed">
+                        {alert.message}
+                      </p>
+                      <span className="text-[10px] text-gray-500 font-mono mt-1.5 block">
+                        Source ID: {alert.cameraId} • {new Date(alert.timestamp).toLocaleTimeString()}
+                      </span>
                     </div>
                   </div>
-                </div>
+                  <button
+                    onClick={() => resolveAlert(alert.id)}
+                    className="self-end px-3 py-1.5 text-[10px] font-extrabold tracking-widest font-mono uppercase bg-white/5 hover:bg-white/10 hover:text-white text-gray-400 border border-white/10 rounded-lg transition-colors"
+                  >
+                    RESOLVE EVENT
+                  </button>
+                </motion.div>
               ))}
-            </div>
+              {alerts.length === 0 && (
+                <div className="h-full flex flex-col items-center justify-center text-center p-8">
+                  <ShieldCheck className="w-10 h-10 text-green-500/30" />
+                  <p className="text-sm font-semibold text-green-400/80 mt-4">All Systems Secured</p>
+                  <p className="text-xs text-gray-500 mt-2">Zero critical risk vectors detected at any ghat grid.</p>
+                </div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
+
       </div>
     </div>
   );
