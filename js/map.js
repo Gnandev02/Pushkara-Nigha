@@ -6,93 +6,14 @@ let activeInfoWindow = null;
 
 
 const MAP_THEME_STYLE = [
-    {
-        "elementType": "geometry",
-        "stylers": [
-            { "color": "#F5F7FA" }
-        ]
-    },
-    {
-        "elementType": "labels.icon",
-        "stylers": [
-            { "visibility": "off" }
-        ]
-    },
-    {
-        "elementType": "labels.text.fill",
-        "stylers": [
-            { "color": "#64748B" }
-        ]
-    },
-    {
-        "elementType": "labels.text.stroke",
-        "stylers": [
-            { "color": "#F5F7FA" }
-        ]
-    },
-    {
-        "featureType": "administrative.land_parcel",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            { "color": "#94A3B8" }
-        ]
-    },
-    {
-        "featureType": "poi",
-        "elementType": "geometry",
-        "stylers": [
-            { "color": "#E2E8F0" }
-        ]
-    },
-    {
-        "featureType": "poi",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            { "color": "#475569" }
-        ]
-    },
-    {
-        "featureType": "road",
-        "elementType": "geometry",
-        "stylers": [
-            { "color": "#FFFFFF" }
-        ]
-    },
-    {
-        "featureType": "road.arterial",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            { "color": "#64748B" }
-        ]
-    },
-    {
-        "featureType": "road.highway",
-        "elementType": "geometry",
-        "stylers": [
-            { "color": "#CBD5E1" }
-        ]
-    },
-    {
-        "featureType": "road.highway",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            { "color": "#475569" }
-        ]
-    },
-    {
-        "featureType": "water",
-        "elementType": "geometry",
-        "stylers": [
-            { "color": "#C1D9F0" } 
-        ]
-    },
-    {
-        "featureType": "water",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            { "color": "#94A3B8" }
-        ]
-    }
+    { elementType: "geometry", stylers: [{ color: "#F1F5F9" }] },
+    { elementType: "labels", stylers: [{ visibility: "off" }] },
+    { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#CBD5E1" }, { weight: 1 }] },
+    { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#F8FAFC" }] },
+    { featureType: "poi", stylers: [{ visibility: "off" }] },
+    { featureType: "road", stylers: [{ visibility: "off" }] },
+    { featureType: "transit", stylers: [{ visibility: "off" }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#E0F2FE" }] }
 ];
 
 
@@ -184,15 +105,15 @@ function renderGoogleMapMarkers() {
         
         const contentHTML = `
             <div style="font-family: 'Inter', sans-serif; padding: 6px; min-width: 180px;">
-                <h4 style="margin: 0 0 4px 0; font-weight: 700; color: var(--text-primary); font-size: 0.88rem;">${ghat.name}</h4>
+                <h4 style="margin: 0 0 4px 0; font-weight: 500; color: var(--text-primary); font-size: 0.88rem;">${ghat.name}</h4>
                 <p style="margin: 0 0 6px 0; font-size: 0.72rem; color: var(--text-muted); font-weight: 500;">${ghat.district}</p>
                 <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-light); padding-top: 6px; margin-top: 4px;">
-                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);">Occupancy:</span>
+                    <span style="font-size: 0.75rem; font-weight: 500; color: var(--text-secondary);">Occupancy:</span>
                     <strong style="font-size: 0.75rem; color: var(--text-primary);">${occupancyPct}%</strong>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
-                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);">Risk Level:</span>
-                    <span style="font-size: 0.65rem; font-weight: 700; color: ${markerColor}; text-transform: uppercase;">${statusLabel}</span>
+                    <span style="font-size: 0.75rem; font-weight: 500; color: var(--text-secondary);">Risk Level:</span>
+                    <span style="font-size: 0.65rem; font-weight: 500; color: ${markerColor}; text-transform: uppercase;">${statusLabel}</span>
                 </div>
             </div>
         `;

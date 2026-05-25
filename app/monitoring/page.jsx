@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { MONITORED_GHATS, getZoneLabel, getRiskLabel } from "@/lib/ghats-data";
 import { Search, MapPin, Activity, Users, RotateCcw, Layers, ChevronDown, AlertTriangle } from "lucide-react";
 
@@ -39,8 +39,13 @@ function RadialRing({ pct }) {
 }
 
 // ── CCTV Panel ───────────────────────────────────────────────
-function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload }) {
-  const [videoSrc, setVideoSrc] = useState(null);
+function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, initialVideoSrc }) {
+  const [videoSrc, setVideoSrc] = useState(initialVideoSrc || null);
+  
+  // Sync if initial props change after fetch
+  useEffect(() => {
+    if (initialVideoSrc && !videoSrc) setVideoSrc(initialVideoSrc);
+  }, [initialVideoSrc, videoSrc]);
   
   const fields = type === "in"
     ? ["inMen", "inWomen", "inOthers"]
@@ -140,7 +145,7 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload }) {
 }
 
 // ── Ghat Monitor Card ────────────────────────────────────────
-function GhatCard({ ghat, state, onChange, onUpload }) {
+function GhatCard({ ghat, state, onChange, onUpload, dbCameras }) {
   const totalIn = state.inMen + state.inWomen + state.inOthers;
   const totalOut = state.outMen + state.outWomen + state.outOthers;
   const crowd = Math.max(0, totalIn - totalOut);
@@ -190,8 +195,8 @@ function GhatCard({ ghat, state, onChange, onUpload }) {
 
       {/* CCTV Grid */}
       <div className="monitor-cctv-grid">
-        <CCTVPanel type="in" camId={ghat.camInId} title="Entry counters" state={state} ghatId={ghat.id} onChange={onChange} onUpload={onUpload} />
-        <CCTVPanel type="out" camId={ghat.camOutId} title="Exit counters" state={state} ghatId={ghat.id} onChange={onChange} onUpload={onUpload} />
+        <CCTVPanel type="in" camId={ghat.camInId} title="Entry counters" state={state} ghatId={ghat.id} onChange={onChange} onUpload={onUpload} initialVideoSrc={dbCameras[ghat.camInId]?.rtspUrl} />
+        <CCTVPanel type="out" camId={ghat.camOutId} title="Exit counters" state={state} ghatId={ghat.id} onChange={onChange} onUpload={onUpload} initialVideoSrc={dbCameras[ghat.camOutId]?.rtspUrl} />
       </div>
 
       {/* Flow Telemetry */}
@@ -239,7 +244,7 @@ function GhatCard({ ghat, state, onChange, onUpload }) {
 }
 
 // ── District Group ────────────────────────────────────────────
-function DistrictGroup({ district, ghats, states, onChange, onUpload, collapsed, onToggle, searchQuery }) {
+function DistrictGroup({ district, ghats, states, onChange, onUpload, collapsed, onToggle, searchQuery, dbCameras }) {
   const visibleGhats = ghats.filter(g =>
     !searchQuery || g.name.toLowerCase().includes(searchQuery) || g.districtFull.toLowerCase().includes(searchQuery)
   );
@@ -280,7 +285,7 @@ function DistrictGroup({ district, ghats, states, onChange, onUpload, collapsed,
       </div>
       <div className="monitoring-grid grid grid-cols-1 xl:grid-cols-2 gap-5">
         {visibleGhats.map(g => (
-          <GhatCard key={g.id} ghat={g} state={states[g.id]} onChange={onChange} onUpload={onUpload} />
+          <GhatCard key={g.id} ghat={g} state={states[g.id]} onChange={onChange} onUpload={onUpload} dbCameras={dbCameras} />
         ))}
       </div>
     </section>
@@ -295,22 +300,47 @@ export default function MonitoringPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [capacityFilter, setCapacityFilter] = useState("all");
   const [collapsed, setCollapsed] = useState({});
+  const [dbCameras, setDbCameras] = useState({});
+
+  useEffect(() => {
+    fetch("/api/cameras")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.cameras) {
+          const camMap = {};
+          data.cameras.forEach(c => camMap[c.cameraId] = c);
+          setDbCameras(camMap);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   const handleChange = useCallback((ghatId, field, value) => {
     setStates(prev => ({ ...prev, [ghatId]: { ...prev[ghatId], [field]: value } }));
   }, []);
 
   const handleUpload = useCallback(async (file, ghatId, camId, type) => {
-    // We send this to the FastAPI backend running on port 8000
     const formData = new FormData();
     formData.append("file", file);
     formData.append("camera_id", camId);
     formData.append("ghat_id", ghatId);
     formData.append("type", type);
     
-    // Optimistic UI feedback could go here
+    // First save to our Next.js API for persistence
     try {
-      // Endpoint from the python app
+      const dbResponse = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (dbResponse.ok) {
+        console.log("Video saved to Next.js DB successfully");
+      }
+    } catch (err) {
+      console.error("Failed to save to Next.js DB", err);
+    }
+
+    // Also send to FastAPI backend running on port 8000 for analytics
+    try {
       const response = await fetch("http://localhost:8000/upload", {
         method: "POST",
         body: formData,
@@ -476,6 +506,7 @@ export default function MonitoringPage() {
             collapsed={!!collapsed[district]}
             onToggle={() => setCollapsed(prev => ({ ...prev, [district]: !prev[district] }))}
             searchQuery={search}
+            dbCameras={dbCameras}
           />
         ))}
       </div>

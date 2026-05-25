@@ -14,23 +14,14 @@ function getRiskColor(risk) {
 
 // ─── Professional light map style ─────────────────────────────
 const MAP_STYLES = [
-  { elementType: "geometry", stylers: [{ color: "#F8FAFC" }] },
-  { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
-  { elementType: "labels.text.fill", stylers: [{ color: "#64748B" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#F8FAFC" }] },
-  { featureType: "administrative.land_parcel", elementType: "labels.text.fill", stylers: [{ color: "#94A3B8" }] },
-  { featureType: "poi", elementType: "geometry", stylers: [{ color: "#F1F5F9" }] },
-  { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#475569" }] },
-  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#E2E8F0" }] },
-  { featureType: "road", elementType: "geometry", stylers: [{ color: "#FFFFFF" }] },
-  { featureType: "road.arterial", elementType: "labels.text.fill", stylers: [{ color: "#64748B" }] },
-  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#E2E8F0" }] },
-  { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#475569" }] },
-  { featureType: "road.local", elementType: "labels.text.fill", stylers: [{ color: "#94A3B8" }] },
-  { featureType: "transit.line", elementType: "geometry", stylers: [{ color: "#E2E8F0" }] },
-  { featureType: "transit.station", elementType: "geometry", stylers: [{ color: "#F1F5F9" }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#BAE6FD" }] },
-  { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#94A3B8" }] }
+  { elementType: "geometry", stylers: [{ color: "#F1F5F9" }] },
+  { elementType: "labels", stylers: [{ visibility: "off" }] },
+  { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#CBD5E1" }, { weight: 1 }] },
+  { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#F8FAFC" }] },
+  { featureType: "poi", stylers: [{ visibility: "off" }] },
+  { featureType: "road", stylers: [{ visibility: "off" }] },
+  { featureType: "transit", stylers: [{ visibility: "off" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#E0F2FE" }] }
 ];
 
 const MAP_CENTER = { lat: 17.05, lng: 81.30 };

@@ -89,7 +89,7 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Inter', sans-serif;
-    font-weight: 600; 
+    font-weight: 500; 
     color: var(--text-primary);
 }
 
@@ -183,7 +183,7 @@ button, input, select {
 
 .header-left h1 {
     font-size: 1.15rem; 
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: -0.01em;
 }
 
@@ -192,7 +192,7 @@ button, input, select {
     align-items: center;
     gap: 6px;
     font-size: 0.7rem;
-    font-weight: 600;
+    font-weight: 500;
     background-color: var(--bg-main);
     border: 1px solid var(--border-light);
     padding: 4px 10px;
@@ -293,7 +293,7 @@ button, input, select {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 0.75rem;
 }
 
@@ -329,7 +329,7 @@ button, input, select {
     align-items: center;
     justify-content: center;
     font-family: 'Inter', sans-serif;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 0.85rem;
     color: #FFFFFF;
 }
@@ -341,7 +341,7 @@ button, input, select {
 }
 
 .sidebar-brand-name {
-    font-weight: 600;
+    font-weight: 500;
     font-size: 0.95rem;
     color: #FFFFFF;
     font-family: 'Inter', sans-serif;
@@ -579,7 +579,7 @@ button, input, select {
 
 .card-heading {
     font-size: 0.95rem; 
-    font-weight: 600;
+    font-weight: 500;
 }
 
 
@@ -588,7 +588,7 @@ button, input, select {
     color: var(--primary);
     border: 1px solid var(--border-light);
     font-size: 0.65rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 3px 8px;
     border-radius: var(--radius-sm);
     display: flex;
@@ -669,7 +669,7 @@ button, input, select {
 
 .stat-title {
     font-size: 0.7rem;
-    font-weight: 600;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--text-muted);
@@ -701,7 +701,7 @@ button, input, select {
 
 .stat-number {
     font-size: 1.8rem;
-    font-weight: 600;
+    font-weight: 500;
     line-height: 1.1;
     letter-spacing: -0.02em;
     background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
@@ -718,7 +718,7 @@ button, input, select {
 .districts-section-header {
     font-family: 'Inter', sans-serif;
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: 0.15em;
     text-transform: uppercase;
     color: var(--primary);
@@ -782,12 +782,12 @@ button, input, select {
 
 .district-card-title {
     font-size: 1.05rem;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .district-badge {
     font-size: 0.65rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 3px 8px;
     border-radius: var(--radius-sm);
     text-transform: uppercase;
@@ -819,7 +819,7 @@ button, input, select {
 
 .district-metric-val {
     font-size: 1.15rem;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .district-progress-bar-container {
@@ -890,7 +890,7 @@ button, input, select {
 
 .ghat-title-text {
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-primary);
 }
 
@@ -974,7 +974,7 @@ button, input, select {
     top: 4px;
     left: 6px;
     font-size: 0.55rem;
-    font-weight: 600;
+    font-weight: 500;
     color: #ffffff;
     text-shadow: 0 1px 2px #000000;
     display: flex;
@@ -987,7 +987,7 @@ button, input, select {
     bottom: 4px;
     right: 6px;
     font-size: 0.52rem;
-    font-weight: 600;
+    font-weight: 500;
     font-family: monospace;
     color: rgba(255, 255, 255, 0.6);
     text-shadow: 0 1px 2px #000000;
@@ -1015,7 +1015,7 @@ button, input, select {
 
 .cctv-upload-btn {
     font-size: 0.6rem;
-    font-weight: 600;
+    font-weight: 500;
     color: #ffffff;
     background: var(--primary);
     border: 1px solid var(--primary-light);
@@ -1051,14 +1051,14 @@ button, input, select {
 
 .ghat-card-metric-lbl {
     font-size: 0.58rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-muted);
     text-transform: uppercase;
 }
 
 .ghat-card-metric-val {
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .ghat-capacity-progress {
@@ -1079,7 +1079,7 @@ button, input, select {
 }
 
 .ghat-progress-val {
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .ghat-progress-bar-track {
@@ -1117,7 +1117,7 @@ button, input, select {
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 0.62rem;
-    font-weight: 600;
+    font-weight: 500;
     display: flex;
     align-items: center;
     gap: 3px;
@@ -1176,7 +1176,7 @@ button, input, select {
 
 .heatmap-block-name {
     font-size: 0.7rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
@@ -1186,7 +1186,7 @@ button, input, select {
 
 .heatmap-block-pct {
     font-size: 1.15rem;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .heatmap-pulse-dot {
@@ -1275,7 +1275,7 @@ button, input, select {
 
 .feed-title {
     font-size: 0.72rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-primary);
 }
 
@@ -1287,7 +1287,7 @@ button, input, select {
 .feed-time {
     font-size: 0.62rem;
     color: var(--text-muted);
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .overview-predictions-card {
@@ -1350,12 +1350,12 @@ button, input, select {
 
 .pred-widget-val {
     font-size: 0.82rem;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .pred-widget-badge {
     font-size: 0.62rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 3px 6px;
     border-radius: 4px;
     background: rgba(16, 185, 129, 0.08);
@@ -1426,7 +1426,7 @@ button, input, select {
 
 .kpi-value {
     font-size: 1.4rem;
-    font-weight: 600;
+    font-weight: 500;
     line-height: 1.15;
     color: var(--text-primary);
 }
@@ -1451,7 +1451,7 @@ button, input, select {
 
 .map-section-label {
     font-size: 0.68rem;
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: 0.08em;
     color: var(--color-safe);
     text-transform: uppercase;
@@ -1459,7 +1459,7 @@ button, input, select {
 
 .map-title {
     font-size: 1.05rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-primary);
     letter-spacing: -0.01em;
 }
@@ -1588,7 +1588,7 @@ button, input, select {
 }
 
 .tooltip-name {
-    font-weight: 600;
+    font-weight: 500;
     font-size: 0.78rem;
     color: var(--text-primary);
     margin-bottom: 2px;
@@ -1641,7 +1641,7 @@ button, input, select {
 
 .chart-filter-btn {
     font-size: 0.72rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 3px 8px;
     border-radius: var(--radius-sm);
     cursor: pointer;
@@ -1705,7 +1705,7 @@ button, input, select {
     background-color: var(--color-safe);
     color: #FFFFFF;
     font-size: 0.5rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 0 3px;
     border-radius: 1px;
 }
@@ -1728,7 +1728,7 @@ button, input, select {
     background-color: rgba(0, 0, 0, 0.65);
     color: #FFFFFF;
     font-size: 0.6rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 1px 4px;
     border-radius: 2px;
     display: flex;
@@ -1776,7 +1776,7 @@ button, input, select {
 
 .camera-loc-title {
     font-size: 0.78rem;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .camera-detection-summary {
@@ -1813,7 +1813,7 @@ button, input, select {
 
 .queue-item-title {
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .queue-item-subtitle {
@@ -1823,7 +1823,7 @@ button, input, select {
 
 .queue-badge {
     font-size: 0.6rem;
-    font-weight: 600;
+    font-weight: 500;
     text-transform: uppercase;
     padding: 1px 4px;
     border-radius: 2px;
@@ -1913,7 +1913,7 @@ button, input, select {
 
 .activity-loc {
     color: var(--primary);
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .activity-desc {
@@ -1975,13 +1975,13 @@ button, input, select {
 
 .ai-pred-title {
     font-size: 0.78rem;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .ai-pred-conf {
     font-size: 0.65rem;
     color: var(--primary-light);
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .ai-pred-desc {
@@ -2052,7 +2052,7 @@ button, input, select {
 
 .badge {
     font-size: 0.6rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 1px 6px;
     border-radius: 2px;
 }
@@ -2113,14 +2113,14 @@ button, input, select {
 
 .gov-header-subtitle {
     font-size: 0.72rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--primary);
     letter-spacing: 0.08em;
 }
 
 .gov-header-title {
     font-size: 1.45rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-primary);
     letter-spacing: -0.015em;
     margin: 0;
@@ -2138,7 +2138,7 @@ button, input, select {
     padding: 6px 12px;
     border-radius: 20px;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-secondary);
     display: flex;
     align-items: center;
@@ -2194,7 +2194,7 @@ button, input, select {
 
 .gov-info-label {
     font-size: 0.7rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -2202,7 +2202,7 @@ button, input, select {
 
 .gov-info-value {
     font-size: 0.92rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-primary);
 }
 
@@ -2303,7 +2303,7 @@ button, input, select {
 
 .monitor-ghat-name {
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-primary);
     margin: 0;
 }
@@ -2316,7 +2316,7 @@ button, input, select {
 
 .zone-badge {
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 6px 14px;
     border-radius: 20px;
     letter-spacing: 0.04em;
@@ -2428,7 +2428,7 @@ button, input, select {
     border-radius: var(--radius-sm);
     padding: 6px 14px;
     font-size: 0.72rem;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -2489,7 +2489,7 @@ button, input, select {
 
 .cctv-drag-overlay span {
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 500;
     color: #38BDF8;
     letter-spacing: 0.05em;
     text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
@@ -2606,7 +2606,7 @@ button, input, select {
 
 .cctv-live-tag {
     font-size: 0.55rem;
-    font-weight: 600;
+    font-weight: 500;
     color: #FFFFFF;
     background-color: rgba(15, 23, 42, 0.6);
     padding: 2px 5px;
@@ -2659,7 +2659,7 @@ button, input, select {
 
 .input-panel-title {
     font-size: 0.62rem;
-    font-weight: 600;
+    font-weight: 500;
     text-transform: uppercase;
     color: var(--text-muted);
     margin-bottom: 6px;
@@ -2680,7 +2680,7 @@ button, input, select {
 
 .counter-control label {
     font-size: 0.58rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-secondary);
 }
 
@@ -2700,7 +2700,7 @@ button, input, select {
     background-color: var(--bg-main);
     border: none;
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -2728,7 +2728,7 @@ button, input, select {
     border: none;
     text-align: center;
     font-size: 0.68rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-primary);
     background: transparent;
     -moz-appearance: textfield;
@@ -2782,7 +2782,7 @@ button, input, select {
 
 .stat-lbl {
     font-size: 0.54rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-muted);
     letter-spacing: 0.02em;
     text-transform: uppercase;
@@ -2790,7 +2790,7 @@ button, input, select {
 
 .stat-val {
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-primary);
 }
 
@@ -2840,7 +2840,7 @@ button, input, select {
 
 .occupancy-text {
     font-size: 0.68rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-secondary);
     min-width: 155px;
     text-align: right;
@@ -2919,7 +2919,7 @@ button, input, select {
 
 .capacity-control-wrapper label {
     font-size: 0.68rem;
-    font-weight: 600;
+    font-weight: 500;
     text-transform: uppercase;
     color: var(--text-muted);
     letter-spacing: 0.04em;
@@ -2933,7 +2933,7 @@ button, input, select {
     background-color: var(--bg-card);
     border-radius: 3px;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 500;
     text-align: center;
     color: var(--text-primary);
     -moz-appearance: textfield;
@@ -2970,7 +2970,7 @@ button, input, select {
     border: 1px solid rgba(220, 38, 38, 0.15);
     color: var(--color-critical);
     font-size: 0.7rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 8px 12px;
     border-radius: var(--radius-sm);
     text-transform: uppercase;
@@ -3016,7 +3016,7 @@ button, input, select {
     border: 1px solid rgba(13, 148, 136, 0.35);
     color: #2DD4BF;
     font-size: 0.62rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 4px 10px;
     border-radius: 4px;
     letter-spacing: 0.08em;
@@ -3027,7 +3027,7 @@ button, input, select {
 
 .command-center-header h2 {
     font-size: 1.55rem;
-    font-weight: 600;
+    font-weight: 500;
     color: #FFFFFF;
     letter-spacing: -0.02em;
     margin-bottom: 6px;
@@ -3090,7 +3090,7 @@ button, input, select {
 
 .control-group label {
     font-size: 0.62rem;
-    font-weight: 600;
+    font-weight: 500;
     color: rgba(45, 212, 191, 0.85); /* Tech glowing teal labels */
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -3200,7 +3200,7 @@ button, input, select {
     border-radius: var(--radius-sm);
     color: rgba(255, 255, 255, 0.85);
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 0 32px 0 12px;
     outline: none;
     cursor: pointer;
@@ -3257,7 +3257,7 @@ button, input, select {
     border-radius: var(--radius-sm);
     color: #FFFFFF;
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: 500;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3375,14 +3375,14 @@ button, input, select {
 
 .cyber-stat-label {
     font-size: 0.58rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-muted);
     letter-spacing: 0.05em;
 }
 
 .cyber-stat-val {
     font-size: 1.15rem;
-    font-weight: 600;
+    font-weight: 500;
     color: #FFFFFF;
     letter-spacing: -0.01em;
 }
@@ -3520,7 +3520,7 @@ button, input, select {
 
 .area-title-text h3 {
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 500;
     color: #FFFFFF;
     letter-spacing: 0.02em;
     text-transform: uppercase;
@@ -3547,7 +3547,7 @@ button, input, select {
 }
 
 .area-meta-value {
-    font-weight: 600;
+    font-weight: 500;
     color: #2DD4BF;
 }
 
@@ -3703,7 +3703,7 @@ button, input, select {
 .radial-pct-text {
     position: absolute;
     font-size: 0.68rem;
-    font-weight: 600;
+    font-weight: 500;
     color: #FFFFFF;
     letter-spacing: -0.01em;
 }
@@ -3722,7 +3722,7 @@ button, input, select {
 
 .risk-level-badge {
     font-size: 0.58rem;
-    font-weight: 600;
+    font-weight: 500;
     text-transform: uppercase;
     padding: 2px 6px;
     border-radius: 3px;
@@ -3761,7 +3761,7 @@ button, input, select {
     border: 1px solid rgba(13, 148, 136, 0.25);
     color: #2DD4BF;
     font-size: 0.58rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 2px 6px;
     border-radius: 3px;
     letter-spacing: 0.01em;
@@ -3804,7 +3804,7 @@ button, input, select {
 
 .command-empty-state h3 {
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 500;
     color: #FFFFFF;
     margin: 0;
 }
@@ -3976,7 +3976,7 @@ button, input, select {
 
 .hud-title {
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: -0.01em;
     color: var(--text-primary);
 }
@@ -3988,7 +3988,7 @@ button, input, select {
     background: rgba(16, 185, 129, 0.08);
     color: #10b981;
     font-size: 0.65rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 3px 8px;
     border-radius: 20px;
     text-transform: uppercase;
@@ -4027,14 +4027,14 @@ button, input, select {
 
 .hud-metric-lbl {
     font-size: 0.65rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-muted);
     text-transform: uppercase;
 }
 
 .hud-metric-val {
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-primary);
 }
 
@@ -4057,7 +4057,7 @@ button, input, select {
 .surveillance-cyber-table thead th {
     background: var(--bg-main);
     color: var(--text-muted);
-    font-weight: 600;
+    font-weight: 500;
     text-transform: uppercase;
     font-size: 0.68rem;
     letter-spacing: 0.05em;
@@ -4102,12 +4102,12 @@ button, input, select {
 }
 
 .table-serial-col {
-    font-weight: 600 !important;
+    font-weight: 500 !important;
     color: var(--text-muted) !important;
 }
 
 .table-name-col {
-    font-weight: 600 !important;
+    font-weight: 500 !important;
     color: var(--text-primary) !important;
 }
 
@@ -4117,7 +4117,7 @@ button, input, select {
     align-items: center;
     gap: 5px;
     font-size: 0.65rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 2px 6px;
     border-radius: 4px;
     text-transform: uppercase;
@@ -4156,7 +4156,7 @@ button, input, select {
 .table-progress-bar-fill.critical { background: #ef4444; }
 
 .table-progress-pct {
-    font-weight: 600;
+    font-weight: 500;
     font-size: 0.72rem;
     min-width: 32px;
     text-align: right;
@@ -4168,7 +4168,7 @@ button, input, select {
     align-items: center;
     justify-content: center;
     font-size: 0.62rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 2px 8px;
     border-radius: 20px;
     text-transform: uppercase;
@@ -4213,7 +4213,7 @@ button, input, select {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 0.65rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
