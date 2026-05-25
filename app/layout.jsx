@@ -1,6 +1,6 @@
 import "./globals.css";
-import Sidebar from "@/components/Sidebar";
 import SocketProvider from "@/components/SocketProvider";
+import LayoutShell from "@/components/LayoutShell";
 
 export const metadata = {
   title: "Pushkara Nigha — AI Crowd Command Center",
@@ -13,16 +13,9 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="min-h-screen" style={{ background: "#F4F6F9" }}>
         <SocketProvider>
-          <div className="flex min-h-screen">
-            <Sidebar />
-            {/* Offset content by sidebar width */}
-            <main
-              className="flex-1 min-h-screen transition-all duration-300"
-              style={{ marginLeft: "240px" }}
-            >
-              {children}
-            </main>
-          </div>
+          <LayoutShell>
+            {children}
+          </LayoutShell>
         </SocketProvider>
       </body>
     </html>
