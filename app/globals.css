@@ -6,19 +6,22 @@
    PUSHKARA NIGHA — GOVERNMENT SURVEILLANCE MONITORING THEME
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
 @layer base {
   body {
     background-color: #F4F6F9;
-    color: #0F172A;
+    color: #334155; /* Softer dark gray */
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    line-height: 1.5;
   }
   h1, h2, h3, h4, h5, h6, .gov-header-title, .card-heading {
-    font-family: 'Manrope', 'Inter', sans-serif;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600; /* slightly bold */
+    letter-spacing: -0.01em; /* tight spacing */
   }
 }
 
@@ -113,7 +116,7 @@
 .cctv-cam-id {
   font-size: 9px;
   color: rgba(255,255,255,0.7);
-  font-family: 'IBM Plex Sans', monospace;
+  font-family: 'Inter', monospace;
   letter-spacing: 0.04em;
 }
 
@@ -184,10 +187,10 @@
 }
 .stat-val {
   display: block;
-  font-size: 18px;
-  font-weight: 800;
-  color: #0F172A;
-  font-family: 'IBM Plex Sans', monospace;
+  font-size: 16px;
+  font-weight: 600;
+  color: #334155;
+  font-family: 'Inter', monospace;
 }
 .main-stat .stat-val { color: #0B6B53; }
 
@@ -226,8 +229,8 @@
 /* ── Zone / Risk Badges ── */
 .zone-badge {
   font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   padding: 2px 8px;
   border-radius: 4px;
@@ -237,8 +240,8 @@
 }
 .risk-level-badge {
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   padding: 2px 8px;
   border-radius: 4px;
   text-transform: uppercase;
@@ -350,8 +353,8 @@
 /* ── Table risk badge ── */
 .table-risk-badge {
   font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   padding: 2px 8px;
   border-radius: 4px;
   text-transform: uppercase;
@@ -400,8 +403,8 @@
 .heatmap-block.moderate { background: rgba(217,119,6,0.1); border: 1px solid rgba(217,119,6,0.25); }
 .heatmap-block.busy { background: rgba(234,88,12,0.1); border: 1px solid rgba(234,88,12,0.25); }
 .heatmap-block.critical { background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.25); }
-.heatmap-block-name { font-size: 11px; font-weight: 700; color: #0F172A; }
-.heatmap-block-pct { font-size: 18px; font-weight: 800; color: #0F172A; font-family: monospace; }
+.heatmap-block-name { font-size: 11px; font-weight: 600; color: #334155; }
+.heatmap-block-pct { font-size: 16px; font-weight: 600; color: #334155; font-family: 'Inter', monospace; }
 .heatmap-pulse-dot {
   position: absolute;
   top: 8px; right: 8px;
@@ -438,19 +441,19 @@
 }
 .gov-header-subtitle {
   font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #0B6B53;
   display: block;
   margin-bottom: 2px;
 }
 .gov-header-title {
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #0F172A;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #1E293B;
   margin: 0;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 .gov-sync-badge {
   font-size: 11px;
@@ -683,7 +686,7 @@
 }
 
 /* ── Gov card heading ── */
-.card-heading { font-size: 0.95rem; font-weight: 700; color: #0F172A; margin: 0; letter-spacing: -0.01em; }
+.card-heading { font-size: 0.9rem; font-weight: 600; color: #1E293B; margin: 0; letter-spacing: -0.01em; }
 .card-header-row { display: flex; justify-content: space-between; align-items: center; }
 .card-title-group { display: flex; align-items: center; gap: 10px; }
 .card-icon-container {

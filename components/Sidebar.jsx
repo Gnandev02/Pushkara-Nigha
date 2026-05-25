@@ -77,7 +77,7 @@ export default function Sidebar() {
             <p className="text-white font-extrabold text-sm tracking-wide leading-tight truncate">
               Pushkara Nigha
             </p>
-            <p className="text-[10px] font-bold tracking-widest uppercase leading-tight truncate" style={{ color: "#2DD4BF" }}>
+            <p className="text-[10px] font-semibold tracking-widest uppercase leading-tight truncate" style={{ color: "#2DD4BF" }}>
               AI Crowd Command
             </p>
           </div>
@@ -204,7 +204,7 @@ export default function Sidebar() {
           >
             <div className="flex items-center gap-2">
               <Activity className="w-3.5 h-3.5" style={{ color: "#0D9488" }} />
-              <span className="text-[10px] font-bold text-slate-400 font-mono tracking-wider">AI PIPELINE</span>
+              <span className="text-[10px] font-semibold text-slate-400 font-mono tracking-wider">AI PIPELINE</span>
             </div>
             <span
               className="px-2 py-0.5 text-[9px] font-extrabold font-mono rounded"

@@ -158,7 +158,7 @@ export default function OverviewPage() {
                   <Icon className="text-[#0B6B53]" style={{ width: 16, height: 16 }} />
                 </div>
               </div>
-              <div className="text-2xl font-extrabold text-slate-900 font-mono mb-1">{kpi.value}</div>
+              <div className="text-2xl font-semibold text-slate-800 font-mono mb-1">{kpi.value}</div>
               <div className="text-[10px] text-slate-400 font-medium">{kpi.sub}</div>
               <div className={`stat-glow-border ${kpi.colorClass}`} />
             </div>
@@ -187,7 +187,7 @@ export default function OverviewPage() {
                 ICCC DIRECT ACTIVE FEED
               </div>
             </div>
-            <div className="w-full flex-1 relative bg-slate-900">
+            <div className="w-full flex-1 relative bg-slate-50">
               <GhatMap liveGhats={liveGhats} />
             </div>
           </div>
