@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { writeFile } from "fs/promises";
-import path from "path";
+import { put } from "@vercel/blob";
 import crypto from "crypto";
 
 const prisma = new PrismaClient();
@@ -17,17 +16,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "Missing file or camera_id" }, { status: 400 });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
     const ext = file.name.split('.').pop();
     const filename = `${cameraId}_${Date.now()}_${crypto.randomUUID().slice(0, 6)}.${ext}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    const filePath = path.join(uploadDir, filename);
+    
+    // Upload the file directly to permanent Vercel Blob storage
+    const blob = await put(`monitoring-videos/${filename}`, file, {
+      access: 'public',
+      addRandomSuffix: false,
+    });
 
-    await writeFile(filePath, buffer);
+    const publicUrl = blob.url;
 
-    const publicUrl = `/uploads/${filename}`;
-
-    // Update the camera's rtspUrl with the new file path in the Neon database
+    // Update the camera's rtspUrl with the new permanent Blob URL in the Neon database
     const camera = await prisma.camera.upsert({
       where: { cameraId },
       update: { rtspUrl: publicUrl },
