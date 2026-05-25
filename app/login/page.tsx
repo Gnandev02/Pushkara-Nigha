@@ -47,20 +47,33 @@ export default function LoginPage() {
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.65, ease: "easeOut" }}
-        className="w-full max-w-[425px] bg-white rounded-2xl p-8 sm:p-10 shadow-[0_24px_64px_rgba(15,23,42,0.35)] border border-slate-200/90 relative z-10 flex flex-col gap-6"
+        className="w-full max-w-[425px] bg-white rounded-2xl p-8 sm:p-10 shadow-[0_24px_64px_rgba(15,23,42,0.35)] border border-slate-200/90 relative z-10 flex flex-col gap-6 overflow-hidden"
       >
+        {/* Patriotic Tri-color Ribbon Accent */}
+        <div className="absolute top-0 left-0 right-0 h-[5px] flex">
+          <div className="flex-1 bg-[#FF9933]" /> {/* Saffron */}
+          <div className="flex-1 bg-[#FFFFFF] border-y border-slate-100/50" /> {/* White */}
+          <div className="flex-1 bg-[#138808]" /> {/* Green */}
+        </div>
+
         {/* Logo and Headings */}
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#0B6B53] shadow-md mx-auto mb-4 border border-white/10 transition-transform duration-300 hover:scale-105">
+          <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl shadow-md mx-auto mb-4 border border-slate-100 transition-all duration-300 hover:scale-105 ${
+            role === "admin" ? "bg-[#1E3A8A]" : "bg-[#0B6B53]"
+          }`}>
             <span className="text-white font-extrabold text-xl tracking-tight">PN</span>
           </div>
           <h1 className="text-2xl font-bold text-[#0F172A] tracking-tight leading-none mb-1.5">
             Pushkara Nigha
           </h1>
-          <p className="text-[10px] text-[#0D9488] font-bold tracking-[0.12em] uppercase mb-1">
+          <p className={`text-[10px] font-bold tracking-[0.12em] uppercase mb-1 transition-colors duration-300 ${
+            role === "admin" ? "text-[#1E3A8A]" : "text-[#0D9488]"
+          }`}>
             AI Crowd Command Center
           </p>
-          <div className="h-[1.5px] w-12 bg-[#0B6B53]/20 mx-auto my-2" />
+          <div className={`h-[1.5px] w-12 mx-auto my-2 transition-colors duration-300 ${
+            role === "admin" ? "bg-[#1E3A8A]/20" : "bg-[#0B6B53]/20"
+          }`} />
           <p className="text-[10px] text-slate-600 font-bold tracking-wide">
             Government of Andhra Pradesh • ICCC Secure Node
           </p>
@@ -69,26 +82,31 @@ export default function LoginPage() {
         {/* Role Selector */}
         <div>
           <p className="text-[10px] font-extrabold text-[#1E293B] uppercase tracking-wider mb-2 text-left">Select Portal Role</p>
-          <div className="flex gap-2">
-            {(["admin", "supervisor"] as const).map(r => (
-              <button
-                key={r}
-                type="button"
-                onClick={() => setRole(r)}
-                className={`flex-1 py-2.5 px-4 text-xs font-bold rounded border transition-all duration-300 flex items-center justify-center gap-2 ${
-                  role === r
-                    ? "bg-[#0B6B53] text-white border-[#0B6B53] shadow-[0_4px_12px_rgba(11,107,83,0.25)]"
-                    : "bg-white text-slate-500 border-slate-200 hover:border-[#0D9488]/40 hover:text-[#0D9488] hover:bg-slate-50"
-                }`}
-              >
-                {r === "admin" ? (
-                  <Shield className={`w-3.5 h-3.5 ${role === r ? "text-[#2DD4BF]" : "text-slate-400"}`} />
-                ) : (
-                  <Eye className={`w-3.5 h-3.5 ${role === r ? "text-[#2DD4BF]" : "text-slate-400"}`} />
-                )}
-                {r === "admin" ? "Admin" : "Supervisor"}
-              </button>
-            ))}
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => setRole("admin")}
+              className={`flex-1 py-3 px-4 text-xs font-bold rounded-lg border transition-all duration-300 flex items-center justify-center gap-2 ${
+                role === "admin"
+                  ? "bg-[#1E3A8A] text-white border-[#1E3A8A] shadow-[0_4px_14px_rgba(30,58,138,0.3)] scale-[1.02]"
+                  : "bg-white text-slate-500 border-slate-200 hover:border-[#1E3A8A]/50 hover:text-[#1E3A8A] hover:bg-blue-50/40"
+              }`}
+            >
+              <Shield className={`w-3.5 h-3.5 transition-colors duration-300 ${role === "admin" ? "text-blue-200" : "text-slate-400"}`} />
+              Admin
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole("supervisor")}
+              className={`flex-1 py-3 px-4 text-xs font-bold rounded-lg border transition-all duration-300 flex items-center justify-center gap-2 ${
+                role === "supervisor"
+                  ? "bg-[#0B6B53] text-white border-[#0B6B53] shadow-[0_4px_14px_rgba(11,107,83,0.3)] scale-[1.02]"
+                  : "bg-white text-slate-500 border-slate-200 hover:border-[#0B6B53]/50 hover:text-[#0B6B53] hover:bg-emerald-50/40"
+              }`}
+            >
+              <Eye className={`w-3.5 h-3.5 transition-colors duration-300 ${role === "supervisor" ? "text-emerald-200" : "text-slate-400"}`} />
+              Supervisor
+            </button>
           </div>
         </div>
 
@@ -110,7 +128,11 @@ export default function LoginPage() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="operator@iccc.gov.in"
-              className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-sm text-slate-800 bg-white focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/15 transition-all font-semibold"
+              className={`w-full border border-l-4 border-slate-300 rounded-lg px-4 py-2.5 text-sm text-slate-800 bg-white focus:outline-none transition-all duration-300 font-semibold ${
+                role === "admin"
+                  ? "border-l-[#1E3A8A] focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/15"
+                  : "border-l-[#0B6B53] focus:border-[#0B6B53] focus:ring-2 focus:ring-[#0B6B53]/15"
+              }`}
             />
           </div>
 
@@ -124,12 +146,18 @@ export default function LoginPage() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full border border-slate-300 rounded-lg px-4 py-2.5 pr-12 text-sm text-slate-800 bg-white focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/15 transition-all font-semibold"
+                className={`w-full border border-l-4 border-slate-300 rounded-lg px-4 py-2.5 pr-12 text-sm text-slate-800 bg-white focus:outline-none transition-all duration-300 font-semibold ${
+                  role === "admin"
+                    ? "border-l-[#1E3A8A] focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/15"
+                    : "border-l-[#0B6B53] focus:border-[#0B6B53] focus:ring-2 focus:ring-[#0B6B53]/15"
+                }`}
               />
               <button
                 type="button"
                 onClick={() => setShowPass(!showPass)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 text-[10px] font-bold tracking-wider select-none transition-colors"
+                className={`absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 text-[10px] font-bold tracking-wider select-none transition-colors duration-300 ${
+                  role === "admin" ? "hover:text-[#1E3A8A]" : "hover:text-[#0B6B53]"
+                }`}
               >
                 {showPass ? "HIDE" : "SHOW"}
               </button>
@@ -142,11 +170,20 @@ export default function LoginPage() {
                 type="checkbox"
                 checked={remember}
                 onChange={e => setRemember(e.target.checked)}
-                className="w-3.5 h-3.5 rounded border-slate-300 accent-[#0B6B53] cursor-pointer"
+                className={`w-3.5 h-3.5 rounded border-slate-300 cursor-pointer transition-colors duration-300 ${
+                  role === "admin" ? "accent-[#1E3A8A]" : "accent-[#0B6B53]"
+                }`}
               />
               <span className="text-[11px] font-bold text-slate-700">Remember me</span>
             </label>
-            <button type="button" className="text-[11px] font-bold text-[#0D9488] hover:underline bg-transparent border-none p-0 cursor-pointer transition-colors hover:text-[#0B6B53]">
+            <button
+              type="button"
+              className={`text-[11px] font-bold bg-transparent border-none p-0 cursor-pointer transition-all duration-300 hover:underline ${
+                role === "admin"
+                  ? "text-[#1E3A8A] hover:text-[#3B82F6]"
+                  : "text-[#0D9488] hover:text-[#0B6B53]"
+              }`}
+            >
               Forgot password?
             </button>
           </div>
@@ -154,7 +191,11 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-[#0B6B53] to-[#0D9488] text-white font-bold text-sm rounded-lg shadow-md hover:shadow-lg hover:from-[#0D9488] hover:to-[#0B6B53] transition-all duration-300 disabled:opacity-60 flex items-center justify-center gap-2 mt-2"
+            className={`w-full py-3 text-white font-bold text-sm rounded-lg shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-60 flex items-center justify-center gap-2 mt-2 ${
+              role === "admin"
+                ? "bg-gradient-to-r from-[#1E3A8A] to-[#3B82F6] hover:from-[#1D4ED8] hover:to-[#1E3A8A] shadow-blue-900/10"
+                : "bg-gradient-to-r from-[#0B6B53] to-[#0D9488] hover:from-[#047857] hover:to-[#0B6B53] shadow-emerald-900/10"
+            }`}
           >
             {loading ? (
               <>
