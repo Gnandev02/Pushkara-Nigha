@@ -488,20 +488,20 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 .gov-header-subtitle {
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
+  font-size: 10px;
+  font-weight: 800; /* Inter ExtraBold (800) */
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #0B6B53;
   display: block;
   margin-bottom: 2px;
 }
 .gov-header-title {
-  font-size: 1.15rem;
-  font-weight: 500;
-  color: #1E293B;
+  font-size: 1.25rem;
+  font-weight: 800; /* Inter ExtraBold (800) */
+  color: #0F172A; /* High contrast */
   margin: 0;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.025em; /* tight operational spacing */
 }
 .gov-sync-badge {
   font-size: 11px;
@@ -600,13 +600,13 @@
 .control-group { display: flex; flex-direction: column; gap: 5px; }
 .control-group label {
   font-size: 10px;
-  font-weight: 700;
-  color: #64748B;
+  font-weight: 800; /* Inter ExtraBold (800) */
+  color: #0F172A; /* High-contrast admin slate */
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 .command-search-wrapper {
   position: relative;
@@ -839,4 +839,20 @@
   box-shadow: inset 5px 0 10px rgba(13, 148, 136, 0.15), 0 0 15px rgba(45, 212, 191, 0.12);
   color: #FFFFFF !important;
 }
+
+/* ── Monospaced Tabular Numbers ── */
+.radial-pct-text, 
+.occupancy-text, 
+.stat-val, 
+.card-timestamp-footer, 
+.surveillance-cyber-table td, 
+.cyber-stat-val, 
+.heatmap-block-pct,
+.gov-sync-badge span,
+.radial-pct-text span {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-variant-numeric: tabular-nums !important;
+  font-feature-settings: "tnum" 1 !important;
+}
+
 

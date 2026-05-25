@@ -4236,4 +4236,19 @@ button, input, select {
     box-shadow: 0 0 6px var(--color-critical);
 }
 
+/* ── Monospaced Tabular Numbers ── */
+.radial-pct-text, 
+.occupancy-text, 
+.stat-val, 
+.card-timestamp-footer, 
+.surveillance-cyber-table td, 
+.cyber-stat-val, 
+.heatmap-block-pct,
+.gov-sync-badge span,
+.radial-pct-text span {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-variant-numeric: tabular-nums !important;
+  font-feature-settings: "tnum" 1 !important;
+}
+
 
