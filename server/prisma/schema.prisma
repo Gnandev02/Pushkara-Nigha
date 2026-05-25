@@ -1,0 +1,122 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id               Int      @id @default(autoincrement())
+  username         String   @unique
+  password         String
+  passcode         String   @default("")
+  role             String
+  fullName         String
+  employeeId       String   @unique
+  mobileNumber     String   @default("")
+  email            String   @default("")
+  assignedDistrict String
+  shiftTiming      String   @default("")
+  status           String   @default("active")
+  lastLogin        String   @default("Never")
+  createdAt        DateTime @default(now())
+}
+
+model Ghat {
+  id                  String   @id
+  ghatName            String
+  district            String
+  capacity            Int
+  currentCrowd        Int
+  occupancyPercentage Float
+  entryCount          Int
+  exitCount           Int
+  activeCameras       Int
+  zoneStatus          String
+  aiRisk              String
+  latitude            Float
+  longitude           Float
+  coordinatesX        Float
+  coordinatesY        Float
+  anomaliesDetected   Int
+  safetyStatus        String
+  inMen               Int
+  inWomen             Int
+  inOthers            Int
+  outMen              Int
+  outWomen            Int
+  outOthers           Int
+  camInId             String
+  camOutId            String
+  aiTrend             String
+  lastUpdated         String
+}
+
+model MonitoringData {
+  id                     Int      @id @default(autoincrement())
+  temp                   String
+  condition              String
+  humidity               String
+  wind                   String
+  waterLevel             String
+  safetyAlert            String
+  totalMonitoredGhats    Int
+  activeFeeds            Int
+  onlineSensors          Int
+  incidentsResolvedToday  Int
+  citizenReportsReceived Int
+  aiModelAccuracy        String
+  inferenceLatency       String
+  updatedAt              DateTime @updatedAt
+}
+
+model District {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+}
+
+model Alert {
+  id           String @id
+  time         String
+  location     String
+  category     String
+  severity     String
+  description  String
+  status       String
+  assignedUnit String
+}
+
+model CameraFeed {
+  id            String   @id
+  location      String
+  resolution    String
+  peopleCount   Int
+  densityLabel  String
+  aiDetections  String[]
+  riskLevel     String
+  feedStatus    String
+  boundingBoxes Json
+}
+
+model Report {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+}
+
+model ShiftOfficer {
+  id               Int    @id @default(autoincrement())
+  officerName      String
+  officerId        String @unique
+  district         String
+  shiftTime        String
+  contactNumber    String
+  assignedGhat     String
+  dutyStatus       String
+  attendance       String
+  reportingOfficer String
+  emergencyContact String
+}

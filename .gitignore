@@ -26,3 +26,12 @@ dist-ssr/
 *.njsproj
 *.sln
 *.sw?
+
+# Environment variables
+.env
+.env.production
+.env.development
+.env.local
+
+# Next.js build output
+.next/

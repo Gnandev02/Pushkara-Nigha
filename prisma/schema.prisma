@@ -1,0 +1,54 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  email     String   @unique
+  role      String   @default("operator") // admin, operator
+  createdAt DateTime @default(now())
+}
+
+model Camera {
+  id        String   @id @default(cuid())
+  cameraId  String   @unique
+  name      String
+  location  String
+  rtspUrl   String?
+  status    String   @default("active") // active, inactive, warning, critical
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  analytics Analytics[]
+  alerts    Alert[]
+}
+
+model Analytics {
+  id             String   @id @default(cuid())
+  cameraId       String
+  totalPeople    Int
+  uniquePeople   Int
+  maleCount      Int
+  femaleCount    Int
+  unknownGender  Int
+  density        Float
+  riskScore      Float
+  createdAt      DateTime @default(now())
+  camera         Camera   @relation(fields: [cameraId], references: [cameraId], onDelete: Cascade)
+}
+
+model Alert {
+  id          String   @id @default(cuid())
+  cameraId    String
+  message     String
+  severity    String   // info, warning, critical
+  timestamp   DateTime @default(now())
+  resolved    Boolean  @default(false)
+  camera      Camera   @relation(fields: [cameraId], references: [cameraId], onDelete: Cascade)
+}
