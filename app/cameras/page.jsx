@@ -2,19 +2,16 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useSocket } from "@/components/SocketProvider";
-import { motion, AnimatePresence } from "framer-motion";
 import { 
   Video, 
   Plus, 
-  Globe, 
   Trash2, 
-  Upload, 
   Camera as CameraIcon, 
   Play, 
   StopCircle,
-  HelpCircle,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  RefreshCw
 } from "lucide-react";
 
 export default function Cameras() {
@@ -151,87 +148,89 @@ export default function Cameras() {
   }, [webcamStream]);
 
   return (
-    <div className="space-y-8 flex-1">
+    <div className="p-6 space-y-5">
       {/* Header */}
-      <div>
-        <h2 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
-          Camera Pipeline Management
-          <Video className="w-8 h-8 text-neonPurple" />
-        </h2>
-        <p className="text-gray-400 mt-1">
-          Connect RTSP feeds, test local webcams, or register simulated camera networks.
-        </p>
+      <div className="gov-header-card">
+        <div>
+          <span className="gov-header-subtitle">SURVEILLANCE INPUT PIPELINES</span>
+          <h1 className="gov-header-title">Camera Pipeline Management</h1>
+        </div>
+        <button
+          onClick={fetchData}
+          className="flex items-center gap-2 text-xs font-semibold text-[#0D9488] hover:underline"
+        >
+          <RefreshCw style={{ width: 13, height: 13 }} /> Refresh Data
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* left column: Camera registrations */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Active Cameras Status Grid */}
-          <div className="glassmorphism rounded-2xl p-6 border border-glassBorder">
-            <h3 className="font-extrabold text-white tracking-wide uppercase text-sm mb-6 flex items-center justify-between">
-              Registered Camera Inputs
-              <span className="px-2 py-0.5 text-[9px] font-mono font-extrabold bg-neonBlue/10 text-neonBlue border border-neonBlue/20 rounded">
-                {cameras.length} TOTAL
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* Left Columns: Registered cameras & webcam simulator */}
+        <div className="lg:col-span-2 space-y-5">
+          {/* Registered Cameras list */}
+          <div className="dashboard-card">
+            <div className="flex items-center justify-between mb-4 pb-2" style={{ borderBottom: "1px solid #F1F5F9" }}>
+              <h3 className="card-heading">Active Pipeline Feeds</h3>
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#0D9488]/10 text-[#0D9488]">
+                {cameras.length} Active Feeds
               </span>
-            </h3>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {cameras.map((cam) => {
                 const statusColors = {
-                  active: "bg-green-500 text-green-400 border-green-500/20",
-                  warning: "bg-amber-500 text-amber-400 border-amber-500/20",
-                  critical: "bg-neonPink text-neonPink border-neonPink/20"
+                  active: "safe",
+                  warning: "busy",
+                  critical: "critical"
                 };
-                const col = statusColors[cam.status] || "bg-gray-500 text-gray-400";
+                const col = statusColors[cam.status] || "safe";
                 
                 return (
-                  <div key={cam.id} className="p-4 rounded-xl bg-white/5 border border-white/5 flex flex-col justify-between gap-4">
+                  <div key={cam.id} className="p-4 rounded-xl border border-slate-100 bg-slate-50/50 flex flex-col justify-between gap-3 hover:border-slate-200 transition-colors">
                     <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] text-gray-500 font-mono tracking-widest uppercase font-bold">{cam.cameraId}</span>
-                        <span className={`px-2.5 py-0.5 rounded text-[9px] font-extrabold font-mono border capitalize flex items-center gap-1.5 bg-opacity-10 ${col}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${cam.status === 'critical' ? 'bg-neonPink animate-ping' : cam.status === 'warning' ? 'bg-amber-400' : 'bg-green-500'}`} />
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[10px] text-slate-400 font-mono tracking-wider uppercase font-bold">{cam.cameraId}</span>
+                        <span className={`table-risk-badge ${col}`}>
                           {cam.status}
                         </span>
                       </div>
-                      <h4 className="text-white font-bold text-base mt-2 tracking-wide">{cam.name}</h4>
-                      <p className="text-xs text-gray-400 mt-1 font-mono">{cam.location}</p>
+                      <h4 className="text-slate-800 font-bold text-sm tracking-wide">{cam.name}</h4>
+                      <p className="text-[11px] text-slate-400 font-mono mt-0.5">{cam.location}</p>
                     </div>
 
-                    <div className="pt-3 border-t border-white/5 flex items-center justify-between text-xs text-gray-400">
-                      <span className="font-mono truncate max-w-[200px]" title={cam.rtspUrl}>
+                    <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                      <span className="font-mono truncate max-w-[160px] text-[11px]" title={cam.rtspUrl}>
                         {cam.rtspUrl ? cam.rtspUrl : "Simulated AI Feed"}
                       </span>
-                      <span className="text-[10px] bg-white/5 px-2 py-1 rounded border border-white/5 font-mono text-neonBlue">
-                        {cam.peopleCount} crowd
+                      <span className="text-[10px] font-bold text-slate-700 bg-slate-200/50 px-2 py-0.5 rounded font-mono">
+                        {cam.peopleCount} live
                       </span>
                     </div>
                   </div>
                 );
               })}
               {cameras.length === 0 && (
-                <div className="col-span-2 py-8 text-center text-gray-500">
-                  No camera inputs registered. Use registration panel or activate local webcam.
+                <div className="col-span-2 py-12 text-center text-slate-400">
+                  <Video className="w-10 h-10 mx-auto opacity-20 mb-3" />
+                  <p className="font-semibold text-sm">No cameras registered</p>
+                  <p className="text-xs mt-0.5">Use the registration form or turn on the local webcam.</p>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Local Device Webcam Simulator Card */}
-          <div className="glassmorphism rounded-2xl p-6 border border-glassBorder relative overflow-hidden">
+          {/* Local Device Webcam Simulator */}
+          <div className="dashboard-card relative overflow-hidden">
             <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
-              <CameraIcon className="w-32 h-32 text-neonBlue" />
+              <CameraIcon className="w-24 h-24 text-[#0B6B53]" />
             </div>
 
-            <h3 className="font-extrabold text-white tracking-wide uppercase text-sm mb-4">
-              Command Center WebCam Stream (Simulator Mode)
-            </h3>
-            <p className="text-xs text-gray-400 mb-6 leading-relaxed">
-              Demonstrate the platform's live capabilities immediately without launching a Python GPU environment. Active webcam streams will calculate mock YOLO crowd counters in your browser and post updates straight to the API route!
+            <h3 className="card-heading mb-2">Command Center WebCam Stream (Simulator)</h3>
+            <p className="text-xs text-slate-400 mb-4 leading-relaxed">
+              Demonstrate live capabilities without launching a Python GPU environment. Activating your webcam calculates mock YOLO crowd counters in your browser and posts updates to <code className="font-mono bg-slate-100 text-slate-600 px-1 rounded">/api/update</code>.
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-              <div className="h-48 rounded-xl border border-dashed border-glassBorder bg-darkBg flex items-center justify-center relative overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+              <div className="h-44 rounded-xl border border-dashed border-slate-200 bg-slate-50 flex items-center justify-center relative overflow-hidden">
                 {isWebcamActive ? (
                   <video 
                     ref={webcamVideoRef}
@@ -242,36 +241,37 @@ export default function Cameras() {
                   />
                 ) : (
                   <div className="text-center p-4">
-                    <CameraIcon className="w-8 h-8 text-gray-600 mx-auto animate-pulse" />
-                    <span className="text-xs text-gray-500 mt-2 block font-mono">Stream Standby</span>
+                    <CameraIcon className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                    <span className="text-[11px] text-slate-400 font-mono">Stream Standby</span>
                   </div>
                 )}
                 {isWebcamActive && (
-                  <div className="absolute top-3 left-3 bg-neonPink/20 text-neonPink text-[9px] font-extrabold font-mono tracking-widest border border-neonPink/30 px-2 py-0.5 rounded animate-pulse">
+                  <div className="absolute top-3 left-3 bg-red-500 text-white text-[9px] font-bold tracking-widest px-2 py-0.5 rounded animate-pulse">
                     LIVE STREAMING
                   </div>
                 )}
               </div>
 
-              <div className="space-y-4">
-                <div className="p-3.5 rounded-xl bg-white/5 border border-white/5">
-                  <span className="text-[10px] text-gray-500 font-mono tracking-wider block">PIPELINE NODE</span>
-                  <span className="text-sm font-bold text-white mt-1 block font-mono">local_webcam</span>
+              <div className="space-y-3">
+                <div className="p-3 rounded-lg border border-slate-100 bg-slate-50/50">
+                  <span className="text-[9px] text-slate-400 font-mono tracking-wider block uppercase">PIPELINE NODE</span>
+                  <span className="text-xs font-bold text-slate-700 mt-0.5 block font-mono">local_webcam</span>
                 </div>
                 {!isWebcamActive ? (
                   <button
                     onClick={startWebcam}
-                    className="w-full py-3 bg-gradient-to-r from-neonPurple to-neonBlue text-white font-extrabold tracking-widest text-xs font-mono uppercase rounded-xl shadow-neonGlow hover:shadow-glow flex items-center justify-center gap-2 transition-all duration-300"
+                    className="w-full py-2.5 font-bold text-white rounded-lg flex items-center justify-center gap-2 transition-all"
+                    style={{ background: "linear-gradient(135deg, #0B6B53, #0D9488)" }}
                   >
-                    <Play className="w-4 h-4 fill-white" />
+                    <Play style={{ width: 14, height: 14 }} />
                     Activate Webcam Feed
                   </button>
                 ) : (
                   <button
                     onClick={stopWebcam}
-                    className="w-full py-3 bg-neonPink/20 text-neonPink border border-neonPink/30 font-extrabold tracking-widest text-xs font-mono uppercase rounded-xl flex items-center justify-center gap-2 hover:bg-neonPink/35 transition-all duration-300"
+                    className="w-full py-2.5 font-bold text-red-700 bg-red-50 border border-red-200 rounded-lg flex items-center justify-center gap-2 hover:bg-red-100 transition-all"
                   >
-                    <StopCircle className="w-4 h-4" />
+                    <StopCircle style={{ width: 14, height: 14 }} />
                     Shutdown Stream Node
                   </button>
                 )}
@@ -282,54 +282,57 @@ export default function Cameras() {
 
         {/* Right column: registration Form */}
         <div>
-          <div className="glassmorphism rounded-2xl p-6 border border-glassBorder sticky top-8">
-            <h3 className="font-extrabold text-white tracking-wide uppercase text-sm mb-6 flex items-center gap-2">
+          <div className="dashboard-card">
+            <h3 className="card-heading mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
+              <Plus className="w-4 h-4 text-[#0B6B53]" />
               Register New Camera Node
-              <Plus className="w-5 h-5 text-neonPurple" />
             </h3>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3">
               <div>
-                <label className="text-[10px] text-gray-500 font-mono tracking-wider uppercase block mb-1.5">
+                <label className="text-[10px] text-slate-400 font-bold tracking-wider uppercase block mb-1">
                   Unique Camera ID *
                 </label>
                 <input
                   type="text"
+                  required
                   placeholder="e.g. ghat_13"
                   value={cameraId}
                   onChange={(e) => setCameraId(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-darkBg border border-glassBorder text-white text-sm focus:outline-none focus:border-neonPurple font-mono transition-colors"
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-800 bg-slate-50 focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/10 font-mono"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] text-gray-500 font-mono tracking-wider uppercase block mb-1.5">
+                <label className="text-[10px] text-slate-400 font-bold tracking-wider uppercase block mb-1">
                   Display Name *
                 </label>
                 <input
                   type="text"
+                  required
                   placeholder="e.g. VIP Entrance East"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-darkBg border border-glassBorder text-white text-sm focus:outline-none focus:border-neonPurple transition-colors"
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-800 bg-slate-50 focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/10"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] text-gray-500 font-mono tracking-wider uppercase block mb-1.5">
+                <label className="text-[10px] text-slate-400 font-bold tracking-wider uppercase block mb-1">
                   Physical Grid Location *
                 </label>
                 <input
                   type="text"
+                  required
                   placeholder="e.g. Godavari Ghat Sector A"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-darkBg border border-glassBorder text-white text-sm focus:outline-none focus:border-neonPurple transition-colors"
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-800 bg-slate-50 focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/10"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] text-gray-500 font-mono tracking-wider uppercase block mb-1.5">
+                <label className="text-[10px] text-slate-400 font-bold tracking-wider uppercase block mb-1">
                   RTSP Stream URL (Optional)
                 </label>
                 <input
@@ -337,15 +340,15 @@ export default function Cameras() {
                   placeholder="rtsp://192.168.1.100:554/live"
                   value={rtspUrl}
                   onChange={(e) => setRtspUrl(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-darkBg border border-glassBorder text-white text-sm focus:outline-none focus:border-neonPurple font-mono transition-colors"
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-800 bg-slate-50 focus:outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/10 font-mono"
                 />
               </div>
 
               {formStatus.message && (
-                <div className={`p-3.5 rounded-xl border flex items-start gap-2.5 text-xs ${
+                <div className={`p-3 rounded-lg border flex items-start gap-2.5 text-xs ${
                   formStatus.type === "success" 
-                    ? "bg-green-500/10 border-green-500/20 text-green-400" 
-                    : "bg-neonPink/10 border-neonPink/20 text-neonPink"
+                    ? "bg-green-50 border-green-200 text-green-700" 
+                    : "bg-red-50 border-red-200 text-red-700"
                 }`}>
                   {formStatus.type === "success" ? <CheckCircle className="w-4 h-4 flex-shrink-0" /> : <AlertCircle className="w-4 h-4 flex-shrink-0" />}
                   <span>{formStatus.message}</span>
@@ -355,9 +358,9 @@ export default function Cameras() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 mt-2 bg-gradient-to-r from-neonPurple to-neonBlue text-white font-extrabold tracking-widest text-xs font-mono uppercase rounded-xl shadow-neonGlow hover:shadow-glow disabled:opacity-50 transition-all duration-300"
+                className="w-full py-3 mt-2 bg-[#0B6B53] text-white font-bold tracking-widest text-xs font-mono uppercase rounded-lg hover:shadow-lg disabled:opacity-50 transition-all"
               >
-                {isSubmitting ? "REGISTERNIG NODE..." : "MOUNT PIPELINE NODE"}
+                {isSubmitting ? "REGISTERING NODE..." : "MOUNT PIPELINE NODE"}
               </button>
             </form>
           </div>

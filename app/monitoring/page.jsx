@@ -1,17 +1,11 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { MONITORED_GHATS, GhatData, getZoneLabel, getRiskLabel } from "@/lib/ghats-data";
+import { MONITORED_GHATS, getZoneLabel, getRiskLabel } from "@/lib/ghats-data";
 import { Search, MapPin, Activity, Users, RotateCcw, Layers, ChevronDown, AlertTriangle } from "lucide-react";
 
-type GhatState = {
-  inMen: number; inWomen: number; inOthers: number;
-  outMen: number; outWomen: number; outOthers: number;
-  capacity: number;
-};
-
-function initState(): Record<string, GhatState> {
-  const state: Record<string, GhatState> = {};
+function initState() {
+  const state = {};
   MONITORED_GHATS.forEach(g => {
     state[g.id] = {
       inMen: g.inMen, inWomen: g.inWomen, inOthers: g.inOthers,
@@ -23,7 +17,7 @@ function initState(): Record<string, GhatState> {
 }
 
 // ── Radial SVG Ring ──────────────────────────────────────────
-function RadialRing({ pct }: { pct: number }) {
+function RadialRing({ pct }) {
   const CIRC = 119.38;
   const offset = CIRC - (Math.min(100, pct) / 100) * CIRC;
   const color = pct < 30 ? "#10B981" : pct <= 75 ? "#D97706" : pct <= 90 ? "#EA580C" : "#DC2626";
@@ -45,19 +39,10 @@ function RadialRing({ pct }: { pct: number }) {
 }
 
 // ── CCTV Panel ───────────────────────────────────────────────
-function CCTVPanel({
-  type, camId, title, state, ghatId, onChange,
-}: {
-  type: "in" | "out";
-  camId: string;
-  title: string;
-  state: GhatState;
-  ghatId: string;
-  onChange: (ghatId: string, field: keyof GhatState, value: number) => void;
-}) {
+function CCTVPanel({ type, camId, title, state, ghatId, onChange }) {
   const fields = type === "in"
-    ? (["inMen", "inWomen", "inOthers"] as const)
-    : (["outMen", "outWomen", "outOthers"] as const);
+    ? ["inMen", "inWomen", "inOthers"]
+    : ["outMen", "outWomen", "outOthers"];
   const labels = ["Men", "Women", "Others"];
 
   return (
@@ -85,6 +70,7 @@ function CCTVPanel({
               <label>{labels[i]}</label>
               <div className="counter-input-group">
                 <button
+                  type="button"
                   className="cnt-btn dec"
                   onClick={() => onChange(ghatId, field, Math.max(0, state[field] - 1))}
                 >−</button>
@@ -96,6 +82,7 @@ function CCTVPanel({
                   onChange={e => onChange(ghatId, field, Math.max(0, parseInt(e.target.value) || 0))}
                 />
                 <button
+                  type="button"
                   className="cnt-btn inc"
                   onClick={() => onChange(ghatId, field, state[field] + 1)}
                 >+</button>
@@ -109,11 +96,7 @@ function CCTVPanel({
 }
 
 // ── Ghat Monitor Card ────────────────────────────────────────
-function GhatCard({ ghat, state, onChange }: {
-  ghat: GhatData;
-  state: GhatState;
-  onChange: (id: string, field: keyof GhatState, value: number) => void;
-}) {
+function GhatCard({ ghat, state, onChange }) {
   const totalIn = state.inMen + state.inWomen + state.inOthers;
   const totalOut = state.outMen + state.outWomen + state.outOthers;
   const crowd = Math.max(0, totalIn - totalOut);
@@ -212,15 +195,7 @@ function GhatCard({ ghat, state, onChange }: {
 }
 
 // ── District Group ────────────────────────────────────────────
-function DistrictGroup({ district, ghats, states, onChange, collapsed, onToggle, searchQuery }: {
-  district: string;
-  ghats: GhatData[];
-  states: Record<string, GhatState>;
-  onChange: (id: string, field: keyof GhatState, value: number) => void;
-  collapsed: boolean;
-  onToggle: () => void;
-  searchQuery: string;
-}) {
+function DistrictGroup({ district, ghats, states, onChange, collapsed, onToggle, searchQuery }) {
   const visibleGhats = ghats.filter(g =>
     !searchQuery || g.name.toLowerCase().includes(searchQuery) || g.districtFull.toLowerCase().includes(searchQuery)
   );
@@ -255,7 +230,7 @@ function DistrictGroup({ district, ghats, states, onChange, collapsed, onToggle,
             </div>
           </div>
         </div>
-        <button className="area-collapse-btn">
+        <button type="button" className="area-collapse-btn">
           <ChevronDown style={{ width: 18, height: 18 }} />
         </button>
       </div>
@@ -270,14 +245,14 @@ function DistrictGroup({ district, ghats, states, onChange, collapsed, onToggle,
 
 // ── Main Monitoring Page ─────────────────────────────────────
 export default function MonitoringPage() {
-  const [states, setStates] = useState<Record<string, GhatState>>(initState);
+  const [states, setStates] = useState(initState);
   const [search, setSearch] = useState("");
   const [districtFilter, setDistrictFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [capacityFilter, setCapacityFilter] = useState("all");
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [collapsed, setCollapsed] = useState({});
 
-  const handleChange = useCallback((ghatId: string, field: keyof GhatState, value: number) => {
+  const handleChange = useCallback((ghatId, field, value) => {
     setStates(prev => ({ ...prev, [ghatId]: { ...prev[ghatId], [field]: value } }));
   }, []);
 
@@ -290,7 +265,7 @@ export default function MonitoringPage() {
 
   // Group ghats by district
   const districts = ["East Godavari", "West Godavari", "Khammam"];
-  const grouped: Record<string, GhatData[]> = {};
+  const grouped = {};
   districts.forEach(d => { grouped[d] = []; });
   MONITORED_GHATS.forEach(g => {
     // Apply district filter
@@ -335,10 +310,12 @@ export default function MonitoringPage() {
   return (
     <div className="p-6 space-y-5">
       {/* Command Center Header */}
-      <div className="command-center-header">
-        <span className="cyber-badge">✦ AI-ICCC TELEMETRY CORE</span>
-        <h2>Pushkara Crowd Command Center</h2>
-        <p>Futuristic neural-grid crowd surveillance, live flow counts, capacity utilization risk vectoring, and incident response routing.</p>
+      <div className="gov-header-card">
+        <div>
+          <span className="gov-header-subtitle">✦ AI-ICCC TELEMETRY CORE</span>
+          <h1 className="gov-header-title">Pushkara Crowd Command Center</h1>
+          <p className="text-xs text-slate-400 mt-1">Real-time crowd flow monitors, surveillance grids, sector capacities, and operational metrics.</p>
+        </div>
       </div>
 
       {/* Command Controls Bar */}

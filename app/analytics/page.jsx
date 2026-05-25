@@ -4,21 +4,9 @@ import { useEffect, useState } from "react";
 import { BarChart2, TrendingUp, Users, RefreshCw } from "lucide-react";
 import { useSocket } from "@/components/SocketProvider";
 
-interface AnalyticsRecord {
-  id: string;
-  totalPeople: number;
-  uniquePeople: number;
-  maleCount: number;
-  femaleCount: number;
-  unknownGender: number;
-  riskScore: number;
-  density: number;
-  createdAt: string;
-}
-
 export default function AnalyticsPage() {
   const { analytics: socketAnalytics } = useSocket();
-  const [history, setHistory] = useState<AnalyticsRecord[]>([]);
+  const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,7 +17,7 @@ export default function AnalyticsPage() {
   }, []);
 
   const analyticsValues = Object.values(socketAnalytics || {});
-  const latest = analyticsValues[0] as any;
+  const latest = analyticsValues[0];
   const totalMale = history.reduce((s, r) => s + r.maleCount, 0);
   const totalFemale = history.reduce((s, r) => s + r.femaleCount, 0);
   const totalPeople = history.reduce((s, r) => s + r.totalPeople, 0);

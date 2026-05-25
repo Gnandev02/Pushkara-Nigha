@@ -8,13 +8,13 @@ import {
 } from "lucide-react";
 
 // ─── Helpers ────────────────────────────────────────────────
-function getRiskClass(risk: string) {
+function getRiskClass(risk) {
   if (risk === "safe") return "safe";
   if (risk === "moderate") return "moderate";
   if (risk === "busy") return "busy";
   return "critical";
 }
-function getHeatmapClass(density: number) {
+function getHeatmapClass(density) {
   if (density < 30) return "safe";
   if (density <= 65) return "moderate";
   if (density <= 85) return "busy";
@@ -25,7 +25,7 @@ function getHeatmapClass(density: number) {
 export default function OverviewPage() {
   const { analytics, summary, alerts } = useSocket();
   const [now, setNow] = useState(() => new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true }));
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     timerRef.current = setInterval(() => {
@@ -302,7 +302,7 @@ export default function OverviewPage() {
 }
 
 // Required: import Activity locally (workaround for dynamic imports)
-function Activity({ className, style }: { className?: string; style?: React.CSSProperties }) {
+function Activity({ className, style }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
       <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />

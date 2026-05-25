@@ -16,7 +16,7 @@ export default function UserManagementPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", role: "supervisor", district: "East Godavari" });
 
-  const addUser = (e: React.FormEvent) => {
+  const addUser = (e) => {
     e.preventDefault();
     setUsers(prev => [...prev, {
       id: Date.now(), ...form, status: "active", lastLogin: "Never"

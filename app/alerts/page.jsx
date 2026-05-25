@@ -4,18 +4,9 @@ import { useEffect, useState } from "react";
 import { Bell, AlertTriangle, CheckCircle, Clock, RefreshCw } from "lucide-react";
 import { useSocket } from "@/components/SocketProvider";
 
-interface AlertItem {
-  id: string;
-  type: string;
-  message: string;
-  location: string;
-  timestamp: string;
-  resolved: boolean;
-}
-
 export default function AlertsPage() {
   const { alerts: socketAlerts } = useSocket();
-  const [dbAlerts, setDbAlerts] = useState<AlertItem[]>([]);
+  const [dbAlerts, setDbAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,11 +16,11 @@ export default function AlertsPage() {
       .catch(() => setLoading(false));
   }, []);
 
-  const allAlerts = [...socketAlerts, ...dbAlerts];
+  const allAlerts = [...(socketAlerts || []), ...(dbAlerts || [])];
   const activeCount = allAlerts.filter(a => !a.resolved).length;
   const resolvedCount = allAlerts.filter(a => a.resolved).length;
 
-  const handleResolve = (id: string) => {
+  const handleResolve = (id) => {
     setDbAlerts(prev => prev.map(a => a.id === id ? { ...a, resolved: true } : a));
   };
 

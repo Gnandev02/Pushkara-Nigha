@@ -3,20 +3,8 @@
 import { useState, useEffect } from "react";
 import { FileText, Download, RefreshCw, BarChart2, Clock, CheckCircle } from "lucide-react";
 
-interface AnalyticsRecord {
-  id: string;
-  totalPeople: number;
-  uniquePeople: number;
-  maleCount: number;
-  femaleCount: number;
-  unknownGender: number;
-  riskScore: number;
-  density: number;
-  createdAt: string;
-}
-
 export default function ReportingPage() {
-  const [records, setRecords] = useState<AnalyticsRecord[]>([]);
+  const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

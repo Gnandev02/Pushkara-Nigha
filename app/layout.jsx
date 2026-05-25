@@ -1,19 +1,14 @@
-import type { Metadata } from "next";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
-import { SocketProvider } from "@/components/SocketProvider";
+import SocketProvider from "@/components/SocketProvider";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Pushkara Nigha — AI Crowd Command Center",
   description:
     "Government of Andhra Pradesh ICCC AI-powered real-time crowd analytics and monitoring platform for Godavari Pushkaralu ghats.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="min-h-screen" style={{ background: "#F4F6F9" }}>
