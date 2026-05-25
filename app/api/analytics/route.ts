@@ -1,33 +1,37 @@
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
 
-export const dynamic = 'force-dynamic';
+const prisma = new PrismaClient();
 
-export async function GET(req) {
+export const dynamic = "force-dynamic";
+
+export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const limit = parseInt(searchParams.get('limit') || '50', 10);
-    const cameraId = searchParams.get('cameraId');
+    const limit = parseInt(searchParams.get("limit") || "20", 10);
+    const cameraId = searchParams.get("cameraId");
+    const isRaw = searchParams.get("raw") === "true";
 
-    // 1. Filter metrics based on Camera ID
     const filter = cameraId ? { cameraId } : {};
 
-    // 2. Fetch the latest historical records
     const analytics = await prisma.analytics.findMany({
       where: filter,
-      orderBy: { createdAt: 'desc' },
-      take: limit,
-      include: { camera: true }
+      orderBy: {
+        createdAt: "desc"
+      },
+      take: limit
     });
 
-    // Reverse history to chronological order for charts
-    const historyChronological = [...analytics].reverse();
+    // If requesting raw array, return it directly
+    if (isRaw) {
+      return NextResponse.json(analytics);
+    }
 
-    // 3. Compute aggregate telemetry for all cameras
+    // Compute aggregates for Dashboard UI compatibility
     const latestAnalyticsPerCamera = await prisma.camera.findMany({
       include: {
         analytics: {
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           take: 1
         }
       }
@@ -39,7 +43,6 @@ export async function GET(req) {
     let femaleCount = 0;
     let unknownGender = 0;
     let averageRisk = 0;
-    let camerasActive = 0;
 
     latestAnalyticsPerCamera.forEach(cam => {
       if (cam.analytics && cam.analytics[0]) {
@@ -50,9 +53,6 @@ export async function GET(req) {
         femaleCount += a.femaleCount;
         unknownGender += a.unknownGender;
         averageRisk += a.riskScore;
-        if (cam.status !== 'inactive') {
-          camerasActive += 1;
-        }
       }
     });
 
@@ -61,6 +61,7 @@ export async function GET(req) {
       averageRisk = parseFloat((averageRisk / activeCount).toFixed(4));
     }
 
+    // Return both formats to support both raw fetch requirements and dashboard bootstrapper
     return NextResponse.json({
       success: true,
       summary: {
@@ -70,14 +71,17 @@ export async function GET(req) {
         femaleCount,
         unknownGender,
         averageRisk,
-        activeCameras: camerasActive,
-        totalCameras: latestAnalyticsPerCamera.length
+        totalCameras: activeCount
       },
-      history: historyChronological
+      history: [...analytics].reverse(),
+      analytics
     });
 
-  } catch (error) {
-    console.error('Error fetching analytics history:', error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (err: any) {
+    console.error("Error fetching analytics history:", err);
+    return NextResponse.json(
+      { error: "Failed", details: err.message },
+      { status: 500 }
+    );
   }
 }
