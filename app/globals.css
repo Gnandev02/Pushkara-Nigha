@@ -447,12 +447,13 @@
   cursor: pointer;
 }
 .heatmap-block:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-.heatmap-block.safe { background: #FFFFFF; border: 1px solid #E2E8F0; border-left: 4px solid #10B981; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-.heatmap-block.moderate { background: #FFFFFF; border: 1px solid #E2E8F0; border-left: 4px solid #F59E0B; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-.heatmap-block.busy { background: #FFFFFF; border: 1px solid #E2E8F0; border-left: 4px solid #F97316; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-.heatmap-block.critical { background: #FFFFFF; border: 1px solid #E2E8F0; border-left: 4px solid #EF4444; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-.heatmap-block-name { font-size: 11px; font-weight: 500; color: #334155; }
-.heatmap-block-pct { font-size: 16px; font-weight: 500; color: #334155; font-family: 'Inter', monospace; }
+.heatmap-block.safe { background: #10B981; border: 1px solid #059669; box-shadow: 0 4px 6px rgba(16,185,129,0.3); }
+.heatmap-block.moderate { background: #F59E0B; border: 1px solid #D97706; box-shadow: 0 4px 6px rgba(245,158,11,0.3); }
+.heatmap-block.busy { background: #F97316; border: 1px solid #EA580C; box-shadow: 0 4px 6px rgba(249,115,22,0.3); }
+.heatmap-block.critical { background: #EF4444; border: 1px solid #DC2626; box-shadow: 0 4px 6px rgba(239,68,68,0.3); }
+.heatmap-block span, .heatmap-block .heatmap-block-name, .heatmap-block .heatmap-block-pct { color: #FFFFFF !important; }
+.heatmap-block-name { font-size: 11px; font-weight: 700; }
+.heatmap-block-pct { font-size: 16px; font-weight: 700; font-family: 'Inter', monospace; }
 .heatmap-pulse-dot {
   position: absolute;
   top: 8px; right: 8px;
@@ -461,8 +462,7 @@
   background: #10B981;
   animation: blink 1.2s ease-in-out infinite;
 }
-.heatmap-block.busy .heatmap-pulse-dot { background: #EA580C; }
-.heatmap-block.critical .heatmap-pulse-dot { background: #DC2626; }
+.heatmap-block .heatmap-pulse-dot { background: #FFFFFF; box-shadow: 0 0 8px rgba(255,255,255,0.8); }
 
 /* ── Alert queue items ── */
 .alert-queue-item {
