@@ -58,7 +58,7 @@ const PULSE_CSS = `
 // ─── Main Component ──────────────────────────────────────────
 export default function GhatMap({ liveGhats, onGhatSelect }) {
   const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "AIzaSyBtu-pHBMT2MD-9O3zqMQRulSPyVQwtRyw",
   });
 
   const mapRef = useRef(null);
