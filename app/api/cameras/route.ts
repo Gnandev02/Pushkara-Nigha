@@ -1,16 +1,18 @@
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
-export async function GET(req) {
+export const dynamic = "force-dynamic";
+
+export async function GET() {
   try {
     const cameras = await prisma.camera.findMany({
       include: {
         analytics: {
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           take: 1
         }
       },
-      orderBy: { cameraId: 'asc' }
+      orderBy: { cameraId: "asc" }
     });
 
     const formattedCameras = cameras.map(cam => {
@@ -20,7 +22,7 @@ export async function GET(req) {
         cameraId: cam.cameraId,
         name: cam.name,
         location: cam.location,
-        rtspUrl: cam.rtspUrl || '',
+        rtspUrl: cam.rtspUrl || "",
         status: cam.status,
         updatedAt: cam.updatedAt,
         peopleCount: latest ? latest.totalPeople : 0,
@@ -39,19 +41,19 @@ export async function GET(req) {
       success: true,
       cameras: formattedCameras
     });
-  } catch (error) {
-    console.error('Error fetching cameras:', error);
+  } catch (error: any) {
+    console.error("Error fetching cameras:", error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
 
-export async function POST(req) {
+export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { cameraId, name, location, rtspUrl, status } = body;
 
     if (!cameraId || !name || !location) {
-      return NextResponse.json({ success: false, message: 'Missing fields.' }, { status: 400 });
+      return NextResponse.json({ success: false, message: "Missing fields." }, { status: 400 });
     }
 
     const camera = await prisma.camera.upsert({
@@ -60,24 +62,24 @@ export async function POST(req) {
         name,
         location,
         rtspUrl,
-        status: status || 'active'
+        status: status || "active"
       },
       create: {
         cameraId,
         name,
         location,
         rtspUrl,
-        status: status || 'active'
+        status: status || "active"
       }
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Camera saved successfully.',
+      message: "Camera saved successfully.",
       camera
     });
-  } catch (error) {
-    console.error('Error upserting camera:', error);
+  } catch (error: any) {
+    console.error("Error upserting camera:", error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
