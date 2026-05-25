@@ -47,7 +47,7 @@ export default function LoginPage() {
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.65, ease: "easeOut" }}
-        className="w-full max-w-[425px] bg-white/98 backdrop-blur-md rounded-2xl p-8 sm:p-10 shadow-[0_24px_64px_rgba(15,23,42,0.28)] border border-slate-200/90 relative z-10 flex flex-col gap-6"
+        className="w-full max-w-[425px] bg-white rounded-2xl p-8 sm:p-10 shadow-[0_24px_64px_rgba(15,23,42,0.35)] border border-slate-200/90 relative z-10 flex flex-col gap-6"
       >
         {/* Logo and Headings */}
         <div className="text-center">
@@ -61,14 +61,14 @@ export default function LoginPage() {
             AI Crowd Command Center
           </p>
           <div className="h-[1.5px] w-12 bg-[#0B6B53]/20 mx-auto my-2" />
-          <p className="text-[10px] text-slate-400 font-semibold tracking-wide">
+          <p className="text-[10px] text-slate-600 font-bold tracking-wide">
             Government of Andhra Pradesh • ICCC Secure Node
           </p>
         </div>
 
         {/* Role Selector */}
         <div>
-          <p className="text-[10px] font-extrabold text-[#475569] uppercase tracking-wider mb-2 text-left">Select Portal Role</p>
+          <p className="text-[10px] font-extrabold text-[#1E293B] uppercase tracking-wider mb-2 text-left">Select Portal Role</p>
           <div className="flex gap-2">
             {(["admin", "supervisor"] as const).map(r => (
               <button
@@ -102,7 +102,7 @@ export default function LoginPage() {
           )}
 
           <div className="flex flex-col gap-1.5">
-            <label className="block text-[10px] font-extrabold text-[#475569] uppercase tracking-wider text-left">
+            <label className="block text-[10px] font-extrabold text-[#1E293B] uppercase tracking-wider text-left">
               Email / Username
             </label>
             <input
@@ -115,7 +115,7 @@ export default function LoginPage() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="block text-[10px] font-extrabold text-[#475569] uppercase tracking-wider text-left">
+            <label className="block text-[10px] font-extrabold text-[#1E293B] uppercase tracking-wider text-left">
               Password
             </label>
             <div className="relative">
@@ -144,7 +144,7 @@ export default function LoginPage() {
                 onChange={e => setRemember(e.target.checked)}
                 className="w-3.5 h-3.5 rounded border-slate-300 accent-[#0B6B53] cursor-pointer"
               />
-              <span className="text-[11px] font-bold text-slate-500">Remember me</span>
+              <span className="text-[11px] font-bold text-slate-700">Remember me</span>
             </label>
             <button type="button" className="text-[11px] font-bold text-[#0D9488] hover:underline bg-transparent border-none p-0 cursor-pointer transition-colors hover:text-[#0B6B53]">
               Forgot password?
@@ -171,7 +171,7 @@ export default function LoginPage() {
         </form>
 
         {/* Footer info */}
-        <div className="text-center border-t border-slate-100 pt-4 text-[9px] text-slate-400 font-extrabold tracking-wider space-y-0.5 mt-2">
+        <div className="text-center border-t border-slate-100 pt-4 text-[9px] text-slate-600 font-extrabold tracking-wider space-y-0.5 mt-2">
           <div>SHA-256 SECURE ENCRYPTION ACTIVE</div>
           <div>NODE: IP MONITORED & AUDITED</div>
         </div>
