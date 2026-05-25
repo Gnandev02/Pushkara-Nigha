@@ -22,11 +22,24 @@ const NAV_ITEMS = [
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true); // default to true to prevent hydration mismatch on mobile
   const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
     setUserRole(localStorage.getItem("pushkara_user_role"));
+    
+    // Auto-collapse on mobile
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setCollapsed(true);
+      } else {
+        setCollapsed(false);
+      }
+    };
+    
+    window.addEventListener("resize", handleResize);
+    handleResize(); // trigger on mount
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const visibleNavItems = NAV_ITEMS.filter((item) => {
@@ -46,7 +59,7 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`fixed top-0 left-0 h-screen z-50 flex flex-col transition-all duration-300 ${
+      className={`sticky top-0 h-screen z-50 flex-shrink-0 flex flex-col transition-all duration-300 ${
         collapsed ? "w-[68px]" : "w-[240px]"
       }`}
       style={{ background: "#071827", borderRight: "1px solid rgba(255,255,255,0.07)" }}

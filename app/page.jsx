@@ -140,7 +140,7 @@ export default function OverviewPage() {
       </div>
 
       {/* KPI Stats Grid */}
-      <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
         {[
           { label: "Active Ghats", value: activeGhats, sub: "12 Total monitored", icon: Layers, colorClass: "" },
           { label: "Live Active Crowd", value: totalLiveCrowd.toLocaleString(), sub: "Real-time devotee flow", icon: Users, colorClass: "" },
@@ -356,7 +356,7 @@ export default function OverviewPage() {
               <h3 className="card-heading">Live Devotee Density Heatmap Matrix</h3>
               <span className="ml-auto text-[10px] font-bold text-[#0D9488] bg-[#0D9488]/10 px-2 py-0.5 rounded">✦ Interactive Real-time Map grid</span>
             </div>
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
               {liveGhats.map((g) => {
                 const crowd = g.crowd;
                 const cls = getHeatmapClass(g.crowdDensity);
