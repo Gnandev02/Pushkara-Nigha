@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import dynamic from "next/dynamic";
 import { useSocket } from "@/components/SocketProvider";
 import { MONITORED_GHATS } from "@/lib/ghats-data";
 import {
   Layers, Users, Video, AlertTriangle, ShieldCheck, Cpu, RefreshCw
 } from "lucide-react";
+
+const GhatMap = dynamic(() => import("@/components/GhatMap"), { ssr: false });
 
 // ─── Helpers ────────────────────────────────────────────────
 function getRiskClass(risk) {
@@ -34,16 +37,61 @@ export default function OverviewPage() {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, []);
 
-  // KPI calculations
-  const totalLiveCrowd = MONITORED_GHATS.reduce((s, g) => s + Math.max(0, (g.inMen + g.inWomen + g.inOthers) - (g.outMen + g.outWomen + g.outOthers)), 0);
-  const highRisk = MONITORED_GHATS.filter(g => g.crowdDensity > 65).length;
-  const nominalZones = MONITORED_GHATS.filter(g => g.crowdDensity < 30).length;
-  const activeGhats = MONITORED_GHATS.length;
-  const totalCameras = MONITORED_GHATS.reduce((s, g) => s + g.camerasCount, 0);
-  const activeAlerts = Array.isArray(alerts) ? alerts.length : Object.keys(analytics).length;
+  // Get live ghats data merged with real-time socket/API telemetry
+  const liveGhats = MONITORED_GHATS.map(g => {
+    const liveIn = analytics && analytics[g.camInId];
+    const liveOut = analytics && analytics[g.camOutId];
+
+    const inMen = liveIn ? liveIn.maleCount : g.inMen;
+    const inWomen = liveIn ? liveIn.femaleCount : g.inWomen;
+    const inOthers = liveIn ? liveIn.unknownGender : g.inOthers;
+
+    const outMen = liveOut ? liveOut.maleCount : g.outMen;
+    const outWomen = liveOut ? liveOut.femaleCount : g.outWomen;
+    const outOthers = liveOut ? liveOut.unknownGender : g.outOthers;
+
+    const crowd = Math.max(0, (inMen + inWomen + inOthers) - (outMen + outWomen + outOthers));
+    const crowdDensity = g.capacity > 0 ? (crowd / g.capacity) * 100 : 0;
+
+    let risk = g.risk;
+    if (liveIn || liveOut) {
+      if (crowdDensity < 30) risk = "safe";
+      else if (crowdDensity <= 55) risk = "moderate";
+      else if (crowdDensity <= 80) risk = "busy";
+      else risk = "critical";
+    }
+
+    // Check alerts
+    const hasActiveAlert = Array.isArray(alerts) && alerts.some(a => !a.resolved && (a.cameraId === g.camInId || a.cameraId === g.camOutId));
+    if (hasActiveAlert) {
+      risk = "critical";
+    }
+
+    return {
+      ...g,
+      inMen,
+      inWomen,
+      inOthers,
+      outMen,
+      outWomen,
+      outOthers,
+      crowd,
+      crowdDensity,
+      risk,
+      hasActiveAlert,
+    };
+  });
+
+  // KPI calculations using liveGhats
+  const totalLiveCrowd = liveGhats.reduce((s, g) => s + g.crowd, 0);
+  const highRisk = liveGhats.filter(g => g.crowdDensity > 65).length;
+  const nominalZones = liveGhats.filter(g => g.crowdDensity < 30).length;
+  const activeGhats = liveGhats.length;
+  const totalCameras = liveGhats.reduce((s, g) => s + g.camerasCount, 0);
+  const activeAlerts = Array.isArray(alerts) ? alerts.length : 0;
 
   // Priority ghats (highest density)
-  const priorityGhats = [...MONITORED_GHATS].sort((a, b) => b.crowdDensity - a.crowdDensity).slice(0, 5);
+  const priorityGhats = [...liveGhats].sort((a, b) => b.crowdDensity - a.crowdDensity).slice(0, 5);
 
   return (
     <div className="p-6 space-y-5">
@@ -118,10 +166,104 @@ export default function OverviewPage() {
         })}
       </section>
 
+      {/* ROW 1: Google Maps (Left) and Priority/System Status (Right) */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+        
+        {/* Left: Google Maps Live Ghat Visualization */}
+        <div className="xl:col-span-2 space-y-4">
+          <div className="dashboard-card p-0 overflow-hidden relative" style={{ height: "550px", display: "flex", flexDirection: "column" }}>
+            <div className="flex items-center justify-between px-5 py-4 bg-white z-10 relative" style={{ borderBottom: "1px solid #F1F5F9" }}>
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0D9488] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#0D9488]"></span>
+                </span>
+                <h3 className="card-heading">LIVE GODAVARI PUSHKAR GHAT MAP</h3>
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold" style={{ background: "rgba(13,148,136,0.1)", color: "#0D9488" }}>
+                  Real-time GIS Command Overlay
+                </span>
+              </div>
+              <div className="text-[10px] text-slate-400 font-bold font-mono">
+                ICCC DIRECT ACTIVE FEED
+              </div>
+            </div>
+            <div className="w-full flex-1 relative bg-slate-900">
+              <GhatMap liveGhats={liveGhats} />
+            </div>
+          </div>
+        </div>
 
-        {/* 12 Ghat Surveillance Table */}
-        <div className="xl:col-span-2 space-y-5">
+        {/* Right: Highest Priority Ghats & System Status */}
+        <div className="space-y-4 flex flex-col justify-between">
+          <div className="dashboard-card flex-1">
+            <div className="card-header-row mb-4">
+              <div className="card-title-group">
+                <div className="card-icon-container" style={{ background: "rgba(220,38,38,0.08)", color: "#DC2626" }}>
+                  <AlertTriangle style={{ width: 18, height: 18 }} />
+                </div>
+                <div>
+                  <h3 className="card-heading">Highest Priority Ghats</h3>
+                  <span className="text-[11px] text-slate-400">Crowd density and occupancy monitoring</span>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-3">
+              {priorityGhats.map((g) => {
+                const crowd = g.crowd;
+                const pct = g.capacity > 0 ? ((crowd / g.capacity) * 100).toFixed(1) : "0.0";
+                const cls = getRiskClass(g.risk);
+                return (
+                  <div key={g.id} className={`alert-queue-item ${cls}`}>
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <p className="text-sm font-bold text-slate-800">{g.name}</p>
+                        <p className="text-[10px] text-slate-400 font-medium">{g.district}</p>
+                      </div>
+                      <span className={`table-risk-badge ${cls}`}>
+                        {g.crowdDensity.toFixed(1)}%
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="progress-bar-container" style={{ flex: 1 }}>
+                        <div
+                          className={`progress-bar-fill ${cls === "safe" ? "bg-safe" : cls === "moderate" ? "bg-warn" : "bg-crit"}`}
+                          style={{ width: `${Math.min(100, g.crowdDensity)}%` }}
+                        />
+                      </div>
+                      <span className="text-[10px] font-mono font-bold text-slate-500">{crowd.toLocaleString()} / {g.capacity.toLocaleString()}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* System Status */}
+          <div className="dashboard-card">
+            <h3 className="card-heading mb-3">System Status</h3>
+            <div className="space-y-2">
+              {[
+                { label: "AI Model Accuracy", value: "97.4%", color: "#059669" },
+                { label: "Inference Latency", value: "38ms", color: "#059669" },
+                { label: "Online Sensors", value: "112", color: "#0F172A" },
+                { label: "Incidents Resolved", value: "18 today", color: "#0F172A" },
+                { label: "Citizen Reports", value: "96 received", color: "#0F172A" },
+              ].map(item => (
+                <div key={item.label} className="flex justify-between items-center py-1.5 border-b border-slate-50 last:border-0">
+                  <span className="text-xs font-medium text-slate-500">{item.label}</span>
+                  <strong className="text-xs font-bold font-mono" style={{ color: item.color }}>{item.value}</strong>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ROW 2: Live Monitoring Tables and Cards (Full Width Below) */}
+      <div className="grid grid-cols-1 gap-5">
+        <div className="space-y-5">
+          
+          {/* 12 Ghat Surveillance Table */}
           <div className="dashboard-card p-0 overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: "1px solid #F1F5F9" }}>
               <div className="flex items-center gap-2">
@@ -157,9 +299,9 @@ export default function OverviewPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {MONITORED_GHATS.map((g, i) => {
-                    const crowd = Math.max(0, (g.inMen + g.inWomen + g.inOthers) - (g.outMen + g.outWomen + g.outOthers));
-                    const pct = ((crowd / g.capacity) * 100).toFixed(1);
+                  {liveGhats.map((g, i) => {
+                    const crowd = g.crowd;
+                    const pct = g.capacity > 0 ? ((crowd / g.capacity) * 100).toFixed(1) : "0.0";
                     const pctNum = parseFloat(pct);
                     const zoneLabel = pctNum < 30 ? "OPEN ZONE" : pctNum <= 65 ? "CROWDED" : "HIGHLY CROWDED";
                     const riskClass = getRiskClass(g.risk);
@@ -215,9 +357,8 @@ export default function OverviewPage() {
               <span className="ml-auto text-[10px] font-bold text-[#0D9488] bg-[#0D9488]/10 px-2 py-0.5 rounded">✦ Interactive Real-time Map grid</span>
             </div>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-              {MONITORED_GHATS.map((g) => {
-                const crowd = Math.max(0, (g.inMen + g.inWomen + g.inOthers) - (g.outMen + g.outWomen + g.outOthers));
-                const pct = ((crowd / g.capacity) * 100).toFixed(1);
+              {liveGhats.map((g) => {
+                const crowd = g.crowd;
                 const cls = getHeatmapClass(g.crowdDensity);
                 return (
                   <div key={g.id} className={`heatmap-block ${cls}`}>
@@ -230,71 +371,7 @@ export default function OverviewPage() {
               })}
             </div>
           </div>
-        </div>
 
-        {/* Right sidebar — Highest Priority Ghats */}
-        <div className="space-y-4">
-          <div className="dashboard-card">
-            <div className="card-header-row mb-4">
-              <div className="card-title-group">
-                <div className="card-icon-container" style={{ background: "rgba(220,38,38,0.08)", color: "#DC2626" }}>
-                  <AlertTriangle style={{ width: 18, height: 18 }} />
-                </div>
-                <div>
-                  <h3 className="card-heading">Highest Priority Ghats</h3>
-                  <span className="text-[11px] text-slate-400">Crowd density and occupancy monitoring</span>
-                </div>
-              </div>
-            </div>
-            <div className="space-y-3">
-              {priorityGhats.map((g) => {
-                const crowd = Math.max(0, (g.inMen + g.inWomen + g.inOthers) - (g.outMen + g.outWomen + g.outOthers));
-                const pct = ((crowd / g.capacity) * 100).toFixed(1);
-                const cls = getRiskClass(g.risk);
-                return (
-                  <div key={g.id} className={`alert-queue-item ${cls}`}>
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <p className="text-sm font-bold text-slate-800">{g.name}</p>
-                        <p className="text-[10px] text-slate-400 font-medium">{g.district}</p>
-                      </div>
-                      <span className={`table-risk-badge ${cls}`}>
-                        {g.crowdDensity.toFixed(1)}%
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="progress-bar-container" style={{ flex: 1 }}>
-                        <div
-                          className={`progress-bar-fill ${cls === "safe" ? "bg-safe" : cls === "moderate" ? "bg-warn" : "bg-crit"}`}
-                          style={{ width: `${Math.min(100, g.crowdDensity)}%` }}
-                        />
-                      </div>
-                      <span className="text-[10px] font-mono font-bold text-slate-500">{crowd.toLocaleString()} / {g.capacity.toLocaleString()}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* System Status */}
-          <div className="dashboard-card">
-            <h3 className="card-heading mb-3">System Status</h3>
-            <div className="space-y-2">
-              {[
-                { label: "AI Model Accuracy", value: "97.4%", color: "#059669" },
-                { label: "Inference Latency", value: "38ms", color: "#059669" },
-                { label: "Online Sensors", value: "112", color: "#0F172A" },
-                { label: "Incidents Resolved", value: "18 today", color: "#0F172A" },
-                { label: "Citizen Reports", value: "96 received", color: "#0F172A" },
-              ].map(item => (
-                <div key={item.label} className="flex justify-between items-center py-1.5 border-b border-slate-50 last:border-0">
-                  <span className="text-xs font-medium text-slate-500">{item.label}</span>
-                  <strong className="text-xs font-bold font-mono" style={{ color: item.color }}>{item.value}</strong>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </div>

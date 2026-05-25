@@ -6,6 +6,8 @@ export interface GhatData {
   name: string;
   district: string;
   districtFull: string;
+  lat: number;
+  lng: number;
   occupancy: number;
   capacity: number;
   risk: "safe" | "moderate" | "busy" | "critical";
@@ -31,6 +33,7 @@ export const MONITORED_GHATS: GhatData[] = [
     name: "Dowleswaram Ghat",
     district: "East Godavari",
     districtFull: "East Godavari – Dowleswaram",
+    lat: 16.9426, lng: 81.7867,
     occupancy: 4500, capacity: 8000, risk: "busy", trend: "up",
     camerasCount: 24, crowdDensity: 56.2, lastUpdated: "Just Now",
     inMen: 2500, inWomen: 2300, inOthers: 200,
@@ -43,6 +46,7 @@ export const MONITORED_GHATS: GhatData[] = [
     name: "Goshpada Ghat",
     district: "East Godavari",
     districtFull: "East Godavari – Goshpada",
+    lat: 16.9500, lng: 81.7950,
     occupancy: 2800, capacity: 6500, risk: "moderate", trend: "stable",
     camerasCount: 18, crowdDensity: 43.1, lastUpdated: "Just Now",
     inMen: 1500, inWomen: 1600, inOthers: 100,
@@ -55,6 +59,7 @@ export const MONITORED_GHATS: GhatData[] = [
     name: "Kotipalli Ghat",
     district: "East Godavari",
     districtFull: "East Godavari – Kotipalli",
+    lat: 16.5731, lng: 82.0372,
     occupancy: 1200, capacity: 5000, risk: "safe", trend: "down",
     camerasCount: 12, crowdDensity: 24.0, lastUpdated: "3 mins ago",
     inMen: 800, inWomen: 700, inOthers: 50,
@@ -67,6 +72,7 @@ export const MONITORED_GHATS: GhatData[] = [
     name: "Pushkar Ghat",
     district: "East Godavari",
     districtFull: "East Godavari – Rajamahendravaram",
+    lat: 16.9891, lng: 81.7843,
     occupancy: 7200, capacity: 9000, risk: "busy", trend: "stable",
     camerasCount: 36, crowdDensity: 80.0, lastUpdated: "Just Now",
     inMen: 4200, inWomen: 4000, inOthers: 300,
@@ -80,6 +86,7 @@ export const MONITORED_GHATS: GhatData[] = [
     name: "Kovvur Ghat",
     district: "West Godavari",
     districtFull: "West Godavari – Kovvur",
+    lat: 17.0156, lng: 81.7297,
     occupancy: 4800, capacity: 7500, risk: "busy", trend: "up",
     camerasCount: 22, crowdDensity: 64.0, lastUpdated: "Just Now",
     inMen: 2800, inWomen: 2600, inOthers: 150,
@@ -92,6 +99,7 @@ export const MONITORED_GHATS: GhatData[] = [
     name: "Narasapuram Ghat",
     district: "West Godavari",
     districtFull: "West Godavari – Narasapuram",
+    lat: 16.4344, lng: 81.6940,
     occupancy: 1500, capacity: 6000, risk: "safe", trend: "stable",
     camerasCount: 14, crowdDensity: 25.0, lastUpdated: "Just Now",
     inMen: 1000, inWomen: 900, inOthers: 50,
@@ -104,6 +112,7 @@ export const MONITORED_GHATS: GhatData[] = [
     name: "Pattiseema Ghat",
     district: "West Godavari",
     districtFull: "West Godavari – Pattiseema",
+    lat: 16.9883, lng: 81.6147,
     occupancy: 5400, capacity: 7000, risk: "busy", trend: "up",
     camerasCount: 28, crowdDensity: 77.1, lastUpdated: "3 mins ago",
     inMen: 3200, inWomen: 3000, inOthers: 100,
@@ -116,6 +125,7 @@ export const MONITORED_GHATS: GhatData[] = [
     name: "Siddhantam Ghat",
     district: "West Godavari",
     districtFull: "West Godavari – Siddhantam",
+    lat: 17.0200, lng: 81.7100,
     occupancy: 1100, capacity: 5500, risk: "safe", trend: "down",
     camerasCount: 10, crowdDensity: 20.0, lastUpdated: "Just Now",
     inMen: 700, inWomen: 600, inOthers: 50,
@@ -129,6 +139,7 @@ export const MONITORED_GHATS: GhatData[] = [
     name: "Bhadrachalam Main Ghat",
     district: "Khammam",
     districtFull: "Khammam – Bhadrachalam",
+    lat: 17.6688, lng: 80.8936,
     occupancy: 5920, capacity: 7500, risk: "busy", trend: "up",
     camerasCount: 34, crowdDensity: 78.9, lastUpdated: "2 mins ago",
     inMen: 3500, inWomen: 3200, inOthers: 150,
@@ -141,6 +152,7 @@ export const MONITORED_GHATS: GhatData[] = [
     name: "Edugurallapalli Ghat",
     district: "Khammam",
     districtFull: "Khammam – Edugurallapalli",
+    lat: 17.6500, lng: 80.8800,
     occupancy: 950, capacity: 5000, risk: "safe", trend: "stable",
     camerasCount: 8, crowdDensity: 19.0, lastUpdated: "Just Now",
     inMen: 600, inWomen: 550, inOthers: 30,
@@ -153,6 +165,7 @@ export const MONITORED_GHATS: GhatData[] = [
     name: "Koonavaram Ghat",
     district: "Khammam",
     districtFull: "Khammam – Koonavaram",
+    lat: 17.6000, lng: 80.9500,
     occupancy: 2100, capacity: 6000, risk: "moderate", trend: "stable",
     camerasCount: 16, crowdDensity: 35.0, lastUpdated: "5 mins ago",
     inMen: 1200, inWomen: 1100, inOthers: 100,
@@ -165,6 +178,7 @@ export const MONITORED_GHATS: GhatData[] = [
     name: "Seetharama Ghat",
     district: "Khammam",
     districtFull: "Khammam – Seetharama",
+    lat: 17.6300, lng: 80.8700,
     occupancy: 5100, capacity: 7000, risk: "busy", trend: "up",
     camerasCount: 24, crowdDensity: 72.9, lastUpdated: "Just Now",
     inMen: 3000, inWomen: 2800, inOthers: 100,
