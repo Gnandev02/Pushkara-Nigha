@@ -271,9 +271,9 @@
 .risk-level-badge.busy { background: #FFF0E6; color: #EA580C; border: 1.5px solid #EA580C; }
 .risk-level-badge.crit { background: #FCE8E6; color: #C5221F; border: 1.5px solid #C5221F; animation: critPulse 1.5s ease-in-out infinite; }
 
-.zone-badge.zone-safe { background: #E6F4EA; color: #137333; border-color: #137333; }
-.zone-badge.zone-warn { background: #FEF7E0; color: #B06000; border-color: #B06000; }
-.zone-badge.zone-crit { background: #FCE8E6; color: #C5221F; border-color: #C5221F; }
+.zone-badge.zone-safe { background: #10B981; color: #FFFFFF; border-color: #059669; box-shadow: 0 2px 4px rgba(16,185,129,0.25); }
+.zone-badge.zone-warn { background: #F59E0B; color: #FFFFFF; border-color: #D97706; box-shadow: 0 2px 4px rgba(245,158,11,0.25); }
+.zone-badge.zone-crit { background: #EF4444; color: #FFFFFF; border-color: #DC2626; box-shadow: 0 2px 4px rgba(239,68,68,0.25); }
 
 /* ── Ghat card zone classes ── */
 .ghat-monitor-card { 
@@ -407,10 +407,10 @@
   border-radius: 4px;
   text-transform: uppercase;
 }
-.table-risk-badge.safe { background: rgba(16,185,129,0.12); color: #047857; }
-.table-risk-badge.moderate { background: rgba(217,119,6,0.1); color: #B45309; }
-.table-risk-badge.busy { background: rgba(234,88,12,0.1); color: #C2410C; }
-.table-risk-badge.critical { background: rgba(220,38,38,0.1); color: #B91C1C; }
+.table-risk-badge.safe { background: #10B981; color: #FFFFFF; border: 1px solid #059669; }
+.table-risk-badge.moderate { background: #F59E0B; color: #FFFFFF; border: 1px solid #D97706; }
+.table-risk-badge.busy { background: #F97316; color: #FFFFFF; border: 1px solid #EA580C; }
+.table-risk-badge.critical { background: #EF4444; color: #FFFFFF; border: 1px solid #DC2626; }
 
 /* ── Table live status badge ── */
 .table-live-status {
@@ -447,10 +447,10 @@
   cursor: pointer;
 }
 .heatmap-block:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-.heatmap-block.safe { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25); }
-.heatmap-block.moderate { background: rgba(217,119,6,0.1); border: 1px solid rgba(217,119,6,0.25); }
-.heatmap-block.busy { background: rgba(234,88,12,0.1); border: 1px solid rgba(234,88,12,0.25); }
-.heatmap-block.critical { background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.25); }
+.heatmap-block.safe { background: #FFFFFF; border: 1px solid #E2E8F0; border-left: 4px solid #10B981; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+.heatmap-block.moderate { background: #FFFFFF; border: 1px solid #E2E8F0; border-left: 4px solid #F59E0B; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+.heatmap-block.busy { background: #FFFFFF; border: 1px solid #E2E8F0; border-left: 4px solid #F97316; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+.heatmap-block.critical { background: #FFFFFF; border: 1px solid #E2E8F0; border-left: 4px solid #EF4444; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
 .heatmap-block-name { font-size: 11px; font-weight: 500; color: #334155; }
 .heatmap-block-pct { font-size: 16px; font-weight: 500; color: #334155; font-family: 'Inter', monospace; }
 .heatmap-pulse-dot {
