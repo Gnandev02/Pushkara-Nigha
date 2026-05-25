@@ -97,19 +97,20 @@ const MAP_THEME_STYLE = [
 
 
 const GHAT_GEOLOCATIONS = {
-    "ghat-dowleswaram": { lat: 16.940, lng: 81.782 },
-    "ghat-goshpada": { lat: 17.005, lng: 81.721 },
-    "ghat-kotipalli": { lat: 16.698, lng: 82.046 },
-    "ghat-pushkar": { lat: 17.000, lng: 81.776 },
-    "ghat-kovvur": { lat: 17.018, lng: 81.728 },
-    "ghat-narasapuram": { lat: 16.438, lng: 81.700 },
-    "ghat-pattiseema": { lat: 17.155, lng: 81.605 },
-    "ghat-siddhantam": { lat: 16.732, lng: 81.784 },
+    "ghat-antarvedi": { lat: 16.326, lng: 81.728 },
     "ghat-bhadrachalam": { lat: 17.670, lng: 80.887 },
-    "ghat-edugurallapalli": { lat: 17.755, lng: 80.932 },
-    "ghat-koonavaram": { lat: 17.585, lng: 81.258 },
-    "ghat-seetharama": { lat: 17.662, lng: 80.895 }
+    "ghat-pushkar": { lat: 17.000, lng: 81.776 },
+    "ghat-pattiseema": { lat: 17.155, lng: 81.605 },
+    "ghat-dharmapuri": { lat: 18.950, lng: 79.088 }
 };
+
+const REQUESTED_GHATS = [
+    { id: "ghat-antarvedi", name: "Antarvedi Confluence Ghat", district: "Konaseema - Antarvedi", risk: "safe", occupancy: 2500, capacity: 8000 },
+    { id: "ghat-bhadrachalam", name: "Bhadrachalam Main Ghat", district: "Bhadradri Kothagudem - Bhadrachalam", risk: "busy", occupancy: 6500, capacity: 8000 },
+    { id: "ghat-pushkar", name: "Pushkar Ghat", district: "East Godavari - Rajamahendravaram", risk: "critical", occupancy: 9500, capacity: 9000 },
+    { id: "ghat-pattiseema", name: "Pattiseema Ghat", district: "Eluru - Pattiseema", risk: "busy", occupancy: 5200, capacity: 7000 },
+    { id: "ghat-dharmapuri", name: "Dharmapuri Lakshmi Narasimha Ghat", district: "Jagtial - Dharmapuri", risk: "moderate", occupancy: 4200, capacity: 7000 }
+];
 
 
 window.initMap = function() {
@@ -146,10 +147,7 @@ function renderGoogleMapMarkers() {
     mapMarkers.forEach(m => m.setMap(null));
     mapMarkers = [];
 
-    const db = window.SmartCityTelemetry;
-    if (!db || !db.MONITORED_GHATS) return;
-
-    db.MONITORED_GHATS.forEach(ghat => {
+    REQUESTED_GHATS.forEach(ghat => {
         const coords = GHAT_GEOLOCATIONS[ghat.id];
         if (!coords) return;
 

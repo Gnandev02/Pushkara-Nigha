@@ -40,6 +40,8 @@ function RadialRing({ pct }) {
 
 // ── CCTV Panel ───────────────────────────────────────────────
 function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload }) {
+  const [videoSrc, setVideoSrc] = useState(null);
+  
   const fields = type === "in"
     ? ["inMen", "inWomen", "inOthers"]
     : ["outMen", "outWomen", "outOthers"];
@@ -47,7 +49,18 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload }) {
 
   return (
     <div>
-      <div className="cctv-screen mb-2">
+      <div className="cctv-screen mb-2 group relative">
+        {videoSrc && (
+          <div className="absolute inset-0 z-0 overflow-hidden rounded-[6px]">
+            <video
+              src={videoSrc}
+              autoPlay
+              loop
+              muted
+              className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105 group-hover:brightness-110"
+            />
+          </div>
+        )}
         <div className="cctv-scanline" />
         <div className="cctv-moving-line" />
         <div className="cctv-hud-top">
@@ -57,23 +70,40 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload }) {
           </span>
           <span className="cctv-cam-id">{camId}</span>
         </div>
-        <div className="flex-1" style={{ minHeight: 40 }} />
-        <div className="text-[8px] font-mono text-[#2DD4BF]/50 select-none">
+        <div className="flex-1 relative z-10" style={{ minHeight: 40 }} />
+        <div className="text-[8px] font-mono text-[#2DD4BF]/50 select-none relative z-10">
           AI DETECT: ON | REC
         </div>
         
         {/* Hover Upload Overlay */}
-        <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 backdrop-blur-sm">
+        <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20 backdrop-blur-sm rounded-[6px]">
           <label className="cursor-pointer bg-[#0D9488] hover:bg-[#0F766E] text-white px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2 shadow-lg border border-[#0D9488]/50">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            UPLOAD FEED
-            <input type="file" className="hidden" accept="video/*" onChange={(e) => {
-              if (e.target.files && e.target.files.length > 0 && onUpload) {
-                onUpload(e.target.files[0], ghatId, camId, type);
+            {videoSrc ? "CHANGE FEED" : "UPLOAD FEED"}
+            <input type="file" className="hidden" accept="video/mp4,video/webm,video/quicktime" onChange={(e) => {
+              if (e.target.files && e.target.files.length > 0) {
+                const file = e.target.files[0];
+                if (videoSrc) URL.revokeObjectURL(videoSrc);
+                setVideoSrc(URL.createObjectURL(file));
+                if (onUpload) {
+                  onUpload(file, ghatId, camId, type);
+                }
               }
               e.target.value = ''; // Reset input
             }} />
           </label>
+          {videoSrc && (
+            <button
+              type="button"
+              onClick={() => {
+                URL.revokeObjectURL(videoSrc);
+                setVideoSrc(null);
+              }}
+              className="bg-red-500/20 hover:bg-red-500/40 text-red-500 hover:text-red-400 px-3 py-1.5 rounded-md text-[10px] font-bold transition-colors border border-red-500/30"
+            >
+              REMOVE FEED
+            </button>
+          )}
         </div>
       </div>
       <div className="cctv-inputs-panel">
