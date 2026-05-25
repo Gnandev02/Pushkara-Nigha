@@ -6,24 +6,29 @@
    PUSHKARA NIGHA — GOVERNMENT SURVEILLANCE MONITORING THEME
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @layer base {
   body {
     background-color: #F4F6F9;
-    color: #1E293B; /* High-contrast slate */
+    color: #0F172A; /* High-contrast crisp dark slate text */
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
     line-height: 1.5;
-    font-weight: 400; /* Body 400 */
+    font-weight: 400; /* Regular Inter (400) */
   }
   h1, h2, h3, h4, h5, h6, .gov-header-title, .card-heading {
     font-family: 'Inter', sans-serif;
-    font-weight: 600; /* Primary headings 600 */
-    color: #0F172A; /* Crisp dark administrative slate */
-    letter-spacing: -0.02em; /* Tight operational spacing */
+    font-weight: 700; /* Inter Bold (700) for a premium administrative dashboard feel */
+    color: #0F172A; /* Deepest contrast */
+    letter-spacing: -0.025em; /* Tight operational spacing */
+  }
+  
+  .gov-header-subtitle {
+    font-weight: 600; /* Inter SemiBold (600) */
+    letter-spacing: 0.1em;
   }
 }
 

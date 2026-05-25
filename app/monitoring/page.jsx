@@ -165,7 +165,7 @@ function GhatCard({ ghat, state, onChange, onUpload, dbCameras }) {
         <div className="flex items-start gap-3">
           <RadialRing pct={pct} />
           <div>
-            <h3 className="text-base font-semibold text-slate-900 leading-tight">{ghat.name}</h3>
+            <h3 className="text-base font-bold text-slate-900 leading-tight">{ghat.name}</h3>
             <span className="text-[11px] text-slate-400 font-medium">{ghat.districtFull}</span>
           </div>
         </div>
@@ -261,7 +261,7 @@ function DistrictGroup({ district, ghats, states, onChange, onUpload, collapsed,
     <section className={`area-group-section ${collapsed ? "collapsed" : ""}`}>
       <div className="area-section-header" onClick={onToggle}>
         <div className="flex items-center gap-4">
-          <h3 className="text-sm font-semibold text-slate-900">{district} District</h3>
+          <h3 className="text-sm font-bold text-slate-900">{district} District</h3>
           <div className="flex items-center gap-3 text-[11px] text-slate-500">
             <div className="area-stat-chip">
               <Layers style={{ width: 13, height: 13 }} />
