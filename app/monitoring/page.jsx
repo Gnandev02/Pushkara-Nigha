@@ -8,8 +8,8 @@ function initState() {
   const state = {};
   MONITORED_GHATS.forEach(g => {
     state[g.id] = {
-      inMen: g.inMen, inWomen: g.inWomen, inOthers: g.inOthers,
-      outMen: g.outMen, outWomen: g.outWomen, outOthers: g.outOthers,
+      inMen: 0, inWomen: 0, inOthers: 0,
+      outMen: 0, outWomen: 0, outOthers: 0,
       capacity: g.capacity,
     };
   });
@@ -124,30 +124,6 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, init
   const fields = type === "in"
     ? ["inMen", "inWomen", "inOthers"]
     : ["outMen", "outWomen", "outOthers"];
-
-  // --- Real-time AI Simulation for Vercel ---
-  // Since the Python backend can't be reached from Vercel's browser client, 
-  // this seamlessly simulates the AI detection flow when a video is active.
-  useEffect(() => {
-    if (!videoSrc) return;
-
-    const timer = setTimeout(() => {
-      // 85% chance to detect a person crossing to make the flow look realistic
-      if (Math.random() > 0.15) {
-        // Distribution: 45% Men, 45% Women, 10% Others
-        const rand = Math.random();
-        const fieldIdx = rand < 0.45 ? 0 : (rand < 0.9 ? 1 : 2);
-        const fieldToUpdate = fields[fieldIdx];
-        
-        // Add 1 to 2 people per detection event
-        const increment = Math.floor(Math.random() * 2) + 1;
-        
-        onChange(ghatId, fieldToUpdate, state[fieldToUpdate] + increment);
-      }
-    }, 1500 + Math.random() * 2500); // Trigger every 1.5s to 4s
-
-    return () => clearTimeout(timer);
-  }, [videoSrc, state, fields, ghatId, onChange]);
 
   const labels = ["Men", "Women", "Others"];
 
@@ -437,9 +413,9 @@ export default function MonitoringPage() {
                   const f = camIn.genderBreakdown.female || 0;
                   const u = camIn.genderBreakdown.unknown || 0;
                   
-                  if (m > 0 && updates.inMen !== m) { updates.inMen = m; modified = true; }
-                  if (f > 0 && updates.inWomen !== f) { updates.inWomen = f; modified = true; }
-                  if (u > 0 && updates.inOthers !== u) { updates.inOthers = u; modified = true; }
+                  if (updates.inMen !== m) { updates.inMen = m; modified = true; }
+                  if (updates.inWomen !== f) { updates.inWomen = f; modified = true; }
+                  if (updates.inOthers !== u) { updates.inOthers = u; modified = true; }
                 }
                 
                 if (camOut && camOut.genderBreakdown) {
@@ -447,9 +423,9 @@ export default function MonitoringPage() {
                   const f = camOut.genderBreakdown.female || 0;
                   const u = camOut.genderBreakdown.unknown || 0;
                   
-                  if (m > 0 && updates.outMen !== m) { updates.outMen = m; modified = true; }
-                  if (f > 0 && updates.outWomen !== f) { updates.outWomen = f; modified = true; }
-                  if (u > 0 && updates.outOthers !== u) { updates.outOthers = u; modified = true; }
+                  if (updates.outMen !== m) { updates.outMen = m; modified = true; }
+                  if (updates.outWomen !== f) { updates.outWomen = f; modified = true; }
+                  if (updates.outOthers !== u) { updates.outOthers = u; modified = true; }
                 }
                 
                 if (modified) {
