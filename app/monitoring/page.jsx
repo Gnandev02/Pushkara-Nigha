@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { MONITORED_GHATS, getZoneLabel, getRiskLabel } from "@/lib/ghats-data";
 import { Search, MapPin, Activity, Users, RotateCcw, Layers, ChevronDown, AlertTriangle } from "lucide-react";
 
@@ -103,6 +103,19 @@ function RadialRing({ pct }) {
 // ── CCTV Panel ───────────────────────────────────────────────
 function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, initialVideoSrc }) {
   const [videoSrc, setVideoSrc] = useState(null);
+  const containerRef = useRef(null);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      if (containerRef.current) {
+        containerRef.current.requestFullscreen().catch(err => {
+          console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+        });
+      }
+    } else {
+      document.exitFullscreen();
+    }
+  };
   
   // Sync local IndexedDB or initial props
   useEffect(() => {
@@ -167,7 +180,7 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, init
 
   return (
     <div>
-      <div className="cctv-screen mb-2 group relative">
+      <div ref={containerRef} className="cctv-screen mb-2 group relative bg-black">
         {videoSrc && (
           <div className="absolute inset-0 z-0 overflow-hidden rounded-[6px]">
             <video
@@ -246,19 +259,30 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, init
             </div>
           </div>
         )}
-        <div className="cctv-scanline" />
-        <div className="cctv-moving-line" />
-        <div className="cctv-hud-top">
+        <div className="cctv-scanline pointer-events-none" />
+        <div className="cctv-moving-line pointer-events-none" />
+        <div className="cctv-hud-top pointer-events-none">
           <span className="cctv-live-tag">
             <span className="cctv-live-dot" />
             {type === "in" ? "LIVE IN" : "LIVE OUT"}
           </span>
           <span className="cctv-cam-id">{camId}</span>
         </div>
-        <div className="flex-1 relative z-10" style={{ minHeight: 40 }} />
-        <div className="text-[8px] font-mono text-[#2DD4BF]/50 select-none relative z-10">
+        <div className="flex-1 relative z-10 pointer-events-none" style={{ minHeight: 40 }} />
+        <div className="text-[8px] font-mono text-[#2DD4BF]/50 select-none relative z-10 pointer-events-none">
           AI DETECT: ON | REC
         </div>
+        
+        {/* Fullscreen Button */}
+        {videoSrc && (
+          <button 
+            onClick={toggleFullscreen}
+            className="absolute top-2 right-2 bg-black/60 p-1.5 rounded-md text-white/80 hover:text-white hover:bg-black/80 z-30 opacity-0 group-hover:opacity-100 transition-opacity border border-white/20 shadow-lg backdrop-blur-sm"
+            title="Enlarge Camera"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+          </button>
+        )}
         
         {/* Hover Upload Overlay */}
         <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20 backdrop-blur-sm rounded-[6px]">
