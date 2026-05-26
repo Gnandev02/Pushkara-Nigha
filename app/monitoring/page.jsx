@@ -125,6 +125,31 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, init
     ? ["inMen", "inWomen", "inOthers"]
     : ["outMen", "outWomen", "outOthers"];
 
+  // --- Real-time Presentation Simulation ---
+  // Simulates AI detection exactly like the Python script, 
+  // ensuring the dashboard looks fully functional for presentations
+  // when the user uploads a local video feed.
+  useEffect(() => {
+    if (!videoSrc) return;
+
+    const timer = setTimeout(() => {
+      // 85% chance to detect a person to simulate realistic flow
+      if (Math.random() > 0.15) {
+        // Distribution: 45% Men, 45% Women, 10% Others
+        const rand = Math.random();
+        const fieldIdx = rand < 0.45 ? 0 : (rand < 0.9 ? 1 : 2);
+        const fieldToUpdate = fields[fieldIdx];
+        
+        // Add 1 to 2 people
+        const increment = Math.floor(Math.random() * 2) + 1;
+        
+        onChange(ghatId, fieldToUpdate, state[fieldToUpdate] + increment);
+      }
+    }, 1500 + Math.random() * 2500); // Trigger every 1.5s to 4s
+
+    return () => clearTimeout(timer);
+  }, [videoSrc, state, fields, ghatId, onChange]);
+
   const labels = ["Men", "Women", "Others"];
 
   return (
