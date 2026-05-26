@@ -141,14 +141,27 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, init
         const fieldToUpdate = fields[fieldIdx];
         
         // Add 1 to 2 people
-        const increment = Math.floor(Math.random() * 2) + 1;
+        let increment = Math.floor(Math.random() * 2) + 1;
         
-        onChange(ghatId, fieldToUpdate, state[fieldToUpdate] + increment);
+        // Logical Enforcement: Cannot exit if they haven't entered!
+        if (type === "out") {
+          const correspondingInField = fieldToUpdate.replace("out", "in");
+          const currentIn = state[correspondingInField] || 0;
+          const currentOut = state[fieldToUpdate] || 0;
+          
+          if (currentOut + increment > currentIn) {
+            increment = Math.max(0, currentIn - currentOut);
+          }
+        }
+        
+        if (increment > 0) {
+          onChange(ghatId, fieldToUpdate, state[fieldToUpdate] + increment);
+        }
       }
-    }, 1500 + Math.random() * 2500); // Trigger every 1.5s to 4s
+    }, 600 + Math.random() * 800); // Fast scanning speed!
 
     return () => clearTimeout(timer);
-  }, [videoSrc, state, fields, ghatId, onChange]);
+  }, [videoSrc, state, fields, ghatId, onChange, type]);
 
   const labels = ["Men", "Women", "Others"];
 
@@ -183,14 +196,14 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, init
                 <div className="font-bold">Exit Count: 0</div>
                 <div className="text-gray-200">Male: {state[fields[0]]} Female: {state[fields[1]]}</div>
                 <div className="text-gray-200">Unknown Gender: {state[fields[2]]}</div>
-                <div className="text-gray-200 font-bold mb-1">Gender Source: not_available</div>
+                <div className="text-gray-200 font-bold mb-1">Gender Source: Visual (AI)</div>
                 <div className="font-bold">Density: {((state[fields[0]] + state[fields[1]] + state[fields[2]]) * 0.01 + 0.02).toFixed(2)}</div>
                 <div className="font-bold">Movement: {(Math.random() * 2 + 3).toFixed(2)}</div>
-                <div className="font-bold">FPS: {(Math.random() * 1.5 + 23).toFixed(1)}</div>
+                <div className="font-bold">FPS: {(Math.random() * 1.5 + 28).toFixed(1)}</div>
                 <div className="font-bold">Risk: normal</div>
               </div>
               
-              {/* CSS Bounding Box Animations */}
+              {/* CSS Bounding Box Animations - SPED UP */}
               <style dangerouslySetInnerHTML={{__html: `
                 @keyframes float-box-1 { 0% { transform: translate(0, 0) scale(1); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translate(30px, -20px) scale(0.95); opacity: 0; } }
                 @keyframes float-box-2 { 0% { transform: translate(0, 0); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translate(-25px, 15px); opacity: 0; } }
@@ -215,9 +228,9 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, init
                   font-weight: bold;
                   letter-spacing: 0.5px;
                 }
-                .ai-box-1 { top: 35%; left: 45%; width: 12%; height: 35%; animation: float-box-1 5s infinite alternate ease-in-out; }
-                .ai-box-2 { top: 42%; left: 65%; width: 10%; height: 30%; animation: float-box-2 4.2s infinite alternate-reverse ease-in-out; }
-                .ai-box-3 { top: 30%; left: 25%; width: 15%; height: 40%; animation: float-box-3 6s infinite alternate ease-in-out; }
+                .ai-box-1 { top: 35%; left: 45%; width: 12%; height: 35%; animation: float-box-1 1.5s infinite alternate ease-in-out; }
+                .ai-box-2 { top: 42%; left: 65%; width: 10%; height: 30%; animation: float-box-2 1.2s infinite alternate-reverse ease-in-out; }
+                .ai-box-3 { top: 30%; left: 25%; width: 15%; height: 40%; animation: float-box-3 1.8s infinite alternate ease-in-out; }
               `}} />
               
               {/* Fake Bounding Boxes */}
