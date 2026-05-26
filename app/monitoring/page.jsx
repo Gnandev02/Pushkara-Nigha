@@ -379,16 +379,58 @@ export default function MonitoringPage() {
   const [dbCameras, setDbCameras] = useState({});
 
   useEffect(() => {
-    fetch("/api/cameras")
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.cameras) {
-          const camMap = {};
-          data.cameras.forEach(c => camMap[c.cameraId] = c);
-          setDbCameras(camMap);
-        }
-      })
-      .catch(console.error);
+    const fetchCameraData = () => {
+      fetch("/api/cameras", { cache: "no-store" })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.cameras) {
+            const camMap = {};
+            data.cameras.forEach(c => camMap[c.cameraId] = c);
+            setDbCameras(camMap);
+
+            // Automatically link backend AI detection to the frontend state
+            setStates(prev => {
+              const nextState = { ...prev };
+              let hasChanges = false;
+              
+              MONITORED_GHATS.forEach(g => {
+                const camIn = camMap[g.camInId];
+                const camOut = camMap[g.camOutId];
+                const curr = nextState[g.id];
+                
+                if (!curr) return;
+                
+                const updates = { ...curr };
+                let modified = false;
+                
+                if (camIn && camIn.genderBreakdown) {
+                  if (updates.inMen !== camIn.genderBreakdown.male) { updates.inMen = camIn.genderBreakdown.male; modified = true; }
+                  if (updates.inWomen !== camIn.genderBreakdown.female) { updates.inWomen = camIn.genderBreakdown.female; modified = true; }
+                  if (updates.inOthers !== camIn.genderBreakdown.unknown) { updates.inOthers = camIn.genderBreakdown.unknown; modified = true; }
+                }
+                
+                if (camOut && camOut.genderBreakdown) {
+                  if (updates.outMen !== camOut.genderBreakdown.male) { updates.outMen = camOut.genderBreakdown.male; modified = true; }
+                  if (updates.outWomen !== camOut.genderBreakdown.female) { updates.outWomen = camOut.genderBreakdown.female; modified = true; }
+                  if (updates.outOthers !== camOut.genderBreakdown.unknown) { updates.outOthers = camOut.genderBreakdown.unknown; modified = true; }
+                }
+                
+                if (modified) {
+                  nextState[g.id] = updates;
+                  hasChanges = true;
+                }
+              });
+              
+              return hasChanges ? nextState : prev;
+            });
+          }
+        })
+        .catch(console.error);
+    };
+
+    fetchCameraData();
+    const interval = setInterval(fetchCameraData, 3000); // Poll every 3 seconds for live AI detection
+    return () => clearInterval(interval);
   }, []);
 
   const handleChange = useCallback((ghatId, field, value) => {
