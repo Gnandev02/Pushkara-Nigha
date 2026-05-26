@@ -104,6 +104,7 @@ function RadialRing({ pct }) {
 function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, initialVideoSrc }) {
   const [videoSrc, setVideoSrc] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showBoxes, setShowBoxes] = useState(true);
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -256,15 +257,19 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, init
               `}} />
               
               {/* Fake Bounding Boxes */}
-              <div className="ai-box ai-box-1">
-                <div className="ai-box-label">ID:14 0.92</div>
-              </div>
-              <div className="ai-box ai-box-2">
-                <div className="ai-box-label">ID:8 0.84</div>
-              </div>
-              <div className="ai-box ai-box-3 border-[#00ff00]">
-                <div className="ai-box-label bg-[#000080]">ID:42 0.77</div>
-              </div>
+              {showBoxes && (
+                <>
+                  <div className="ai-box ai-box-1">
+                    <div className="ai-box-label">ID:14 0.92</div>
+                  </div>
+                  <div className="ai-box ai-box-2">
+                    <div className="ai-box-label">ID:8 0.84</div>
+                  </div>
+                  <div className="ai-box ai-box-3 border-[#00ff00]">
+                    <div className="ai-box-label bg-[#000080]">ID:42 0.77</div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -329,7 +334,18 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, init
         )}
       </div>
       <div className="cctv-inputs-panel">
-        <h4 className="input-panel-title">{title}</h4>
+        <div className="flex justify-between items-center mb-2">
+          <h4 className="input-panel-title !mb-0">{title}</h4>
+          <label className="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-500 hover:text-slate-700 select-none">
+            <input 
+              type="checkbox" 
+              className="accent-[#0D9488]"
+              checked={showBoxes} 
+              onChange={(e) => setShowBoxes(e.target.checked)} 
+            />
+            SHOW BOXES
+          </label>
+        </div>
         <div className="input-controls-row">
           {fields.map((field, i) => (
             <div key={field} className="counter-control">
