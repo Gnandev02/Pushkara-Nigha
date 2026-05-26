@@ -77,17 +77,6 @@ async function deleteVideoLocally(camId) {
   }
 }
 
-function initState() {
-  const state = {};
-  MONITORED_GHATS.forEach(g => {
-    state[g.id] = {
-      inMen: g.inMen, inWomen: g.inWomen, inOthers: g.inOthers,
-      outMen: g.outMen, outWomen: g.outWomen, outOthers: g.outOthers,
-      capacity: g.capacity,
-    };
-  });
-  return state;
-}
 
 // ── Radial SVG Ring ──────────────────────────────────────────
 function RadialRing({ pct }) {
