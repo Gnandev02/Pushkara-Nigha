@@ -8,12 +8,23 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  username  String   @unique
+  id        String     @id @default(cuid())
+  name      String
   password  String
-  email     String   @unique
-  role      String   @default("operator") // admin, operator
-  createdAt DateTime @default(now())
+  email     String     @unique
+  role      String     @default("operator") // admin, operator
+  approved  Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  loginLogs LoginLog[]
+}
+
+model LoginLog {
+  id          String   @id @default(cuid())
+  userId      String
+  loginTime   DateTime @default(now())
+  ipAddress   String?
+  deviceInfo  String?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Camera {
