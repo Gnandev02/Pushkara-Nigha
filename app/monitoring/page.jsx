@@ -16,6 +16,79 @@ function initState() {
   return state;
 }
 
+// ── IndexedDB Local Video Store ──────────────────────────────
+const DB_NAME = "PushkaraCCTVStore";
+const STORE_NAME = "videos";
+
+async function openDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onupgradeneeded = (e) => {
+      e.target.result.createObjectStore(STORE_NAME);
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function saveVideoLocally(camId, file) {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readwrite");
+      const store = tx.objectStore(STORE_NAME);
+      store.put(file, camId);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (err) {
+    console.error("Local save failed", err);
+  }
+}
+
+async function getVideoLocally(camId) {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readonly");
+      const store = tx.objectStore(STORE_NAME);
+      const request = store.get(camId);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  } catch (err) {
+    console.error("Local load failed", err);
+    return null;
+  }
+}
+
+async function deleteVideoLocally(camId) {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readwrite");
+      const store = tx.objectStore(STORE_NAME);
+      store.delete(camId);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (err) {
+    console.error("Local delete failed", err);
+  }
+}
+
+function initState() {
+  const state = {};
+  MONITORED_GHATS.forEach(g => {
+    state[g.id] = {
+      inMen: g.inMen, inWomen: g.inWomen, inOthers: g.inOthers,
+      outMen: g.outMen, outWomen: g.outWomen, outOthers: g.outOthers,
+      capacity: g.capacity,
+    };
+  });
+  return state;
+}
+
 // ── Radial SVG Ring ──────────────────────────────────────────
 function RadialRing({ pct }) {
   const CIRC = 119.38;
@@ -40,12 +113,24 @@ function RadialRing({ pct }) {
 
 // ── CCTV Panel ───────────────────────────────────────────────
 function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, initialVideoSrc }) {
-  const [videoSrc, setVideoSrc] = useState(initialVideoSrc || null);
+  const [videoSrc, setVideoSrc] = useState(null);
   
-  // Sync if initial props change after fetch
+  // Sync local IndexedDB or initial props
   useEffect(() => {
-    if (initialVideoSrc && !videoSrc) setVideoSrc(initialVideoSrc);
-  }, [initialVideoSrc, videoSrc]);
+    let objectUrl = null;
+    getVideoLocally(camId).then(file => {
+      if (file) {
+        objectUrl = URL.createObjectURL(file);
+        setVideoSrc(objectUrl);
+      } else if (initialVideoSrc && !videoSrc) {
+        setVideoSrc(initialVideoSrc);
+      }
+    });
+    
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [camId, initialVideoSrc]);
   
   const fields = type === "in"
     ? ["inMen", "inWomen", "inOthers"]
@@ -88,8 +173,9 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, init
             <input type="file" className="hidden" accept="video/mp4,video/webm,video/quicktime" onChange={(e) => {
               if (e.target.files && e.target.files.length > 0) {
                 const file = e.target.files[0];
-                if (videoSrc) URL.revokeObjectURL(videoSrc);
+                // if (videoSrc && videoSrc.startsWith('blob:')) URL.revokeObjectURL(videoSrc);
                 setVideoSrc(URL.createObjectURL(file));
+                saveVideoLocally(camId, file);
                 if (onUpload) {
                   onUpload(file, ghatId, camId, type);
                 }
@@ -101,8 +187,9 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, init
             <button
               type="button"
               onClick={() => {
-                URL.revokeObjectURL(videoSrc);
+                if (videoSrc && videoSrc.startsWith('blob:')) URL.revokeObjectURL(videoSrc);
                 setVideoSrc(null);
+                deleteVideoLocally(camId);
               }}
               className="bg-red-500/20 hover:bg-red-500/40 text-red-500 hover:text-red-400 px-3 py-1.5 rounded-md text-[10px] font-bold transition-colors border border-red-500/30"
             >
