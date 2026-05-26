@@ -103,7 +103,16 @@ function RadialRing({ pct }) {
 // ── CCTV Panel ───────────────────────────────────────────────
 function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, initialVideoSrc }) {
   const [videoSrc, setVideoSrc] = useState(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef(null);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(document.fullscreenElement === containerRef.current);
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -202,7 +211,7 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, init
               <div className="absolute bottom-[20%] left-0 bg-red-500 text-white text-[8px] font-bold px-1 rounded-tr-sm z-10 tracking-wider">EXIT</div>
               
               {/* Black Transparent HUD */}
-              <div className="absolute top-1 left-1 bg-black/60 p-1.5 text-white font-mono text-[9px] leading-[1.3] rounded-sm backdrop-blur-md border border-white/10 z-10 shadow-lg">
+              <div className={`absolute top-1 left-1 bg-black/60 p-1.5 text-white font-mono leading-[1.3] rounded-sm backdrop-blur-md border border-white/10 z-10 shadow-lg ${isFullscreen ? 'text-[14px] p-4 top-4 left-4' : 'text-[9px]'}`}>
                 <div className="font-bold">Visible Count: {state[fields[0]] + state[fields[1]] + state[fields[2]]}</div>
                 <div className="font-bold">Unique People: {(state[fields[0]] + state[fields[1]] + state[fields[2]]) * 2 + 15}</div>
                 <div className="font-bold">Entry Count: {state[fields[0]] + state[fields[1]] + state[fields[2]]}</div>
@@ -261,7 +270,7 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, init
         )}
         <div className="cctv-scanline pointer-events-none" />
         <div className="cctv-moving-line pointer-events-none" />
-        <div className="cctv-hud-top pointer-events-none">
+        <div className={`cctv-hud-top pointer-events-none ${isFullscreen ? 'text-lg p-4' : ''}`}>
           <span className="cctv-live-tag">
             <span className="cctv-live-dot" />
             {type === "in" ? "LIVE IN" : "LIVE OUT"}
@@ -284,8 +293,9 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, init
           </button>
         )}
         
-        {/* Hover Upload Overlay */}
-        <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20 backdrop-blur-sm rounded-[6px]">
+        {/* Hover Upload Overlay - Hidden in Fullscreen */}
+        {!isFullscreen && (
+          <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20 backdrop-blur-sm rounded-[6px]">
           <label className="cursor-pointer bg-[#0D9488] hover:bg-[#0F766E] text-white px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2 shadow-lg border border-[#0D9488]/50">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             {videoSrc ? "CHANGE FEED" : "UPLOAD FEED"}
@@ -316,6 +326,7 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, init
             </button>
           )}
         </div>
+        )}
       </div>
       <div className="cctv-inputs-panel">
         <h4 className="input-panel-title">{title}</h4>
