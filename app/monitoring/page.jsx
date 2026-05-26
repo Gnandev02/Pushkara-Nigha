@@ -500,7 +500,26 @@ function DistrictGroup({ district, ghats, states, onChange, onUpload, collapsed,
 
 // ── Main Monitoring Page ─────────────────────────────────────
 export default function MonitoringPage() {
-  const [states, setStates] = useState(initState);
+  const [states, setStates] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("pushkara_monitoring_state");
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error("Failed to parse saved state", e);
+        }
+      }
+    }
+    return initState();
+  });
+  
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("pushkara_monitoring_state", JSON.stringify(states));
+    }
+  }, [states]);
+
   const [search, setSearch] = useState("");
   const [districtFilter, setDistrictFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
