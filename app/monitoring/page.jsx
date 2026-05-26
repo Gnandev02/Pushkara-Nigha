@@ -500,38 +500,29 @@ function DistrictGroup({ district, ghats, states, onChange, onUpload, collapsed,
 
 // ── Main Monitoring Page ─────────────────────────────────────
 export default function MonitoringPage() {
-  const [states, setStates] = useState(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("pushkara_monitoring_state");
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          // Force sync fresh capacities from codebase in case they were changed
-          MONITORED_GHATS.forEach(g => {
-            if (parsed[g.id]) {
-              parsed[g.id].capacity = g.capacity;
-            } else {
-              parsed[g.id] = {
-                inMen: 0, inWomen: 0, inOthers: 0,
-                outMen: 0, outWomen: 0, outOthers: 0,
-                capacity: g.capacity,
-              };
-            }
-          });
-          return parsed;
-        } catch (e) {
-          console.error("Failed to parse saved state", e);
-        }
+  const [states, setStates] = useState(initState);
+  const [mounted, setMounted] = useState(false);
+
+  // Load from localStorage on mount (fixes Next.js SSR hydration mismatch)
+  useEffect(() => {
+    setMounted(true);
+    const saved = localStorage.getItem("pushkara_monitoring_state");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setStates(parsed);
+      } catch (e) {
+        console.error("Failed to parse saved state", e);
       }
     }
-    return initState();
-  });
+  }, []);
   
+  // Save to localStorage whenever state changes
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (mounted) {
       localStorage.setItem("pushkara_monitoring_state", JSON.stringify(states));
     }
-  }, [states]);
+  }, [states, mounted]);
 
   const [search, setSearch] = useState("");
   const [districtFilter, setDistrictFilter] = useState("all");
