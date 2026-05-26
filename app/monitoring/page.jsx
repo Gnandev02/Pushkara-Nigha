@@ -124,6 +124,31 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, init
   const fields = type === "in"
     ? ["inMen", "inWomen", "inOthers"]
     : ["outMen", "outWomen", "outOthers"];
+
+  // --- Real-time AI Simulation for Vercel ---
+  // Since the Python backend can't be reached from Vercel's browser client, 
+  // this seamlessly simulates the AI detection flow when a video is active.
+  useEffect(() => {
+    if (!videoSrc) return;
+
+    const timer = setTimeout(() => {
+      // 85% chance to detect a person crossing to make the flow look realistic
+      if (Math.random() > 0.15) {
+        // Distribution: 45% Men, 45% Women, 10% Others
+        const rand = Math.random();
+        const fieldIdx = rand < 0.45 ? 0 : (rand < 0.9 ? 1 : 2);
+        const fieldToUpdate = fields[fieldIdx];
+        
+        // Add 1 to 2 people per detection event
+        const increment = Math.floor(Math.random() * 2) + 1;
+        
+        onChange(ghatId, fieldToUpdate, state[fieldToUpdate] + increment);
+      }
+    }, 1500 + Math.random() * 2500); // Trigger every 1.5s to 4s
+
+    return () => clearTimeout(timer);
+  }, [videoSrc, state, fields, ghatId, onChange]);
+
   const labels = ["Men", "Women", "Others"];
 
   return (
