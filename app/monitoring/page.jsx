@@ -343,7 +343,7 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, init
               checked={showBoxes} 
               onChange={(e) => setShowBoxes(e.target.checked)} 
             />
-            SHOW BOXES
+            BOUNDING BOXES
           </label>
         </div>
         <div className="input-controls-row">
