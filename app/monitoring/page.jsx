@@ -164,6 +164,73 @@ function CCTVPanel({ type, camId, title, state, ghatId, onChange, onUpload, init
               muted
               className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105 group-hover:brightness-110"
             />
+            
+            {/* --- AI Visual Simulation Overlay --- */}
+            <div className="absolute inset-0 pointer-events-none transition-opacity duration-300 opacity-80 group-hover:opacity-100">
+              
+              {/* Green Entry & Red Exit Lines */}
+              <div className="absolute left-0 right-0 top-[45%] h-[1px] bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]" />
+              <div className="absolute top-[45%] left-0 bg-green-500 text-white text-[8px] font-bold px-1 rounded-br-sm z-10 tracking-wider">ENTRY</div>
+              
+              <div className="absolute left-0 right-0 bottom-[20%] h-[1px] bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+              <div className="absolute bottom-[20%] left-0 bg-red-500 text-white text-[8px] font-bold px-1 rounded-tr-sm z-10 tracking-wider">EXIT</div>
+              
+              {/* Black Transparent HUD */}
+              <div className="absolute top-1 left-1 bg-black/60 p-1.5 text-white font-mono text-[9px] leading-[1.3] rounded-sm backdrop-blur-md border border-white/10 z-10 shadow-lg">
+                <div className="font-bold">Visible Count: {state[fields[0]] + state[fields[1]] + state[fields[2]]}</div>
+                <div className="font-bold">Unique People: {(state[fields[0]] + state[fields[1]] + state[fields[2]]) * 2 + 15}</div>
+                <div className="font-bold">Entry Count: {state[fields[0]] + state[fields[1]] + state[fields[2]]}</div>
+                <div className="font-bold">Exit Count: 0</div>
+                <div className="text-gray-200">Male: {state[fields[0]]} Female: {state[fields[1]]}</div>
+                <div className="text-gray-200">Unknown Gender: {state[fields[2]]}</div>
+                <div className="text-gray-200 font-bold mb-1">Gender Source: not_available</div>
+                <div className="font-bold">Density: {((state[fields[0]] + state[fields[1]] + state[fields[2]]) * 0.01 + 0.02).toFixed(2)}</div>
+                <div className="font-bold">Movement: {(Math.random() * 2 + 3).toFixed(2)}</div>
+                <div className="font-bold">FPS: {(Math.random() * 1.5 + 23).toFixed(1)}</div>
+                <div className="font-bold">Risk: normal</div>
+              </div>
+              
+              {/* CSS Bounding Box Animations */}
+              <style dangerouslySetInnerHTML={{__html: `
+                @keyframes float-box-1 { 0% { transform: translate(0, 0) scale(1); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translate(30px, -20px) scale(0.95); opacity: 0; } }
+                @keyframes float-box-2 { 0% { transform: translate(0, 0); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translate(-25px, 15px); opacity: 0; } }
+                @keyframes float-box-3 { 0% { transform: translate(0, 0); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translate(40px, 10px); opacity: 0; } }
+                
+                .ai-box {
+                  position: absolute;
+                  border: 1px solid #00ff00;
+                  background: rgba(0,255,0,0.08);
+                  pointer-events: none;
+                }
+                .ai-box-label {
+                  position: absolute;
+                  top: -12px;
+                  left: -1px;
+                  background: #000080;
+                  color: white;
+                  font-size: 8px;
+                  padding: 1px 3px;
+                  font-family: monospace;
+                  white-space: nowrap;
+                  font-weight: bold;
+                  letter-spacing: 0.5px;
+                }
+                .ai-box-1 { top: 35%; left: 45%; width: 12%; height: 35%; animation: float-box-1 5s infinite alternate ease-in-out; }
+                .ai-box-2 { top: 42%; left: 65%; width: 10%; height: 30%; animation: float-box-2 4.2s infinite alternate-reverse ease-in-out; }
+                .ai-box-3 { top: 30%; left: 25%; width: 15%; height: 40%; animation: float-box-3 6s infinite alternate ease-in-out; }
+              `}} />
+              
+              {/* Fake Bounding Boxes */}
+              <div className="ai-box ai-box-1">
+                <div className="ai-box-label">ID:14 0.92</div>
+              </div>
+              <div className="ai-box ai-box-2">
+                <div className="ai-box-label">ID:8 0.84</div>
+              </div>
+              <div className="ai-box ai-box-3 border-[#00ff00]">
+                <div className="ai-box-label bg-[#000080]">ID:42 0.77</div>
+              </div>
+            </div>
           </div>
         )}
         <div className="cctv-scanline" />
