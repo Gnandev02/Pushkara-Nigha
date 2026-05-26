@@ -505,7 +505,20 @@ export default function MonitoringPage() {
       const saved = localStorage.getItem("pushkara_monitoring_state");
       if (saved) {
         try {
-          return JSON.parse(saved);
+          const parsed = JSON.parse(saved);
+          // Force sync fresh capacities from codebase in case they were changed
+          MONITORED_GHATS.forEach(g => {
+            if (parsed[g.id]) {
+              parsed[g.id].capacity = g.capacity;
+            } else {
+              parsed[g.id] = {
+                inMen: 0, inWomen: 0, inOthers: 0,
+                outMen: 0, outWomen: 0, outOthers: 0,
+                capacity: g.capacity,
+              };
+            }
+          });
+          return parsed;
         } catch (e) {
           console.error("Failed to parse saved state", e);
         }
