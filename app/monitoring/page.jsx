@@ -385,17 +385,19 @@ export default function MonitoringPage() {
         .then(data => {
           if (data.success && data.cameras) {
             const camMap = {};
-            data.cameras.forEach(c => camMap[c.cameraId] = c);
+            // Make mapping case-insensitive to ensure linking works regardless of backend formatting
+            data.cameras.forEach(c => {
+              if (c.cameraId) camMap[c.cameraId.toLowerCase()] = c;
+            });
             setDbCameras(camMap);
 
-            // Automatically link backend AI detection to the frontend state
             setStates(prev => {
               const nextState = { ...prev };
               let hasChanges = false;
               
               MONITORED_GHATS.forEach(g => {
-                const camIn = camMap[g.camInId];
-                const camOut = camMap[g.camOutId];
+                const camIn = camMap[g.camInId.toLowerCase()];
+                const camOut = camMap[g.camOutId.toLowerCase()];
                 const curr = nextState[g.id];
                 
                 if (!curr) return;
@@ -403,16 +405,26 @@ export default function MonitoringPage() {
                 const updates = { ...curr };
                 let modified = false;
                 
+                // Only link/update if the backend provides valid detected counts (>0)
+                // This prevents wiping out manual baseline inputs when the AI starts
                 if (camIn && camIn.genderBreakdown) {
-                  if (updates.inMen !== camIn.genderBreakdown.male) { updates.inMen = camIn.genderBreakdown.male; modified = true; }
-                  if (updates.inWomen !== camIn.genderBreakdown.female) { updates.inWomen = camIn.genderBreakdown.female; modified = true; }
-                  if (updates.inOthers !== camIn.genderBreakdown.unknown) { updates.inOthers = camIn.genderBreakdown.unknown; modified = true; }
+                  const m = camIn.genderBreakdown.male || 0;
+                  const f = camIn.genderBreakdown.female || 0;
+                  const u = camIn.genderBreakdown.unknown || 0;
+                  
+                  if (m > 0 && updates.inMen !== m) { updates.inMen = m; modified = true; }
+                  if (f > 0 && updates.inWomen !== f) { updates.inWomen = f; modified = true; }
+                  if (u > 0 && updates.inOthers !== u) { updates.inOthers = u; modified = true; }
                 }
                 
                 if (camOut && camOut.genderBreakdown) {
-                  if (updates.outMen !== camOut.genderBreakdown.male) { updates.outMen = camOut.genderBreakdown.male; modified = true; }
-                  if (updates.outWomen !== camOut.genderBreakdown.female) { updates.outWomen = camOut.genderBreakdown.female; modified = true; }
-                  if (updates.outOthers !== camOut.genderBreakdown.unknown) { updates.outOthers = camOut.genderBreakdown.unknown; modified = true; }
+                  const m = camOut.genderBreakdown.male || 0;
+                  const f = camOut.genderBreakdown.female || 0;
+                  const u = camOut.genderBreakdown.unknown || 0;
+                  
+                  if (m > 0 && updates.outMen !== m) { updates.outMen = m; modified = true; }
+                  if (f > 0 && updates.outWomen !== f) { updates.outWomen = f; modified = true; }
+                  if (u > 0 && updates.outOthers !== u) { updates.outOthers = u; modified = true; }
                 }
                 
                 if (modified) {
@@ -429,7 +441,7 @@ export default function MonitoringPage() {
     };
 
     fetchCameraData();
-    const interval = setInterval(fetchCameraData, 3000); // Poll every 3 seconds for live AI detection
+    const interval = setInterval(fetchCameraData, 3000);
     return () => clearInterval(interval);
   }, []);
 
