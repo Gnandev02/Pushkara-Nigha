@@ -33,8 +33,10 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (res.ok && data.success) {
+        localStorage.setItem("pushkara_is_auth", "true");
         localStorage.setItem("pushkara_user_name", data.user.name);
         localStorage.setItem("pushkara_user_role", data.user.role);
+        localStorage.setItem("pushkara_user_email", data.user.email);
         router.push("/");
       } else {
         setError(data.error || "Authentication failed. Unauthorized access.");
