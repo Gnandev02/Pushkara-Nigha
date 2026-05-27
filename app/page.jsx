@@ -29,29 +29,66 @@ export default function OverviewPage() {
   const { analytics, summary, alerts } = useSocket();
   const [now, setNow] = useState(() => new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true }));
   const timerRef = useRef(null);
+  
+  // Sync with manual inputs from the Monitoring page
+  const [monitoringState, setMonitoringState] = useState(null);
 
   useEffect(() => {
+    // Initial load
+    const saved = localStorage.getItem("pushkara_monitoring_state");
+    if (saved) {
+      try {
+        setMonitoringState(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to parse monitoring state", e);
+      }
+    }
+
+    // Listen for cross-tab updates (e.g. if user is editing in Monitoring tab)
+    const handleStorageChange = (e) => {
+      if (e.key === "pushkara_monitoring_state" && e.newValue) {
+        setMonitoringState(JSON.parse(e.newValue));
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+
     timerRef.current = setInterval(() => {
       setNow(new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true }));
     }, 30000);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+    return () => { 
+      if (timerRef.current) clearInterval(timerRef.current); 
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
-  // Get live ghats data merged with real-time socket/API telemetry
+  // Get live ghats data merged with real-time socket/API telemetry and manual inputs
   const liveGhats = MONITORED_GHATS.map(g => {
     const liveIn = analytics && analytics[g.camInId];
     const liveOut = analytics && analytics[g.camOutId];
+    const monState = monitoringState && monitoringState[g.id];
 
-    const inMen = liveIn ? liveIn.maleCount : g.inMen;
-    const inWomen = liveIn ? liveIn.femaleCount : g.inWomen;
-    const inOthers = liveIn ? liveIn.unknownGender : g.inOthers;
+    // Priority:
+    // 1. Live AI backend feed (if > 0, to avoid blanking out during resets)
+    // 2. Manual inputs from Monitoring page (monState)
+    // 3. Fallback mock data from ghats-data.ts (g)
+    const getVal = (liveData, monVal, fallbackVal, field) => {
+      if (liveData && liveData[field] > 0) return liveData[field];
+      if (monState !== undefined && monVal !== undefined) return monVal;
+      return fallbackVal;
+    };
 
-    const outMen = liveOut ? liveOut.maleCount : g.outMen;
-    const outWomen = liveOut ? liveOut.femaleCount : g.outWomen;
-    const outOthers = liveOut ? liveOut.unknownGender : g.outOthers;
+    const inMen = getVal(liveIn, monState?.inMen, g.inMen, 'maleCount');
+    const inWomen = getVal(liveIn, monState?.inWomen, g.inWomen, 'femaleCount');
+    const inOthers = getVal(liveIn, monState?.inOthers, g.inOthers, 'unknownGender');
+
+    const outMen = getVal(liveOut, monState?.outMen, g.outMen, 'maleCount');
+    const outWomen = getVal(liveOut, monState?.outWomen, g.outWomen, 'femaleCount');
+    const outOthers = getVal(liveOut, monState?.outOthers, g.outOthers, 'unknownGender');
+
+    const capacity = monState?.capacity || g.capacity;
 
     const crowd = Math.max(0, (inMen + inWomen + inOthers) - (outMen + outWomen + outOthers));
-    const crowdDensity = g.capacity > 0 ? (crowd / g.capacity) * 100 : 0;
+    const crowdDensity = capacity > 0 ? (crowd / capacity) * 100 : 0;
 
     let risk = g.risk;
     if (liveIn || liveOut) {
