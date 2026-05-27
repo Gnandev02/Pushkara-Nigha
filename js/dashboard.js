@@ -385,40 +385,18 @@ function initDashboardModule() {
         clearInterval(window.dashboardIntervalId);
     }
     window.dashboardIntervalId = setInterval(() => {
-        
-        const randomIndex = Math.floor(Math.random() * db.MONITORED_GHATS.length);
-        const targetGhat = db.MONITORED_GHATS[randomIndex];
-
-        
-        const fluctuationPercent = (Math.random() * 6 - 3) / 100; 
-        const delta = Math.floor(targetGhat.occupancy * fluctuationPercent);
-        targetGhat.occupancy = Math.max(200, Math.min(targetGhat.capacity, targetGhat.occupancy + delta));
-        targetGhat.crowdDensity = (targetGhat.occupancy / targetGhat.capacity) * 100;
-
-        
-        if (targetGhat.crowdDensity >= 88.0) {
-            targetGhat.risk = "critical";
-            targetGhat.safetyStatus = "CRITICAL LIMIT EXCEEDED. Dispatch SWAT!";
-        } else if (targetGhat.crowdDensity >= 75.0) {
-            targetGhat.risk = "busy";
-            targetGhat.safetyStatus = "Heavy density. Diverting pathway streams.";
-        } else if (targetGhat.crowdDensity >= 50.0) {
-            targetGhat.risk = "moderate";
-            targetGhat.safetyStatus = "Steady volume. Continuous scan active.";
-        } else {
-            targetGhat.risk = "safe";
-            targetGhat.safetyStatus = "Nominal clearing bounds.";
-        }
-
+        // Random fluctuation logic has been removed so that dashboard matches monitoring page exactly.
+        // The loop will now just re-render UI components based on the actual telemetry data.
         
         renderKPIs(db.SYSTEM_STATUS, db.MONITORED_GHATS);
         renderMapHotspots(db.MONITORED_GHATS);
         renderAlertQueue(db.MONITORED_GHATS);
         updateOverviewDashboard();
         
-        
-        if (targetGhat.id === selectedGhatId) {
-            filterCCTVFeedsByGhat(targetGhat);
+        // Update CCTV feed info for the selected ghat to ensure UI is in sync
+        const selectedGhat = db.MONITORED_GHATS.find(g => g.id === selectedGhatId);
+        if (selectedGhat) {
+            filterCCTVFeedsByGhat(selectedGhat);
         }
 
         
@@ -451,7 +429,7 @@ function initDashboardModule() {
         }
 
         // Save fluctuations to localStorage to persist state
-        localStorage.setItem("pushkara_nigha_telemetry", JSON.stringify(db));
+        // localStorage.setItem("pushkara_nigha_telemetry", JSON.stringify(db));
 
     }, 6000);
 
