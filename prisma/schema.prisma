@@ -38,6 +38,7 @@ model Camera {
   updatedAt DateTime @updatedAt
   analytics Analytics[]
   alerts    Alert[]
+  videoBlob VideoBlob?
 }
 
 model Analytics {
@@ -68,4 +69,13 @@ model GlobalState {
   id        String   @id @default("singleton")
   stateData Json
   updatedAt DateTime @updatedAt
+}
+
+model VideoBlob {
+  id        String   @id @default(cuid())
+  cameraId  String   @unique
+  mimeType  String
+  data      Bytes
+  updatedAt DateTime @updatedAt
+  camera    Camera   @relation(fields: [cameraId], references: [cameraId], onDelete: Cascade)
 }
