@@ -34,7 +34,7 @@ export default function OverviewPage() {
   const [monitoringState, setMonitoringState] = useState(null);
 
   useEffect(() => {
-    // Initial load
+    // Initial load from local storage for instant UI
     const saved = localStorage.getItem("pushkara_monitoring_state");
     if (saved) {
       try {
@@ -43,6 +43,20 @@ export default function OverviewPage() {
         console.error("Failed to parse monitoring state", e);
       }
     }
+
+    // Fetch actual global state from API to ensure cross-device sync
+    const fetchGlobalState = () => {
+      fetch("/api/state")
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.state) {
+            setMonitoringState(data.state);
+            localStorage.setItem("pushkara_monitoring_state", JSON.stringify(data.state));
+          }
+        })
+        .catch(console.error);
+    };
+    fetchGlobalState();
 
     // Listen for cross-tab updates (e.g. if user is editing in Monitoring tab)
     const handleStorageChange = (e) => {
@@ -54,6 +68,7 @@ export default function OverviewPage() {
 
     timerRef.current = setInterval(() => {
       setNow(new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true }));
+      fetchGlobalState(); // Keep overview in sync with other devices every 30s
     }, 30000);
     return () => { 
       if (timerRef.current) clearInterval(timerRef.current); 

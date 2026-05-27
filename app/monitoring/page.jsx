@@ -428,8 +428,8 @@ function GhatCard({ ghat, state, onChange, onUpload, dbCameras }) {
 
       {/* CCTV Grid */}
       <div className="monitor-cctv-grid">
-        <CCTVPanel type="in" camId={ghat.camInId} title="Entry counters" state={state} ghatId={ghat.id} onChange={onChange} onUpload={onUpload} initialVideoSrc={dbCameras[ghat.camInId]?.rtspUrl} />
-        <CCTVPanel type="out" camId={ghat.camOutId} title="Exit counters" state={state} ghatId={ghat.id} onChange={onChange} onUpload={onUpload} initialVideoSrc={dbCameras[ghat.camOutId]?.rtspUrl} />
+        <CCTVPanel type="in" camId={ghat.camInId} title="Entry counters" state={state} ghatId={ghat.id} onChange={onChange} onUpload={onUpload} initialVideoSrc={dbCameras[ghat.camInId.toLowerCase()]?.rtspUrl} />
+        <CCTVPanel type="out" camId={ghat.camOutId} title="Exit counters" state={state} ghatId={ghat.id} onChange={onChange} onUpload={onUpload} initialVideoSrc={dbCameras[ghat.camOutId.toLowerCase()]?.rtspUrl} />
       </div>
 
       {/* Flow Telemetry */}
@@ -529,22 +529,37 @@ function DistrictGroup({ district, ghats, states, onChange, onUpload, collapsed,
 export default function MonitoringPage() {
   const [states, setStates] = useState(initState);
   const [mounted, setMounted] = useState(false);
+  
+  // Ref for debouncing API syncs
+  const syncTimeoutRef = useRef(null);
 
-  // Load from localStorage on mount (fixes Next.js SSR hydration mismatch)
+  // Load from Global API on mount (cross-device sync)
   useEffect(() => {
     setMounted(true);
+    
+    // First try localStorage for immediate UI render (optimistic)
     const saved = localStorage.getItem("pushkara_monitoring_state");
     if (saved) {
       try {
-        const parsed = JSON.parse(saved);
-        setStates(parsed);
+        setStates(JSON.parse(saved));
       } catch (e) {
-        console.error("Failed to parse saved state", e);
+        console.error("Failed to parse local state", e);
       }
     }
+
+    // Then fetch actual global state from API
+    fetch("/api/state")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.state) {
+          setStates(data.state);
+          localStorage.setItem("pushkara_monitoring_state", JSON.stringify(data.state));
+        }
+      })
+      .catch(console.error);
   }, []);
   
-  // Save to localStorage whenever state changes
+  // Save to localStorage immediately when state changes for fast UI
   useEffect(() => {
     if (mounted) {
       localStorage.setItem("pushkara_monitoring_state", JSON.stringify(states));
@@ -626,7 +641,21 @@ export default function MonitoringPage() {
   }, []);
 
   const handleChange = useCallback((ghatId, field, value) => {
-    setStates(prev => ({ ...prev, [ghatId]: { ...prev[ghatId], [field]: value } }));
+    setStates(prev => {
+      const nextStates = { ...prev, [ghatId]: { ...prev[ghatId], [field]: value } };
+      
+      // Debounce the backend API sync to prevent spamming the database
+      if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+      syncTimeoutRef.current = setTimeout(() => {
+        fetch("/api/state", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(nextStates),
+        }).catch(err => console.error("Failed to sync global state:", err));
+      }, 1000);
+      
+      return nextStates;
+    });
   }, []);
 
   const handleUpload = useCallback(async (file, ghatId, camId, type) => {

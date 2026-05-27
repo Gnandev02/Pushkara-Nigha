@@ -63,3 +63,9 @@ model Alert {
   resolved    Boolean  @default(false)
   camera      Camera   @relation(fields: [cameraId], references: [cameraId], onDelete: Cascade)
 }
+
+model GlobalState {
+  id        String   @id @default("singleton")
+  stateData Json
+  updatedAt DateTime @updatedAt
+}
