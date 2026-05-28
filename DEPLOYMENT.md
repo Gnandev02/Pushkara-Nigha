@@ -1,115 +1,104 @@
-# 🚀 Production Deployment & AI Setup Guide
+# 🚀 NeuralCrowd AI Platform
 
-This guide details the steps required to deploy the **AI Crowd Analytics Platform** to Vercel and Neon PostgreSQL, as well as configure and run the Python AI pipeline on a GPU/local server.
+> **Production-Grade AI Crowd Analytics Platform**
 
----
+NeuralCrowd AI Platform is a real-time, comprehensive crowd analytics and safety monitoring solution. It combines a high-performance Next.js web application with a standalone Python AI pipeline. The AI pipeline analyzes video feeds (CCTV, webcams, RTSP streams) using computer vision models (like YOLOv8) to track crowd density, identify stampede risks, and extract demographic data. This telemetry is instantly transmitted to the Next.js dashboard, providing actionable, real-time insights through interactive charts, maps, and alerts.
 
-## 1. Prerequisites
+## ✨ Key Features
 
-Ensure you have the following installed on your machine:
-* **Node.js (v18.x or later)**
-* **Python (3.8 - 3.11)** (Note: YOLOv8 supports up to Python 3.11)
-* **Git**
+* **Real-time Analytics Dashboard:** Built with Next.js 14 and Recharts for live, interactive data visualization.
+* **AI Computer Vision Pipeline:** Integrates seamlessly with an external Python/YOLOv8 pipeline processing RTSP, MP4, or live camera feeds.
+* **Instantaneous Socket.IO Updates:** Pushes analytics and alerts directly to browser clients in real-time—no page refreshes required.
+* **Stampede & Risk Detection:** Triggers automated alerts based on crowd density thresholds and movement anomalies.
+* **Modern & Responsive UI:** Styled with Tailwind CSS and animated with Framer Motion for a premium user experience.
+* **Robust Data Persistence:** Utilizes Prisma ORM with Neon serverless PostgreSQL for scalable, reliable data storage.
+* **Geolocation & Mapping:** Features interactive camera mapping using the Google Maps API.
 
----
+## 🛠️ Technology Stack
 
-## 2. Database Setup (Neon PostgreSQL)
+* **Frontend:** Next.js 14 (React), Tailwind CSS, Framer Motion, Recharts, Lucide React
+* **Backend:** Node.js, Next.js API Routes, Socket.IO
+* **Database:** PostgreSQL (Neon Serverless), Prisma ORM
+* **External AI Pipeline:** Python, YOLOv8 (Computer Vision)
+* **Storage:** Vercel Blob (for static assets/images)
+* **Maps:** Google Maps API
 
-1. Sign up/Login to [Neon Console](https://neon.tech).
-2. Create a new project (e.g., `neuralcrowd-analytics`).
-3. Under the **Dashboard**, copy your **Connection String** (use the pooled connection string ending in `-pooler` for serverless environments).
-4. Paste it into your `.env` file at the root:
+## 🚀 Getting Started
+
+To get the NeuralCrowd AI Platform up and running, you need to configure both the web application and the accompanying Python AI server.
+
+### 1. Database Configuration (Neon PostgreSQL)
+
+1. Create a new PostgreSQL database (we recommend [Neon](https://neon.tech)).
+2. Copy your connection string (use the pooled connection string ending in `-pooler` if using Neon).
+3. Create a `.env` file in the root of the project and add your database URL:
    ```env
    DATABASE_URL="postgresql://username:password@ep-host-pooler.region.neon.tech/dbname?sslmode=require"
    ```
 
----
+### 2. Local Web Server Setup
 
-## 3. Local Web Server Startup
-
-To run the Next.js 14 Web UI and Socket.IO server:
-
-1. **Install dependencies**:
-   ```powershell
-   npm.cmd install
-   ```
-2. **Push the database schema**:
-   Creates required analytics, camera, and alert tables in Neon PostgreSQL.
-   ```powershell
-   node_modules/prisma/build/index.js db push
-   ```
-3. **Generate Prisma Client**:
-   ```powershell
-   node_modules/prisma/build/index.js generate
-   ```
-4. **Start the server**:
-   Runs the unified Next.js + Socket.IO server on `http://localhost:3000`.
-   ```powershell
-   npm.cmd run dev
+1. **Install Dependencies:**
+   ```bash
+   npm install
    ```
 
----
-
-## 4. Python AI Server Setup
-
-The Python AI pipeline runs separately on your GPU/local machine. It analyzes video feeds (RTSP/Webcam/MP4), calculates crowd metrics, and sends analytics via HTTP POST requests to `http://localhost:3000/api/update`.
-
-### Installation Steps
-
-1. Navigate to your `crowd_analytics` folder:
-   ```powershell
-   cd c:\Users\gnand\OneDrive\Desktop\crowd_analytics\crowd_analytics
+2. **Initialize the Database:**
+   Push the schema to your database to create the necessary tables.
+   ```bash
+   npx prisma db push
+   npx prisma generate
    ```
-2. Install Python dependencies:
-   * **Windows users**:
-     ```powershell
-     pip install -r requirements-windows.txt
-     ```
-   * **General**:
-     ```powershell
-     pip install -r requirements.txt
-     ```
-3. Ensure you have `yolov8m.pt` inside the `models/` directory, or YOLO will automatically download it.
 
-### Launching the AI Stream
+3. **Start the Development Server:**
+   This starts both the Next.js application and the Socket.IO server.
+   ```bash
+   npm run dev
+   ```
+   The application will be available at `http://localhost:3000`.
 
-Run the AI detection loop on a sample video, webcam, or RTSP URL:
+### 3. AI Pipeline Setup
 
-* **Sample Video**:
-  ```powershell
-  python app.py --source videos/test_sample.mp4 --camera-id ghat_1
-  ```
-* **Webcam Feed**:
-  ```powershell
-  python app.py --source 0 --camera-id local_webcam --realtime
-  ```
-* **RTSP Camera Network**:
-  ```powershell
-  python app.py --source "rtsp://admin:password@192.168.1.100:554/h264" --camera-id ghat_entrance
-  ```
+The Python AI engine runs independently on a machine with GPU capabilities. It processes video and sends analytics data to your Next.js server via HTTP POST.
 
----
+*Please ensure you have Python (3.8 - 3.11) installed.*
 
-## 5. Vercel Serverless Deployment
+1. **Navigate to the AI directory** (e.g., `crowd_analytics`):
+   ```bash
+   cd path/to/crowd_analytics
+   ```
 
-Deploying the Next.js frontend and database APIs to Vercel is extremely straightforward:
+2. **Install Python Requirements:**
+   ```bash
+   pip install -r requirements.txt
+   # Or for Windows: pip install -r requirements-windows.txt
+   ```
 
-1. Push your code repository to **GitHub / GitLab / Bitbucket**.
-2. Connect your repository to **Vercel**:
-   * Create a new project on Vercel.
-   * Import your repository.
-3. Configure the following **Environment Variables** in the Vercel dashboard:
-   * `DATABASE_URL` (Your Neon pooled URL)
-   * `NEXT_PUBLIC_API_URL` (Your production Vercel deployment URL, e.g. `https://your-domain.vercel.app`)
-   * `JWT_SECRET` (A secure random string)
-4. Click **Deploy**. Vercel will build the Next.js 14 App Router and expose the endpoints.
+3. **Run the AI Stream:**
+   You can analyze video files, webcams, or live RTSP streams. Examples:
+   ```bash
+   # Analyze a sample video file
+   python app.py --source videos/test_sample.mp4 --camera-id cam_01
 
----
+   # Analyze local webcam
+   python app.py --source 0 --camera-id local_webcam --realtime
 
-## 6. How Real-time Socket.IO Broadcasts Work
+   # Analyze RTSP network camera
+   python app.py --source "rtsp://admin:password@192.168.1.100:554/h264" --camera-id entrance_cam
+   ```
 
-1. **AI loop (`app.py`)** processes camera frames $\rightarrow$ calculates crowd totals, genders, and stampede risks.
-2. **HTTP POST** is triggered to `/api/update` on the Next.js server.
-3. **Database Insertion**: Next.js logs the telemetry into the Neon PostgreSQL DB.
-4. **WebSocket Broadcast**: The Next.js server utilizes `global.io` to emit an immediate broadcast event (`analytics_update`) to all connected browser clients.
-5. **UI Update**: The React dashboard displays the updated crowd metrics, lines, charts, and alarm feeds instantly without page refresh!
+## 🏗️ Architecture & Data Flow
+
+1. **AI Processing (`app.py`):** The Python script analyzes frames, extracting crowd metrics (headcounts, demographics, risk levels).
+2. **Data Ingestion:** The AI pipeline sends HTTP POST requests containing this telemetry to the Next.js API endpoint (`/api/update`).
+3. **Storage:** Next.js persists the telemetry data into the Neon PostgreSQL database using Prisma.
+4. **Real-time Broadcast:** Upon successful database insertion, the Next.js server utilizes `Socket.IO` to broadcast an `analytics_update` event to all connected web clients.
+5. **Dynamic UI:** The React frontend receives the WebSocket event and immediately updates the charts, maps, and alert feeds.
+
+## ☁️ Deployment
+
+For detailed instructions on deploying the application to production environments like Vercel, please refer to the [DEPLOYMENT.md](./DEPLOYMENT.md) guide.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
