@@ -1,20 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Users, Shield, UserPlus, MoreVertical, CheckCircle, Clock } from "lucide-react";
 
-const DEMO_USERS = [
-  { id: 1, name: "Admin Operator", email: "admin@iccc.gov.in", role: "admin", status: "active", lastLogin: "Just now", district: "All Districts" },
-  { id: 2, name: "Ravi Shankar", email: "ravi.s@iccc.gov.in", role: "supervisor", status: "active", lastLogin: "12 mins ago", district: "East Godavari" },
-  { id: 3, name: "Priya Lakshmi", email: "priya.l@iccc.gov.in", role: "supervisor", status: "active", lastLogin: "1 hour ago", district: "West Godavari" },
-  { id: 4, name: "Kiran Babu", email: "kiran.b@iccc.gov.in", role: "supervisor", status: "inactive", lastLogin: "2 days ago", district: "Khammam" },
-  { id: 5, name: "Surya Prakash", email: "surya.p@iccc.gov.in", role: "supervisor", status: "active", lastLogin: "30 mins ago", district: "East Godavari" },
-];
-
 export default function UserManagementPage() {
-  const [users, setUsers] = useState(DEMO_USERS);
+  const [users, setUsers] = useState([]);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", role: "supervisor", district: "East Godavari" });
+
+  useEffect(() => {
+    const saved = localStorage.getItem("app_users");
+    if (saved) {
+      try {
+        setUsers(JSON.parse(saved));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    setIsLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem("app_users", JSON.stringify(users));
+    }
+  }, [users, isLoaded]);
 
   const addUser = (e) => {
     e.preventDefault();
